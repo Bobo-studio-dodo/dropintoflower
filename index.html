@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>遺落成華</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/hotspots.css">
+    <style>
+        .type-char {
+            display: inline;
+            opacity: 0;
+            animation: charFadeIn 0.12s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes charFadeIn {
+            0% { opacity: 0; transform: translateY(1px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        #talk-text.fade-switch {
+            opacity: 0;
+            transform: scale(0.99);
+            transition: opacity 0.08s ease, transform 0.08s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 外層延伸背景 -->
+    <img id="outer-bg" src="images/background1.webp" alt="Outer Background">
+
+    <div id="app-container">
+        <!-- 音訊 -->
+        <audio id="bgm1" src="audio/music1.mp3" loop preload="auto"></audio>
+
+        <!-- 引導提示框 -->
+        <div id="guide-hint-box" class="guide-hint-style"></div>
+
+        <!-- =================== 場景 1: 首頁 (Index) =================== -->
+        <div id="scene-index" class="scene active">
+            <img id="bg-index" class="layer" src="images/background1.webp" alt="Index Background">
+            <div id="danmaku-container"></div>
+            
+            <img id="door-img" class="layer" src="images/btndoor.webp" alt="Door">
+            <img id="name-img" class="layer glowing" src="images/btnname.webp" alt="Name Tag">
+            <img id="logo-layer" class="layer" src="images/logo.webp" alt="Logo">
+
+            <div id="nametag-btn"></div>
+            <div id="door-btn"></div>
+        </div>
+
+        <!-- =================== 場景 2: 大廳 (Main) =================== -->
+        <div id="scene-main" class="scene">
+            <img id="bg-main" class="layer" src="images/background2.webp" alt="Main Background">
+            <img id="reset-img" class="layer" src="images/reset.webp" alt="Reset">
+            <div id="reset-btn" class="hotspot" title="重置回到首頁"></div>
+
+            <img id="time-img" class="layer" src="images/time.webp" alt="Time">
+            <img id="board-img" class="layer" src="images/board.webp" alt="Board">
+            <img id="book-img" class="layer" src="images/book.webp" alt="Book">
+            <img id="window-img" class="layer" src="images/window.webp" alt="Window">
+            <img id="desk-img" class="layer" src="images/desk.webp" alt="Desk">
+            <img id="bed-img" class="layer" src="images/bed.webp" alt="Bed">
+
+            <img id="bird1-img" class="bird-layer" src="images/windbird.webp" alt="Bird 1">
+            <img id="bird2-img" class="bird-layer" src="images/windbird2.webp" alt="Bird 2">
+            <img id="bird3-img" class="bird-layer" src="images/windbird3.webp" alt="Bird 3">
+
+            <div id="hotspot-time" class="hotspot disabled"></div>
+            <div id="hotspot-board" class="hotspot disabled"></div>
+            <div id="hotspot-book" class="hotspot disabled"></div>
+            <div id="hotspot-window" class="hotspot disabled"></div>
+            <div id="hotspot-desk" class="hotspot disabled"></div>
+            <div id="hotspot-bed" class="hotspot disabled"></div>
+        </div>
+
+        <!-- =================== 場景 3: 窗戶 (Window) =================== -->
+        <div id="scene-window" class="scene">
+            <img id="bg-window" class="layer" src="images/windowbackground.webp" alt="Window Background">
+            <img id="window-home-img" class="layer" src="images/home.webp" alt="Home Button">
+            <div id="btn-window-home" class="hotspot btn-home-hitbox" title="返回大廳"></div>
+        </div>
+
+        <!-- =================== 場景 4: 書本 (Book) =================== -->
+        <div id="scene-book" class="scene">
+            <img id="bg-book" class="layer" src="images/bookbackground.webp" alt="Book Background">
+            <img id="btnbook-img" class="layer glowing" src="images/btnbook.webp" alt="Book Cover">
+            <div id="btnbook-hitbox" class="hotspot" title="閱讀書本"></div>
+
+            <img id="coverbook-img" class="layer" src="images/btncoverbook.webp" alt="Cover Flip">
+            <img id="openbook1-img" class="layer book-open-layer" src="images/btnopenbook.webp" alt="Book Page 1">
+            <img id="openbook2-img" class="layer book-open-layer" src="images/btnopenbook2.webp" alt="Book Page 2">
+            <img id="openbook3-img" class="layer book-open-layer" src="images/btnopenbook3.webp" alt="Book Page 3">
+            <img id="mail-img" class="layer" src="images/mail.webp" alt="Mail Envelope">
+
+            <img id="card-inf" class="layer flower-card from-right" src="images/inf.webp" alt="洋甘菊">
+            <img id="card-inl" class="layer flower-card from-left" src="images/inl.webp" alt="桔梗花">
+            <img id="card-inp" class="layer flower-card from-right" src="images/inp.webp" alt="繡球花">
+            <img id="card-inm" class="layer flower-card from-left" src="images/inm.webp" alt="櫻花">
+
+            <img id="book-home-img" class="layer" src="images/home.webp" alt="Home Button">
+            <div id="btn-book-home" class="hotspot btn-home-hitbox" title="返回大廳"></div>
+        </div>
+
+        <!-- =================== 場景 5: 夢境與花園 (Bed) =================== -->
+        <div id="scene-bed" class="scene">
+            <img id="bg-bed" class="layer glowing" src="images/bedbackground.webp" alt="Bed Background">
+            <img id="bg-garden" class="layer" src="images/background3.webp" alt="Garden Background" style="display: none; opacity: 0;">
+            <div id="eye-close-overlay"></div>
+
+            <img id="mail2-img" class="layer" src="images/mail2.webp" alt="Closed Mail" style="pointer-events: auto;">
+            <img id="mail3-img" class="layer" src="images/mail3.webp" alt="Opened Mail" style="pointer-events: auto;">
+            <img id="talk3-img" class="layer" src="images/talk3.webp" alt="Card" style="pointer-events: auto;">
+
+            <div id="theme-select-container">
+                <div id="theme-title">請選擇一個主題</div>
+                <img class="layer" src="images/btnf.webp" alt="友情">
+                <img class="layer" src="images/btnl.webp" alt="愛情">
+                <img class="layer" src="images/btnp.webp" alt="未來規劃">
+                <img class="layer" src="images/btnm.webp" alt="財務管理">
+
+                <!-- 移除了原本包在 div 中的中文字 -->
+                <div id="hitbox-f" class="hotspot theme-hitbox" data-theme="友情"></div>
+                <div id="hitbox-l" class="hotspot theme-hitbox" data-theme="愛情"></div>
+                <div id="hitbox-p" class="hotspot theme-hitbox" data-theme="未來規劃"></div>
+                <div id="hitbox-m" class="hotspot theme-hitbox" data-theme="財務管理"></div>
+            </div>
+        </div>
+
+        <!-- 全域共用對話框 -->
+        <div id="global-talk">
+            <img id="talk-img" class="layer" src="images/talk1.webp" alt="Dialog Box">
+            <div id="talk-text"></div>
+        </div>
+
+        <!-- 輸入名字彈窗（使用純 div 容器，絕不觸發頁面跳轉） -->
+        <div id="input-modal">
+            <div class="modal-box">
+                <h3>請在此寫下你的名字...</h3>
+                <input type="text" id="name-input" maxlength="10" placeholder="請輸入名字" autocomplete="off" enterkeyhint="done">
+                <div id="error-msg" class="error-msg"></div>
+                <button id="btn-submit" type="button">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 記憶體儲存備用容器
+        const memoryStore = {};
+
+        // 安全儲存物件：負責遊戲期間保存資料（Session 級別）
+        const safeStorage = {
+            setItem: (key, val) => {
+                try { sessionStorage.setItem(key, val); } catch(e) {}
+                memoryStore[key] = val;
+            },
+            getItem: (key) => {
+                try { 
+                    return sessionStorage.getItem(key) || memoryStore[key] || null; 
+                } catch(e) { 
+                    return memoryStore[key] || null; 
+                }
+            },
+            clear: () => {
+                try { sessionStorage.clear(); } catch(e) {}
+                try { localStorage.clear(); } catch(e) {}
+                for (let k in memoryStore) delete memoryStore[k];
+            }
+        };
+
+        let isInputFocused = false;
+
+        // 手機與平板適應視窗縮放
+        function autoScaleApp() {
+            if (isInputFocused) return;
+            const app = document.getElementById('app-container');
+            const winWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+            const winHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const scale = Math.min(winWidth / 768, winHeight / 1024);
+            app.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        }
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', autoScaleApp);
+        } else {
+            window.addEventListener('resize', autoScaleApp, { passive: true });
+        }
+        window.addEventListener('orientationchange', () => { setTimeout(autoScaleApp, 200); });
+
+        // 避免雙指拖曳
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+
+        const guideHintBox = document.getElementById('guide-hint-box');
+
+        function showGuideHint(text, positionClass = 'bottom') {
+            if (!text) {
+                guideHintBox.style.display = 'none';
+                return;
+            }
+            guideHintBox.textContent = text;
+            guideHintBox.className = `guide-hint-style ${positionClass}`;
+            guideHintBox.style.display = 'block';
+        }
+
+        // 背景音樂
+        const bgm1 = document.getElementById('bgm1');
+        function playMainBgm() {
+            if (bgm1 && bgm1.paused) {
+                const playPromise = bgm1.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {});
+                }
+            }
+        }
+        document.addEventListener('touchstart', playMainBgm, { once: true, passive: true });
+        document.addEventListener('click', playMainBgm);
+
+        const globalTalk = document.getElementById('global-talk');
+        const talkImg = document.getElementById('talk-img');
+        const talkText = document.getElementById('talk-text');
+
+        let typingTimer = null;
+        let isTyping = false;
+        let onTypeComplete = null;
+        let currentFullText = "";
+
+        // 打字機效果
+        function runTypewriter(text, speed = 42, callback = null) {
+            if (typingTimer) clearTimeout(typingTimer);
+            talkText.classList.remove('fade-switch');
+            talkText.innerHTML = "";
+            isTyping = true;
+            onTypeComplete = callback;
+            currentFullText = text;
+
+            let charIndex = 0;
+
+            function printNextChar() {
+                if (!isTyping) return;
+
+                if (charIndex < text.length) {
+                    const char = text.charAt(charIndex);
+                    const span = document.createElement('span');
+                    span.className = 'type-char';
+                    span.textContent = char;
+                    talkText.appendChild(span);
+
+                    charIndex++;
+                    let pause = speed;
+                    if (['，', '、'].includes(char)) pause = 130;
+                    else if (['。', '！', '？'].includes(char)) pause = 220;
+
+                    typingTimer = setTimeout(printNextChar, pause);
+                } else {
+                    isTyping = false;
+                    typingTimer = null;
+                    if (onTypeComplete) onTypeComplete();
+                }
+            }
+            printNextChar();
+        }
+
+        function completeTypewriterImmediately() {
+            if (typingTimer) clearTimeout(typingTimer);
+            talkText.innerHTML = "";
+            for (let i = 0; i < currentFullText.length; i++) {
+                const span = document.createElement('span');
+                span.textContent = currentFullText.charAt(i);
+                talkText.appendChild(span);
+            }
+            isTyping = false;
+            typingTimer = null;
+            if (onTypeComplete) onTypeComplete();
+        }
+
+        function smoothSwitchDialog(nextCall) {
+            talkText.classList.add('fade-switch');
+            setTimeout(nextCall, 80);
+        }
+
+        const outerBg = document.getElementById('outer-bg');
+
+        function switchScene(sceneId, bgImage = null) {
+            document.querySelectorAll('.scene').forEach(sc => sc.classList.remove('active'));
+            const target = document.getElementById(sceneId);
+            target.classList.add('active');
+            
+            if (bgImage) outerBg.src = bgImage;
+            showGuideHint(null);
+        }
+
+        // 讀取保存的名字
+        const getUserName = () => safeStorage.getItem('user_name') || "你";
+
+        // 首頁彈幕
+        const danmakuContainer = document.getElementById('danmaku-container');
+        const danmakuList = ["再來一次", "如果當時那樣就好了", "不甘心", "要是能重來", "現在這樣都是我的錯"];
+        function spawnDanmaku() {
+            if (!document.getElementById('scene-index').classList.contains('active')) return;
+            const text = danmakuList[Math.floor(Math.random() * danmakuList.length)];
+            const el = document.createElement('div');
+            el.className = 'danmaku-item';
+            el.textContent = text;
+            el.style.top = (Math.floor(Math.random() * 650) + 80) + 'px';
+            danmakuContainer.appendChild(el);
+
+            let startTime = null;
+            const duration = Math.random() * 4000 + 6000;
+            function animateDanmaku(ts) {
+                if (!startTime) startTime = ts;
+                const p = (ts - startTime) / duration;
+                if (p < 1) {
+                    el.style.transform = `translate3d(${768 + (-1068) * p}px, 0, 0)`;
+                    requestAnimationFrame(animateDanmaku);
+                } else {
+                    el.remove();
+                }
+            }
+            requestAnimationFrame(animateDanmaku);
+        }
+        setInterval(spawnDanmaku, 2000);
+        spawnDanmaku();
+
+        const nametagBtn = document.getElementById('nametag-btn');
+        const inputModal = document.getElementById('input-modal');
+        const nameInput = document.getElementById('name-input');
+        const btnSubmit = document.getElementById('btn-submit');
+        const errorMsg = document.getElementById('error-msg');
+        const doorBtn = document.getElementById('door-btn');
+        const doorImg = document.getElementById('door-img');
+        const nameImg = document.getElementById('name-img');
+        const bgIndex = document.getElementById('bg-index');
+        
+        let isDoorUnlocked = false;
+        let isSubmitting = false;
+        let isClickBlocked = false;
+
+        // 頁面初次載入或重新整理時：強制清空所有歷史紀錄，確保重頭開始！
+        window.addEventListener('DOMContentLoaded', () => {
+            safeStorage.clear(); // 清空舊資料
+
+            nametagBtn.textContent = "";
+            nameInput.value = "";
+            nameImg.classList.add('glowing');
+            globalTalk.style.display = 'none';
+            autoScaleApp();
+            showGuideHint("✨ 請點擊門牌寫下姓名，開啟花園旅程", "bottom");
+        });
+
+        nameInput.addEventListener('focus', () => { isInputFocused = true; });
+        nameInput.addEventListener('blur', () => {
+            isInputFocused = false;
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                autoScaleApp();
+            }, 100);
+        });
+
+        function openNameModal(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (isDoorUnlocked || isClickBlocked) return;
+            bgIndex.classList.add('blurred');
+            inputModal.style.display = 'flex';
+            setTimeout(() => nameInput.focus(), 100);
+        }
+        nametagBtn.addEventListener('click', openNameModal);
+
+        function validateInput(text) {
+            text = text.trim();
+            if (!text) return { valid: false, msg: "名字不能為空喔！" };
+            if (/[^一-龥a-zA-Z0-9]/.test(text)) return { valid: false, msg: "請勿包含特殊符號！" };
+            if (/^[一-龥]+$/.test(text) && text.length > 5) return { valid: false, msg: "中文字數最多限制 5 個字" };
+            if (/^[a-zA-Z0-9]+$/.test(text) && text.length > 10) return { valid: false, msg: "英文字數最多限制 10 個字" };
+            return { valid: true, msg: "" };
+        }
+
+        // 提交姓名並進行遊戲內保存
+        function submitName(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (isSubmitting) return;
+
+            const val = nameInput.value.trim();
+            const res = validateInput(val);
+            if (!res.valid) {
+                errorMsg.textContent = res.msg;
+                return;
+            }
+
+            isSubmitting = true;
+            isClickBlocked = true;
+            nameInput.blur();
+
+            // 保存玩家姓名供後續遊戲呼叫
+            safeStorage.setItem('user_name', val);
+            nametagBtn.textContent = val;
+            inputModal.style.display = 'none';
+            bgIndex.classList.remove('blurred');
+
+            setTimeout(() => { 
+                isSubmitting = false; 
+                isClickBlocked = false; 
+            }, 300);
+
+            nameImg.classList.remove('glowing');
+            showGuideHint("✨ 點擊對話框繼續故事", "bottom");
+
+            dialogContext = 'index';
+            currentDialogList = [`${val}你好，請點擊大門進入房間`];
+            currentDialogIndex = 0;
+            talkImg.src = 'images/talk1.webp';
+            globalTalk.style.display = 'block';
+            runTypewriter(currentDialogList[0]);
+        }
+
+        btnSubmit.addEventListener('click', submitName);
+        nameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                submitName(e);
+            }
+        });
+
+        let currentDialogList = [];
+        let currentDialogIndex = 0;
+        let dialogContext = ''; 
+
+        function handleGlobalTalkClick(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            if (isTyping) {
+                completeTypewriterImmediately();
+                return;
+            }
+
+            if (dialogContext === 'index') {
+                globalTalk.style.display = 'none';
+                isDoorUnlocked = true;
+                doorBtn.classList.add('unlocked');
+                doorImg.classList.add('glowing');
+                nametagBtn.style.pointerEvents = 'none';
+                
+                isClickBlocked = true;
+                setTimeout(() => { isClickBlocked = false; }, 350);
+
+                showGuideHint("✨ 請按下大門進入房間", "bottom");
+            } 
+            else if (dialogContext === 'main') {
+                if (currentDialogIndex === 4) {
+                    triggerBirdSequence(() => {
+                        currentDialogIndex = 5;
+                        smoothSwitchDialog(() => runTypewriter(currentDialogList[5]));
+                    });
+                    return;
+                }
+                currentDialogIndex++;
+                if (currentDialogIndex < currentDialogList.length) {
+                    smoothSwitchDialog(() => runTypewriter(currentDialogList[currentDialogIndex]));
+                } else {
+                    globalTalk.style.display = 'none';
+                    document.getElementById('hotspot-window').classList.remove('disabled');
+                    document.getElementById('window-img').classList.add('glowing');
+                    showGuideHint("✨ 請按下窗戶去看看", "bottom");
+                }
+            }
+            else if (dialogContext === 'window') {
+                currentDialogIndex++;
+                if (currentDialogIndex < currentDialogList.length) {
+                    smoothSwitchDialog(() => runTypewriter(currentDialogList[currentDialogIndex]));
+                } else {
+                    globalTalk.style.display = 'none';
+                    document.getElementById('window-home-img').classList.add('glowing');
+                    document.getElementById('btn-window-home').style.display = 'block';
+                    showGuideHint("✨ 點擊左上角返回大廳", "top");
+                }
+            }
+            else if (dialogContext === 'book') {
+                currentDialogIndex++;
+                if (currentDialogIndex < currentDialogList.length) {
+                    handleBookEvents(currentDialogIndex);
+                    smoothSwitchDialog(() => runTypewriter(currentDialogList[currentDialogIndex]));
+                } else {
+                    globalTalk.style.display = 'none';
+                    document.getElementById('book-home-img').classList.add('glowing');
+                    document.getElementById('btn-book-home').style.display = 'block';
+                    showGuideHint("✨ 點擊左上角返回大廳", "top");
+                    // 保存階段紀錄
+                    safeStorage.setItem('story_stage', 'read_book');
+                }
+            }
+            else if (dialogContext === 'bed1') {
+                currentDialogIndex++;
+                if (currentDialogIndex < currentDialogList.length) {
+                    talkImg.src = `images/${currentDialogList[currentDialogIndex].type}`;
+                    
+                    if (currentDialogIndex === currentDialogList.length - 1) {
+                        smoothSwitchDialog(() => {
+                            runTypewriter(currentDialogList[currentDialogIndex].text, 42, () => {
+                                const themeContainer = document.getElementById('theme-select-container');
+                                themeContainer.style.display = 'block';
+                                setTimeout(() => {
+                                    themeContainer.style.opacity = '1';
+                                }, 30);
+                            });
+                        });
+                    } else {
+                        smoothSwitchDialog(() => runTypewriter(currentDialogList[currentDialogIndex].text));
+                    }
+                }
+            }
+            else if (dialogContext === 'bed2') {
+                currentDialogIndex++;
+                if (currentDialogIndex < currentDialogList.length) {
+                    talkImg.src = `images/${currentDialogList[currentDialogIndex].type}`;
+                    smoothSwitchDialog(() => runTypewriter(currentDialogList[currentDialogIndex].text));
+                } else {
+                    globalTalk.style.display = 'none';
+                    showGardenAndMail();
+                }
+            }
+        }
+
+        globalTalk.addEventListener('click', handleGlobalTalkClick);
+
+        let isDoorTransitioning = false;
+
+        function handleDoorClick(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (!isDoorUnlocked || isClickBlocked || isDoorTransitioning) return;
+
+            isDoorTransitioning = true;
+            isDoorUnlocked = false;
+            doorBtn.classList.remove('unlocked');
+            doorImg.classList.remove('glowing');
+            showGuideHint(null);
+
+            // 保存階段紀錄
+            safeStorage.setItem('story_stage', 'stage_1');
+            loadMainScene();
+
+            setTimeout(() => { isDoorTransitioning = false; }, 1000);
+        }
+
+        doorBtn.addEventListener('click', handleDoorClick);
+
+        function loadMainScene() {
+            switchScene('scene-main', 'images/background2.webp');
+            playMainBgm();
+
+            const stage = safeStorage.getItem('story_stage');
+            const windowImg = document.getElementById('window-img');
+            const bookImg = document.getElementById('book-img');
+            const bedImg = document.getElementById('bed-img');
+            const hotspotWindow = document.getElementById('hotspot-window');
+            const hotspotBook = document.getElementById('hotspot-book');
+            const hotspotBed = document.getElementById('hotspot-bed');
+
+            if (stage === 'read_book') {
+                globalTalk.style.display = 'none';
+                windowImg.classList.remove('glowing');
+                hotspotWindow.classList.add('disabled');
+                bookImg.classList.remove('glowing');
+                hotspotBook.classList.add('disabled');
+
+                hotspotBed.classList.remove('disabled');
+                bedImg.classList.add('glowing');
+                showGuideHint("✨ 請按下床鋪準備入睡", "bottom");
+            } else if (stage === 'visited_window') {
+                globalTalk.style.display = 'none';
+                windowImg.classList.remove('glowing');
+                hotspotWindow.classList.add('disabled');
+                bedImg.classList.remove('glowing');
+                hotspotBed.classList.add('disabled');
+
+                hotspotBook.classList.remove('disabled');
+                bookImg.classList.add('glowing');
+                showGuideHint("✨ 請按下書櫃尋找書籍", "bottom");
+            } else {
+                document.getElementById('app-container').classList.add('fade-from-white-anim');
+                hotspotWindow.classList.add('disabled');
+                hotspotBook.classList.add('disabled');
+                hotspotBed.classList.add('disabled');
+
+                currentDialogList = [
+                    "現在是晚上12:10",
+                    "在這個時間點，深夜裡的寂靜被無限放大",
+                    "似乎有些不太容易察覺的情緒正緩緩地流動著",
+                    "開心？憤怒？悲傷？還是焦慮？",
+                    "這模糊不清的感覺...",
+                    "咦..！窗外好像有些什麼，去看看吧！"
+                ];
+                currentDialogIndex = 0;
+                dialogContext = 'main';
+                talkImg.src = 'images/talk2.webp';
+                globalTalk.style.display = 'block';
+                runTypewriter(currentDialogList[0]);
+            }
+        }
+
+        function triggerBirdSequence(cb) {
+            talkText.textContent = "";
+            const b1 = document.getElementById('bird1-img');
+            const b2 = document.getElementById('bird2-img');
+            const b3 = document.getElementById('bird3-img');
+
+            b1.classList.add('bird-anim-1');
+
+            setTimeout(() => {
+                b1.classList.remove('bird-anim-1');
+                b1.style.display = 'none';
+                b2.classList.add('bird-anim-2');
+            }, 200);
+
+            setTimeout(() => {
+                b2.classList.remove('bird-anim-2');
+                b2.style.display = 'none';
+                b3.classList.add('bird-anim-3');
+            }, 420);
+
+            setTimeout(() => {
+                b3.classList.remove('bird-anim-3');
+                b3.style.display = 'none';
+                if (cb) cb();
+            }, 660);
+        }
+
+        document.getElementById('hotspot-window').addEventListener('click', () => {
+            if (document.getElementById('hotspot-window').classList.contains('disabled')) return;
+            switchScene('scene-window', 'images/windowbackground.webp');
+            currentDialogList = [
+                "剛剛好像有什麼東西跑過去...",
+                "跑得太快了吧，怎麼現在連個影子都沒有",
+                "恩...？這個盆栽...似乎已經很久都沒有種東西",
+                "是什麼時候開始忘記這個興趣呢...",
+                "那現在來種點什麼好了",
+                "我想想...之前書櫃好像放了一本有關花卉的書",
+                "去找找看現在適合種什麼吧！"
+            ];
+            currentDialogIndex = 0;
+            dialogContext = 'window';
+            talkImg.src = 'images/talk2.webp';
+            globalTalk.style.display = 'block';
+            runTypewriter(currentDialogList[0]);
+        });
+
+        document.getElementById('btn-window-home').addEventListener('click', () => {
+            safeStorage.setItem('story_stage', 'visited_window');
+            loadMainScene();
+        });
+
+        document.getElementById('hotspot-book').addEventListener('click', () => {
+            if (document.getElementById('hotspot-book').classList.contains('disabled')) return;
+            switchScene('scene-book', 'images/bookbackground.webp');
+            showGuideHint("✨ 請按下書籍開始閱讀", "bottom");
+        });
+
+        const coverbookImg = document.getElementById('coverbook-img');
+        const openbook1 = document.getElementById('openbook1-img');
+        const openbook2 = document.getElementById('openbook2-img');
+        const openbook3 = document.getElementById('openbook3-img');
+        const mailImg = document.getElementById('mail-img');
+        const cards = [document.getElementById('card-inf'), document.getElementById('card-inl'), document.getElementById('card-inp'), document.getElementById('card-inm')];
+
+        document.getElementById('btnbook-hitbox').addEventListener('click', () => {
+            document.getElementById('btnbook-img').style.display = 'none';
+            document.getElementById('btnbook-hitbox').style.display = 'none';
+            coverbookImg.style.display = 'block';
+            showGuideHint(null);
+
+            currentDialogList = [
+                "這個書名...", "讓我看看...", "在每個人的心中，有一座專屬的心靈花園。",
+                "洋甘菊——綻放喜悅、幸福、純粹的友誼與陽光般的正能量；",
+                "桔梗花——守護永恆的愛與真誠不變的情感；",
+                "繡球花——凝聚在一起的希望，擁抱對未來的憧憬；",
+                "櫻花——象徵富裕的財富與生活中取捨的智慧。",
+                "這座心靈花園，只能在入睡時才能看見",
+                "請注意，當遺憾盤踞在心中時", "花園中的萬物將不再綻放",
+                "欸咦！這是...", "是誰要我找他啊...？是剛剛說的夢裡嗎？",
+                "是也到了該要睡覺的時間", "先睡一覺看看怎麼回事吧！"
+            ];
+            currentDialogIndex = 0;
+            dialogContext = 'book';
+            talkImg.src = 'images/talk2.webp';
+            globalTalk.style.display = 'block';
+            runTypewriter(currentDialogList[0]);
+        });
+
+        function handleBookEvents(idx) {
+            cards.forEach(c => { c.classList.remove('active'); c.style.display = 'none'; });
+            if (idx === 1) {
+                coverbookImg.classList.add('open-flip');
+                openbook1.style.display = 'block';
+                openbook1.classList.add('page-flip-in');
+            } else if (idx === 3) showFlowerCard(cards[0]);
+            else if (idx === 4) showFlowerCard(cards[1]);
+            else if (idx === 5) showFlowerCard(cards[2]);
+            else if (idx === 6) showFlowerCard(cards[3]);
+            else if (idx === 7) {
+                openbook1.classList.add('page-flip-out');
+                setTimeout(() => { openbook1.style.display = 'none'; openbook2.style.display = 'block'; openbook2.classList.add('page-flip-in'); }, 400);
+            } else if (idx === 10) {
+                openbook2.classList.add('page-flip-out');
+                setTimeout(() => {
+                    openbook2.style.display = 'none'; openbook3.style.display = 'block'; openbook3.classList.add('page-flip-in');
+                    mailImg.style.display = 'block'; setTimeout(() => mailImg.classList.add('drop-out'), 50);
+                }, 400);
+            }
+        }
+        function showFlowerCard(c) { c.style.display = 'block'; setTimeout(() => c.classList.add('active'), 30); }
+
+        document.getElementById('btn-book-home').addEventListener('click', () => {
+            loadMainScene();
+        });
+
+        document.getElementById('hotspot-bed').addEventListener('click', () => {
+            if (document.getElementById('hotspot-bed').classList.contains('disabled')) return;
+            switchScene('scene-bed', 'images/bedbackground.webp');
+            playMainBgm();
+            showGuideHint("✨ 點擊畫面進入睡眠", "bottom");
+        });
+
+        const bgBed = document.getElementById('bg-bed');
+        bgBed.addEventListener('click', (e) => {
+            e.stopPropagation();
+            bgBed.classList.remove('glowing');
+            bgBed.style.pointerEvents = 'none';
+            document.getElementById('eye-close-overlay').style.opacity = '1';
+            showGuideHint(null);
+
+            setTimeout(() => {
+                bgBed.style.display = 'none';
+                outerBg.style.filter = 'brightness(0)';
+                // 調用前面保存的名字getUserName()
+                currentDialogList = [
+                    { type: 'talk1.webp', text: `你來啦！${getUserName()}` },
+                    { type: 'talk2.webp', text: "你是誰？" },
+                    { type: 'talk1.webp', text: "我是你心靈花園中的管理者" },
+                    { type: 'talk2.webp', text: "為何要找我？" },
+                    { type: 'talk1.webp', text: "因為你的花園...被「遺憾」這個黑暗漩渦占據了" },
+                    { type: 'talk2.webp', text: "...所以剛剛那種不舒服的感受" },
+                    { type: 'talk2.webp', text: "是遺憾嗎..." },
+                    { type: 'talk2.webp', text: "最近的心情...確實被..." }
+                ];
+                currentDialogIndex = 0;
+                dialogContext = 'bed1';
+                talkImg.src = `images/${currentDialogList[0].type}`;
+                globalTalk.style.display = 'block';
+                runTypewriter(currentDialogList[0].text);
+            }, 1200);
+        });
+
+        document.querySelectorAll('.theme-hitbox').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const theme = btn.getAttribute('data-theme');
+                // 保存選擇的主題紀錄
+                safeStorage.setItem('selected_theme', theme);
+
+                const themeContainer = document.getElementById('theme-select-container');
+                themeContainer.style.opacity = '0';
+                setTimeout(() => {
+                    themeContainer.style.display = 'none';
+                }, 300);
+
+                currentDialogList = [
+                    { type: 'talk2.webp', text: `最近的心情...確實被${theme}相關的事情困擾著` },
+                    { type: 'talk1.webp', text: `${getUserName()} 你辛苦了！` },
+                    { type: 'talk1.webp', text: "現在起有我陪著你" },
+                    { type: 'talk1.webp', text: "讓我們一起讓你的心靈花園重新開花，好嗎？" }
+                ];
+                currentDialogIndex = 0;
+                dialogContext = 'bed2';
+                talkImg.src = `images/${currentDialogList[0].type}`;
+                smoothSwitchDialog(() => runTypewriter(currentDialogList[0].text));
+            });
+        });
+
+        function showGardenAndMail() {
+            const bgGarden = document.getElementById('bg-garden');
+            bgGarden.style.display = 'block';
+            outerBg.src = 'images/background3.webp';
+            outerBg.style.opacity = '0.3';
+
+            setTimeout(() => {
+                bgGarden.style.opacity = '1';
+                document.getElementById('eye-close-overlay').style.opacity = '0';
+                const m2 = document.getElementById('mail2-img');
+                m2.style.display = 'block';
+                m2.classList.add('mail-appear-anim');
+                setTimeout(() => document.getElementById('talk3-img').style.display = 'block', 700);
+            }, 300);
+        }
+
+        function openFinalMail(e) {
+            if (e) e.stopPropagation();
+            document.getElementById('talk3-img').style.display = 'none';
+            document.getElementById('mail2-img').style.display = 'none';
+            const m3 = document.getElementById('mail3-img');
+            m3.style.display = 'block';
+            m3.classList.add('mail-open-anim');
+            safeStorage.setItem('story_stage', 'opened_mail');
+        }
+        document.getElementById('talk3-img').addEventListener('click', openFinalMail);
+        document.getElementById('mail2-img').addEventListener('click', openFinalMail);
+
+        // 左上角手動重置按鈕（同樣會清空保存）
+        document.getElementById('reset-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            safeStorage.clear();
+            location.reload();
+        });
+    </script>
+</body>
+</html>
