@@ -13,15 +13,25 @@
   畫面二   window 窗戶 ／ bookshelf 書架 ／ bed 床
            bird1、bird2、bird3 三張鳥影（尺寸與 window.png 完全相同，會重疊在窗戶上依序快速切換）
   畫面三   windowbig 大窗戶 ／ btn-back 返回按鈕
-  畫面四   background4 ／ book-cover 書封面、book-open 書翻開、book-page 書內頁（三張同尺寸，會有翻頁效果）／ flower1 洋甘菊、flower2 桔梗花、flower3 繡球花、flower4 櫻花（滿版，提到時整個畫面角色登場；
+  畫面四   background4 ／ book-cover 書封面、book-open 書翻開、book-page 書內頁（三張同尺寸；換頁時原地中軸旋轉翻面）／ flower1 洋甘菊、flower2 桔梗花、flower3 繡球花、flower4 櫻花（滿版，提到時整個畫面角色登場；
            直式 flowerN.png 1080×1920，橫式 flowerN-wide.png 1920×1080 可省略，沒有橫式就用直式）
-  畫面五   背景直接是黑色 ／ keeper 管理員鳥
+  畫面五   背景直接是黑色 ／ keeper1、keeper2、keeper3 管理員鳥的三個造型（同尺寸，對話時依句子切換）／ remind 提醒框插圖（可省略）
+           write 寫下遺憾的範例圖示（可省略，放在「請在卡片上寫下…」通知框上方）
+           onsite 現場排卡引導圖（可省略，放在通知框上方，讓工作人員快速辨識）
+           flowers-intro 四種花朵與遺憾主題的介紹圖（可省略，顯示在畫面正中間）
+           card-friend、card-love、card-future、card-money、card-other 五張主題卡（友情／愛情／未來規劃／財務管理／其他；
+           直式 6.2×13.3 公分，約 732×1571，工作人員按小按鈕時滿版顯示）
   其他     btn-menu 選單按鈕（可省略）／ talk1、talk2 對話框（可省略）
   貼紙位置與大小：改下方 CSS 的 #plate #door #mail #win #shelf #bed（x、y、w 是占版面的百分比，r 是旋轉角度）。
 -->
 
 <script>
 function imgOk(i){ i.parentElement.classList.remove('empty'); }
+function flOk(i){ i.closest('.fp').classList.remove('empty'); }
+function flErr(i){                 // 橫式版找不到 → 移除橫式來源，改用直式版；直式也沒有才顯示佔位
+  const src = i.parentElement.querySelector('source');
+  if (src) src.remove(); else i.closest('.fp').classList.add('empty');
+}
 function imgMiss(i){
   const p = i.parentElement, f = i.getAttribute('src');
   p.classList.add('empty'); p.dataset.file = f;
@@ -64,16 +74,19 @@ function imgMiss(i){
     width:min(94vw, calc((100svh - var(--top) - var(--talk)) * 0.5556), 560px);
   }
   /* 手機直式 / 平板直式（牆比例 5:9；x、w 是占牆寬的百分比，y 是占牆高的百分比） */
-  #plate{--x:25%;--y:3%; --w:50%;--r:2deg;   --ar:3/2}
+  /* 門牌上名字的位置：--nm-x / --nm-y 是名字中心點（占門牌圖寬、高的百分比），--nm-size 字大小，--nm-r 旋轉 */
+  #plate{--x:25%;--y:3%; --w:50%;--r:2deg;   --ar:3/2; --nm-x:58%;--nm-y:58%;--nm-size:14cqw;--nm-r:0deg}
   #door {--x:3%; --y:23%;--w:62%;--r:-1.5deg;--ar:3/5}
   #mail {--x:60%;--y:52%;--w:38%;--r:3deg;   --ar:4/5}
   #win  {--x:44%;--y:4%; --w:54%;--r:1.5deg; --ar:4/5}
   #shelf{--x:2%; --y:19%;--w:46%;--r:-2deg;  --ar:3/5}
   #bed  {--x:3%; --y:63%;--w:94%;--r:1deg;   --ar:3/2}
-  #bigwin{--x:4%;--y:3%; --w:92%;--r:0deg;   --ar:4/5}
-  #back {--x:24%;--y:76%;--w:52%;--r:0deg;   --ar:3/1}
-  #book {--x:2%; --y:14%;--w:96%;--r:0deg;   --ar:4/3}
-  #back4{--x:24%;--y:76%;--w:52%;--r:0deg;   --ar:3/1}
+  /* 畫面三、四：單張大圖，填滿可用空間（手機貼近底部、電腦置中放大），返回鈕放在上方 */
+  #s3,#s4{position:fixed;inset:var(--top) 0 var(--talk) 0;width:auto;aspect-ratio:auto}
+  #bigwin,#book{left:0;top:0;width:100%;height:100%;--r:0deg;--ar:4/5}
+  #bigwin img{height:100%;object-fit:contain;object-position:center bottom}
+  #back {--x:24%;--y:4%;--w:52%;--r:0deg;   --ar:3/1}
+  #back4{--x:24%;--y:4%;--w:52%;--r:0deg;   --ar:3/1}
   #keeper{--x:10%;--y:22%;--w:80%;--r:0deg;  --ar:1/1}
   /* 電腦 / 平板 / 手機橫放（牆比例 16:10） */
   @media (min-aspect-ratio:1/1){
@@ -86,10 +99,9 @@ function imgMiss(i){
     #win  {--x:56%;--y:4%; --w:26%}
     #shelf{--x:12%;--y:8%; --w:20%}
     #bed  {--x:30%;--y:52%;--w:40%}
-    #bigwin{--x:28%;--y:4%;--w:44%}
-    #back {--x:76%;--y:78%;--w:18%}
-    #book {--x:21%;--y:8%; --w:58%}
-    #back4{--x:76%;--y:82%;--w:18%}
+    #bigwin img,.bk img{object-position:center}
+    #back {--x:79%;--y:78%;--w:18%}
+    #back4{--x:81%;--y:74%;--w:17%}
     #keeper{--x:33%;--y:12%;--w:34%}
   }
 
@@ -111,9 +123,10 @@ function imgMiss(i){
   .sticker.empty img{display:none}
   .sticker.empty .lbl{display:block;font-size:18cqw;color:var(--blue)}
   .sticker.empty::after{content:attr(data-file);position:absolute;left:0;right:0;bottom:5cqw;text-align:center;font-size:7cqw;color:var(--blue)}
-  .nm{position:absolute;inset:0;display:grid;place-items:center;font-size:14cqw;white-space:nowrap;pointer-events:none}
-  .glow{animation:glow 1.8s ease-in-out infinite}
-  @keyframes glow{0%,100%{filter:drop-shadow(0 0 4px var(--cream))}50%{filter:drop-shadow(0 0 2.5cqw #fff)}}
+  .nm{position:absolute;left:var(--nm-x,50%);top:var(--nm-y,50%);transform:translate(-50%,-50%) rotate(var(--nm-r,0deg));
+    font-size:var(--nm-size,14cqw);white-space:nowrap;pointer-events:none}
+  .glow{filter:drop-shadow(0 0 2cqw rgba(255,255,255,.9));animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{50%{scale:1.04}}
   .shake{animation:shake .35s}
   @keyframes shake{25%{transform:rotate(var(--r)) translateX(-6px)}75%{transform:rotate(var(--r)) translateX(6px)}}
 
@@ -143,27 +156,33 @@ function imgMiss(i){
     50%{transform:translate(-1.8cqw,1.4cqw) rotate(-.8deg)}
     75%{transform:translate(1.4cqw,1.2cqw) rotate(.5deg)}}
 
-  /* 畫面四：書本（封面 → 翻開 → 內頁，換頁時舊的一頁翻走）。翻頁轉軸可改 --pivot，例如 50% 50% */
-  #book{aspect-ratio:var(--ar);perspective:1400px}
+  /* 畫面四：書本（封面 → 翻開 → 內頁）。換頁：舊的一頁沿中軸轉到側面消失，新的一頁再從側面轉出來 */
+  #keeper{aspect-ratio:var(--ar);opacity:0;transition:opacity .9s ease-out}   /* 畫面五：管理員鳥淡入 */
+  #keeper.shown{opacity:1}
+  #book{perspective:1600px}
   .bk{position:absolute;inset:0;display:none;z-index:1;backface-visibility:hidden}
   .bk.show{display:block}
-  .bk img{display:block;width:100%;height:100%;object-fit:contain}
+  .bk img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
   .bk .lbl{display:none}
   .bk.empty{border:3px dashed var(--blue);border-radius:14px;background:rgba(241,224,228,.8);place-items:center}
   .bk.empty.show{display:grid}
   .bk.empty img{display:none}
   .bk.empty .lbl{display:block;font-size:12cqw;color:var(--blue)}
   .bk.empty::after{content:attr(data-file);position:absolute;left:0;right:0;bottom:3cqw;text-align:center;font-size:4cqw;color:var(--blue)}
-  .bk.turning{z-index:2;transform-origin:var(--pivot,left center);animation:turn .8s ease-in-out forwards}
-  @keyframes turn{from{transform:rotateY(0);filter:brightness(1)}to{transform:rotateY(-110deg);filter:brightness(.7)}}
+  .bk.flipout{z-index:2;animation:flipout .35s ease-in forwards}
+  .bk.flipin{animation:flipin .35s ease-out .35s both}
+  @keyframes flipout{to{transform:rotateY(-90deg)}}
+  @keyframes flipin{from{transform:rotateY(90deg)}to{transform:rotateY(0)}}
 
-  /* 畫面四：花卉角色登場（滿版 cover，蓋在場景最上方、對話框下方） */
+  /* 畫面四：花卉角色登場（滿版 cover，蓋在場景最上方、對話框下方）。四張圖事先放好並解碼，切換時只是顯示/隱藏，不會閃上一張 */
   #flower{position:fixed;inset:0;z-index:28;pointer-events:none}
+  #flower .fp{position:absolute;inset:0;display:none}
+  #flower .fp.show{display:block}
   #flower img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
   #flower .ph{display:none;position:absolute;inset:0;place-items:center;text-align:center;padding:16px;
     font-size:clamp(22px,3vw + 8px,34px);color:var(--blue);background:rgba(241,224,228,.85);border:3px dashed var(--blue)}
-  #flower.empty img{display:none} #flower.empty .ph{display:grid}
-  #flower.enter{animation:enter .55s cubic-bezier(.2,.9,.3,1.25)}
+  #flower .fp.empty img{display:none} #flower .fp.empty .ph{display:grid}
+  #flower .fp.enter{animation:enter .55s cubic-bezier(.2,.9,.3,1.25)}
   @keyframes enter{from{opacity:0;transform:translateY(8%) scale(.96)}to{opacity:1;transform:none}}
   .popin{animation:popin .6s cubic-bezier(.2,.9,.3,1.2)}
   @keyframes popin{from{scale:.6;opacity:0}to{scale:1;opacity:1}}
@@ -191,11 +210,19 @@ function imgMiss(i){
     font-size:var(--em);line-height:1.7;line-break:strict;
     width:min(92vw,19em);padding:12px 1em 10px;border-radius:26px;display:flex;flex-direction:column;gap:4px;
     border:3px solid var(--blue);background:var(--tb);cursor:pointer;box-shadow:0 6px 0 rgba(120,155,170,.35)}
-  #talk[data-w="1"]{--tb:var(--rose)} #talk[data-w="2"]{--tb:var(--cream)}
+  #talk[data-w="1"]{--tb:var(--blue);color:var(--night)}   /* 鳥（管理員）：藍色底 */
+  #talk[data-w="2"]{--tb:var(--cream)}
   #talk-img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:none;border-radius:inherit}
   #talk.img{background:none;border-color:transparent;box-shadow:none}
   #talk.img #talk-img{display:block}
   #talk-text{position:relative}
+  #talk-note{margin-top:2px;font-size:.8em;line-height:1.5;opacity:.85}
+  #choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  #choices button{flex:1 1 45%;font-size:calc(var(--em) * .85);padding:8px 14px;border-radius:14px;
+    border:2px solid var(--ink);background:var(--cream);color:var(--ink)}
+  #choices button:hover{background:var(--lav)}
+  #choices button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  #talk.menu .ctrl{display:none}
   .ctrl{position:relative;align-self:flex-end;display:flex;gap:8px}
   .ctrl button{font-size:clamp(16px,.6vw + 12px,20px);padding:2px 16px;border-radius:999px;
     border:2px solid var(--blue);background:var(--blush);color:var(--ink)}
@@ -205,7 +232,7 @@ function imgMiss(i){
   .ch.on{opacity:1;transition:opacity .15s}
 
   /* ───── 彈出視窗：輸入名字、領信 ───── */
-  #modal,#claim{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:16px;
+  .ov{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:16px;
     background:rgba(61,83,93,.45);backdrop-filter:blur(3px)}
   .mbox,.cbox{width:min(92vw,480px);padding:28px;border-radius:24px;background:var(--cream);border:3px solid var(--blue);text-align:center}
   .cbox{max-height:92svh;overflow:auto}
@@ -216,6 +243,11 @@ function imgMiss(i){
   .cbox .small{font-size:clamp(19px,.8vw + 14px,23px);color:var(--blue)}
   #claim-close{margin-top:14px;font-size:clamp(21px,.6vw + 16px,25px);padding:10px 28px;border-radius:14px;border:0;background:var(--blue);color:var(--cream)}
   #claim-close:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+  .btns{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:14px}
+  .btns button{flex:1 1 40%;font-size:clamp(21px,.6vw + 16px,25px);padding:10px 18px;border-radius:14px;border:2px solid var(--blue);
+    background:var(--blue);color:var(--cream)}
+  .btns .alt{background:var(--blush);color:var(--ink)}
+  .btns button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
   .mbox h3{margin:0 0 16px;font-size:24px;font-weight:normal}
   .mbox input{width:100%;font:inherit;font-size:22px;text-align:center;padding:10px;border-radius:14px;
     border:2.5px solid var(--rose);background:#fff;color:var(--ink);user-select:text}
@@ -225,8 +257,69 @@ function imgMiss(i){
   #ok:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 
   @media (prefers-reduced-motion:reduce){
-    .glow,.shake,.cue,.popin,#flower.enter,.bk.turning{animation:none} .ch.on{transition:none} .sticker,#curtain{transition:none}
+    .glow,.shake,.cue,.popin,#flower .fp.enter,.bk.flipout,.bk.flipin{animation:none} .ch.on{transition:none} .sticker,#curtain,#keeper{transition:none}
   }
+
+  /* 畫面正中間的兩個選項（畫面五） */
+  #cchoices{position:fixed;inset:0;z-index:31;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;pointer-events:none}
+  #cchoices button{pointer-events:auto;width:min(80vw,16em);font-size:var(--em);padding:12px 20px;border-radius:18px;
+    border:2.5px solid var(--ink);background:var(--cream);color:var(--ink);box-shadow:0 5px 0 rgba(61,83,93,.35)}
+  #cchoices button:hover{background:var(--lav)}
+  #cchoices button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+  .cbox b{font-weight:normal;color:var(--blue)}
+  .cbox .small.warn{color:#a0524a}                       /* 「無法返回」的提醒 */
+  .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:8px 0 4px}
+  .chip{font-size:clamp(20px,.6vw + 15px,24px);padding:6px 16px;border-radius:999px;border:2px solid var(--blue);
+    background:var(--cream);color:var(--ink)}
+  .chip[aria-checked="true"]{background:var(--blue);color:var(--night)}
+  .chip[aria-checked="true"]::before{content:"✓ "}
+  .chip:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+  .btns button:disabled{opacity:.4;cursor:not-allowed}
+  .btns.col{flex-direction:column}
+  .btns.col button{flex:none;width:100%}
+  #w-stuck{background:#7597a5;color:#ffffff;border-color:#7597a5}      /* 我好像寫不太出來... */
+  .btns .rose{background:var(--rose);color:var(--ink);border-color:var(--ink)}
+  .big{display:block;width:100%;margin:10px 0 14px;font-size:clamp(22px,.8vw + 17px,27px);padding:12px 16px;
+    border-radius:16px;border:2.5px solid var(--ink)}
+  .big.rose{background:var(--rose);color:var(--ink)}
+  .big.blue{background:var(--blue);color:var(--night)}
+  .big:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+  /* 現場排卡畫面：畫面旁邊的工作人員小按鈕 */
+  .staff{position:absolute;right:8px;bottom:max(14px,env(safe-area-inset-bottom));width:120px;display:flex;flex-direction:column;
+    align-items:flex-end;gap:4px;font-size:13px;line-height:1.4;text-align:right;color:rgba(247,238,208,.85)}
+  .staff button{font-size:14px;padding:3px 10px;border-radius:10px;border:1.5px solid rgba(247,238,208,.6);
+    background:transparent;color:rgba(247,238,208,.9)}
+
+  /* 主題卡（直式卡片）：完整顯示、盡量放大。手機幾乎滿版，電腦置中 */
+  #cardview{position:fixed;inset:0;z-index:45;background:#0f161a;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #cardview .cv{width:100vw;height:100svh;display:grid;place-items:center}
+  #cardview img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  #cv-ph{text-align:center;color:var(--cream);padding:24px;border:3px dashed var(--cream);border-radius:24px;font-size:clamp(34px,5vw,64px)}
+  #cv-ph small{display:block;font-size:.4em;opacity:.8;margin-top:8px}
+
+  /* 四種花朵介紹：文字有光暈、沒有背景；圖在正中間；選項在下面 */
+  #flowers{flex-direction:column;justify-content:space-between;gap:12px;background:rgba(31,43,49,.88);
+    padding:calc(env(safe-area-inset-top) + 64px) 16px max(20px,env(safe-area-inset-bottom))}
+  #flowers .glow-title{margin:0;text-align:center;font-weight:normal;font-size:clamp(26px,1.2vw + 20px,38px);color:var(--cream);
+    text-shadow:0 0 6px rgba(247,238,208,.9),0 0 18px rgba(247,238,208,.65),0 0 34px rgba(247,238,208,.45)}
+  #flowers .fl-mid{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+  #flowers .fl-mid img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  #flowers .fl-mid .ph{display:none;width:min(80vw,420px);aspect-ratio:4/5;max-height:100%;place-items:center;text-align:center;padding:16px;
+    font-size:clamp(22px,3vw + 8px,32px);color:var(--cream);border:3px dashed var(--cream);border-radius:20px}
+  #flowers .fl-mid.empty img{display:none} #flowers .fl-mid.empty .ph{display:grid}
+  #flowers .btns{width:min(92vw,520px);margin:0}
+
+  /* DEBUG-START：檢查用選單（做完請刪除 CSS、HTML、JS 三處 DEBUG 區塊） */
+  #dbg-btn{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:10px;z-index:60;font-size:16px;padding:4px 12px;
+    border-radius:999px;border:2px dashed #a0524a;background:rgba(247,238,208,.95);color:#a0524a}
+  #dbg{position:fixed;top:calc(env(safe-area-inset-top) + 52px);right:10px;z-index:60;max-width:min(320px,92vw);
+    max-height:calc(100svh - 70px);overflow:auto;display:flex;flex-direction:column;gap:6px;padding:10px;
+    border-radius:14px;border:2px dashed #a0524a;background:rgba(247,238,208,.97)}
+  #dbg .g{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+  #dbg b{font-weight:normal;font-size:16px;color:#a0524a;min-width:3.8em}
+  #dbg button{font-size:15px;padding:3px 10px;border-radius:10px;border:1.5px solid var(--blue);background:var(--blush);color:var(--ink)}
+  /* DEBUG-END */
 </style>
 </head>
 
@@ -298,16 +391,19 @@ function imgMiss(i){
   <!-- 畫面五：入睡（背景純黑） -->
   <div class="wall hid" id="s5">
     <div class="sticker" id="keeper">
-      <img src="images/keeper.png" alt="" onload="imgOk(this)" onerror="imgMiss(this)">
-      <span class="lbl">管理員鳥</span>
+      <div class="bk"><img src="images/keeper1.png" alt="" onload="imgOk(this)" onerror="imgMiss(this)"><span class="lbl">管理員鳥 1</span></div>
+      <div class="bk"><img src="images/keeper2.png" alt="" onload="imgOk(this)" onerror="imgMiss(this)"><span class="lbl">管理員鳥 2</span></div>
+      <div class="bk"><img src="images/keeper3.png" alt="" onload="imgOk(this)" onerror="imgMiss(this)"><span class="lbl">管理員鳥 3</span></div>
     </div>
   </div>
 
 </main>
 
 <div id="flower" class="hid" aria-hidden="true">
-  <img alt="">
-  <div class="ph"></div>
+  <div class="fp"><picture><source media="(min-aspect-ratio: 1/1)" srcset="images/flower1-wide.png"><img src="images/flower1.png" alt="" decoding="async" onload="flOk(this)" onerror="flErr(this)"></picture><div class="ph">洋甘菊（flower1.png）</div></div>
+  <div class="fp"><picture><source media="(min-aspect-ratio: 1/1)" srcset="images/flower2-wide.png"><img src="images/flower2.png" alt="" decoding="async" onload="flOk(this)" onerror="flErr(this)"></picture><div class="ph">桔梗花（flower2.png）</div></div>
+  <div class="fp"><picture><source media="(min-aspect-ratio: 1/1)" srcset="images/flower3-wide.png"><img src="images/flower3.png" alt="" decoding="async" onload="flOk(this)" onerror="flErr(this)"></picture><div class="ph">繡球花（flower3.png）</div></div>
+  <div class="fp"><picture><source media="(min-aspect-ratio: 1/1)" srcset="images/flower4-wide.png"><img src="images/flower4.png" alt="" decoding="async" onload="flOk(this)" onerror="flErr(this)"></picture><div class="ph">櫻花（flower4.png）</div></div>
 </div>
 <div id="curtain"></div>
 
@@ -320,16 +416,20 @@ function imgMiss(i){
   <button type="button" id="reset">重新開始</button>
 </nav>
 
+<div id="cchoices" class="hid"></div>
+
 <div id="talk" class="hid" data-w="2">
   <img id="talk-img" alt="">
   <div id="talk-text"></div>
+  <div id="talk-note" class="hid"></div>
+  <div id="choices" class="hid"></div>
   <div class="ctrl">
     <button type="button" id="prev">‹ 上一句</button>
     <button type="button" id="next">下一句 ›</button>
   </div>
 </div>
 
-<div id="modal" class="hid">
+<div id="modal" class="ov hid">
   <div class="mbox">
     <h3>請在此寫下你的名字...</h3>
     <input id="inp" type="text" maxlength="20" placeholder="請輸入名字" autocomplete="off" enterkeyhint="done" aria-label="名字">
@@ -338,7 +438,97 @@ function imgMiss(i){
   </div>
 </div>
 
-<div id="claim" class="hid" role="dialog" aria-modal="true" aria-labelledby="claim-title">
+<div id="remind" class="ov hid" role="dialog" aria-modal="true" aria-labelledby="remind-title">
+  <div class="cbox">
+    <img src="images/remind.png" alt="" onerror="this.classList.add('hid')">
+    <h3 id="remind-title">拿出羽毛</h3>
+    <p>請將手中的信件打開，拿出裡面的羽毛。</p>
+    <div class="btns">
+      <button type="button" id="remind-again" class="alt">再次領信</button>
+      <button type="button" id="remind-ok">我打開了信件</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════ 畫面五之後的通知框 ═════
+     文字可以直接改：只要不刪到 < > 之間的標籤就不會壞。<br> 是換行，<b>字</b> 是強調的字。
+     標著「待編輯」「待補」的地方，是等你補內容的位置。 -->
+<div id="write" class="ov hid" role="dialog" aria-modal="true">
+  <div class="cbox">
+    <img src="images/write.png" alt="" onerror="this.classList.add('hid')">
+    <p>請在卡片上簡單地寫下，現在心中第一直覺想到的「遺憾」故事</p>
+    <p class="small">小提醒：如果沒有書寫工具，我們有筆提供可以借用~</p>
+    <p class="small">你寫下的遺憾故事，屬於哪一個主題呢？</p>
+    <div class="chips" id="themes" role="radiogroup" aria-label="遺憾故事的主題">
+      <button type="button" class="chip" role="radio" aria-checked="false" data-t="友情">友情</button>
+      <button type="button" class="chip" role="radio" aria-checked="false" data-t="愛情">愛情</button>
+      <button type="button" class="chip" role="radio" aria-checked="false" data-t="未來規劃">未來規劃</button>
+      <button type="button" class="chip" role="radio" aria-checked="false" data-t="財務管理">財務管理</button>
+      <button type="button" class="chip" role="radio" aria-checked="false" data-t="其他">其他</button>
+    </div>
+    <p class="small" id="w-hint">選好主題後，才能按「我寫好了！」~</p>
+    <div class="btns">
+      <button type="button" id="w-done" disabled>我寫好了！</button>
+      <button type="button" id="w-stuck" class="alt">我好像寫不太出來...</button>
+    </div>
+  </div>
+</div>
+
+<div id="choose" class="ov hid" role="dialog" aria-modal="true">
+  <div class="cbox">
+    <button type="button" id="c-onsite" class="big rose">現場排卡</button>
+    <p>透過「實體卡牌」，解讀你心中的遺憾。我們會陪著你一起梳理遺憾，並尊重你的意願，隨時可以停止。</p>
+    <button type="button" id="c-online" class="big blue">線上排卡</button>
+    <p>透過線上簡易版卡牌，在專屬且安心的私人空間裡自我探索遺憾的回憶。</p>
+    <p class="small warn">這一步無法返回，要注意不要按錯啦~</p>
+  </div>
+</div>
+
+<div id="onsite" class="ov hid" role="dialog" aria-modal="true">
+  <div class="cbox">
+    <img src="images/onsite.png" alt="" onerror="this.classList.add('hid')">
+    <p>請找現場的工作人員，我們會陪你一起排卡。（此段文字待編輯）</p>
+    <button type="button" id="o-online" class="big blue">改成線上排卡</button>
+    <p class="small warn">這一步無法返回哦！</p>
+  </div>
+  <div class="staff">
+    <button type="button" id="o-card">查看主題卡</button>
+    <span>由工作人員按下此按鈕，請勿自行按下</span>
+  </div>
+</div>
+
+<div id="flowers" class="ov hid" role="dialog" aria-modal="true" aria-labelledby="fl-title">
+  <h3 id="fl-title" class="glow-title">四種花朵對應四種遺憾主題</h3>
+  <div class="fl-mid">
+    <img src="images/flowers-intro.png" alt="四種花朵與對應的遺憾主題" onload="this.parentElement.classList.remove('empty')" onerror="this.parentElement.classList.add('empty')">
+    <div class="ph">介紹圖<br>flowers-intro.png</div>
+  </div>
+  <div class="btns">
+    <button type="button" id="f-done">我寫好了！</button>
+    <button type="button" id="f-think" class="alt">嗯...我再想想</button>
+  </div>
+</div>
+
+<div id="endbox" class="ov hid" role="dialog" aria-modal="true">
+  <div class="cbox">
+    <p>無論你目前心中是否帶著遺憾，都很感謝你今天的到來。我們在現場準備了一份神秘小禮物，只要出示這個畫面即可向工作人員領取！<br>如果對我們的卡牌套組感到好奇，或想了解更多細節，歡迎隨時找我們聊聊～</p>
+    <div class="btns col">
+      <button type="button" id="end-draw" class="rose">來抽個卡吧！</button>
+      <button type="button" id="end-home">結束旅行</button>
+      <button type="button" id="end-back" class="alt">返回上一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- 工作人員用：滿版顯示主題卡（點一下畫面就關閉） -->
+<div id="cardview" class="hid" aria-hidden="true">
+  <div class="cv">
+    <img id="cv-img" alt="" class="hid">
+    <div id="cv-ph" class="hid"></div>
+  </div>
+</div>
+
+<div id="claim" class="ov hid" role="dialog" aria-modal="true" aria-labelledby="claim-title">
   <div class="cbox">
     <img src="images/claim.png" alt="" onerror="this.classList.add('hid')">
     <h3 id="claim-title">領取信件</h3>
@@ -348,6 +538,19 @@ function imgMiss(i){
     <button type="button" id="claim-close">已領取信件，關閉畫面</button>
   </div>
 </div>
+
+<!-- DEBUG-START：檢查用選單（做完請整段刪除） -->
+<button id="dbg-btn" type="button">檢查</button>
+<div id="dbg" class="hid">
+  <div class="g"><b>畫面一</b><button data-j="a1">重新開始</button><button data-j="a2">領信</button><button data-j="a3">進門</button></div>
+  <div class="g"><b>畫面二</b><button data-j="b1">旁白</button><button data-j="b2">窗戶</button><button data-j="b3">書架</button><button data-j="b4">床</button></div>
+  <div class="g"><b>畫面三</b><button data-j="c1">窗戶旁白</button></div>
+  <div class="g"><b>畫面四</b><button data-j="d1">書本旁白</button></div>
+  <div class="g"><b>畫面五</b><button data-j="e1">鳥登場</button><button data-j="e2">提醒框</button><button data-j="e3">羽毛選單</button><button data-j="e4">羽毛之後</button></div>
+  <div class="g"><b>主題卡</b><button data-j="t1">友情</button><button data-j="t2">愛情</button><button data-j="t3">未來規劃</button><button data-j="t4">財務管理</button><button data-j="t5">其他</button></div>
+  <div class="g"><b>結尾</b><button data-j="e5">兩個選項</button><button data-j="e6">寫卡提醒</button><button data-j="e7">現場/線上</button><button data-j="e8">現場引導</button><button data-j="e9">寫不出來</button><button data-j="e10">結束</button></div>
+</div>
+<!-- DEBUG-END -->
 
 <script>
 const $ = s => document.querySelector(s);
@@ -373,19 +576,23 @@ function say(list, d) {
   Q = list.map(x => ({ w: 2, ...(typeof x === 'string' ? { t: x } : x) }));
   qi = 0; done = d || null; show(talk); line(false); next.focus({ preventScroll: true });
 }
+const note = $('#talk-note'), chEl = $('#choices'), ccEl = $('#cchoices');
 let chars = [];
 function render(text) {            // 先把整句排好（文字隱藏），對話框大小從一開始就固定
   tt.textContent = ''; chars = [];
-  for (const c of text) { const e = document.createElement('span'); e.className = 'ch'; e.textContent = c; tt.append(e); chars.push(e); }
+  for (const c of text) {
+    if (c === '\n') { tt.append(document.createElement('br')); continue; }          // 文字裡的 \n 會換行
+    const e = document.createElement('span'); e.className = 'ch'; e.textContent = c; tt.append(e); chars.push(e);
+  }
 }
 function line(instant) {
   const x = Q[qi];
   talk.dataset.w = x.w; talk.classList.remove('img'); ti.src = `images/talk${x.w}.png`;
   prev.classList.toggle('hid', qi === 0);
   next.textContent = qi === Q.length - 1 ? '結束' : '下一句 ›';
-  clearTimeout(tm); full = x.t; render(full);
+  clearTimeout(tm); full = x.t; render(full); hideExtras();
   if (x.view) x.view(instant);                                     // 每次顯示這句都會執行（含退回上一句）
-  if (instant) { chars.forEach(c => c.classList.add('on')); typing = false; return; }   // 退回上一句：直接顯示
+  if (instant) { chars.forEach(c => c.classList.add('on')); typing = false; extras(x); return; }   // 退回上一句：直接顯示
   if (x.run) x.run();                                              // 這句開始時執行
   typing = true; let i = 0;
   (function step() {
@@ -396,12 +603,32 @@ function line(instant) {
     } else { typing = false; endLine(); }
   })();
 }
-function endLine() {               // 這句完整顯示後執行（只會執行一次）
+function endLine() {               // 這句完整顯示後執行
   const x = Q[qi];
-  if (x && x.after && !x.fired) { x.fired = true; x.after(); }
+  if (!x) return;
+  if (x.after && !x.fired) { x.fired = true; x.after(); }
+  extras(x);
+}
+function extras(x) {               // 備註小字、選單（x.center = true 時，選項出現在畫面正中間）
+  if (x.note) { note.textContent = x.note; show(note); }
+  if (x.choices) {
+    const box = x.center ? ccEl : chEl;
+    box.replaceChildren();
+    x.choices.forEach(c => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = c.label;
+      b.addEventListener('click', e => { e.stopPropagation(); hideExtras(); c.go(); });
+      box.append(b);
+    });
+    show(box); talk.classList.add('menu');
+  }
+}
+function hideExtras() {
+  show(note, false); show(chEl, false); chEl.replaceChildren(); show(ccEl, false); ccEl.replaceChildren();
+  talk.classList.remove('menu');
 }
 function finishTyping() { clearTimeout(tm); chars.forEach(c => c.classList.add('on')); typing = false; endLine(); }
 function go(d) {
+  if (talk.classList.contains('menu')) return;              // 選單出現時，只能按選項
   if (d < 0) { if (qi > 0) { qi--; line(true); } else if (typing) finishTyping(); return; }
   if (typing) { finishTyping(); return; }
   if (++qi < Q.length) line(false);
@@ -416,7 +643,7 @@ document.addEventListener('keydown', e => {
 });
 
 let busy = false;
-const talking = () => busy || ['#talk', '#modal', '#claim'].some(q => !$(q).classList.contains('hid'));
+const talking = () => busy || !talk.classList.contains('hid') || !!document.querySelector('.ov:not(.hid)');
 
 /* ───── 引導：提示直接出現在物件旁，並讓該物件發光 ───── */
 const plate = $('#plate'), door = $('#door'), mail = $('#mail'), win = $('#win'), shelf = $('#shelf'), bed = $('#bed'), back = $('#back'), back4 = $('#back4');
@@ -464,7 +691,7 @@ function submitName() {
   show(modal, false); guide(null);
   mail.querySelector('img').src = 'images/mailbox2.png';          // 信箱換成「放入信封」的造型
   mail.querySelector('.lbl').textContent = '信箱（有信）';
-  say([{ t: `${v}嗨！信箱裡好像放了一封信，去看看吧！`, w: 2 }],   /* 文字可自行修改 */
+  say([{ t: `${v} 哈嚕！\n信箱裡好像放了一封信，去看看吧！`, w: 2 }],   /* 文字可自行修改 */
       () => guide(...TIPS.mail));
 }
 $('#ok').addEventListener('click', submitName);
@@ -474,15 +701,20 @@ inp.addEventListener('compositionend', () => { composing = false; liveCheck(); }
 inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submitName(); } });
 
 /* ───── 畫面一：信箱（領信畫面）───── */
+let claimBack = null;               // 領信畫面關閉後要回到哪裡（畫面五的提醒框用）
+function openClaim() {
+  $('#claim-name').textContent = store.get('user_name') || '';
+  show(claim); $('#claim-close').focus();
+}
 mail.addEventListener('click', () => {
   if (talking()) return;
   if (step === 0) { nudge(mail); guide(...TIPS.name); return; }
-  $('#claim-name').textContent = store.get('user_name') || '';
-  show(claim); $('#claim-close').focus();
+  openClaim();
 });
 $('#claim-close').addEventListener('click', () => {
   show(claim, false);
-  if (step === 1) { step = 2; guide(...TIPS.door); }               // 領完信才能進大門
+  if (claimBack) { const f = claimBack; claimBack = null; f(); return; }   // 從畫面五來的：回到提醒框
+  if (step === 1) { step = 2; guide(...TIPS.door); }                       // 領完信才能進大門
 });
 
 /* ───── 畫面一：大門 → 畫面二 ───── */
@@ -529,9 +761,10 @@ function goScene(from, to, bg, after, color = 'var(--cream)', ms = 550) {
     setTimeout(() => { busy = false; if (after) after(); }, ms);
   }, ms);
 }
+const startRoom = () => say(ROOM, () => { roomReady = true; roomPhase = 1; guide(...TIPS.win); });
 function enterRoom() {
   store.set('story_stage', 'room');
-  goScene('#s1', '#s2', 'background2', () => say(ROOM, () => { roomReady = true; roomPhase = 1; guide(...TIPS.win); }));
+  goScene('#s1', '#s2', 'background2', startRoom);
 }
 const ROOM_TIPS = [null, TIPS.win, TIPS.shelf, TIPS.bed];
 [win, shelf, bed].forEach(el => el.addEventListener('click', () => {
@@ -551,9 +784,11 @@ const WINDOW = [
   '我想想...之前書櫃好像放了一本有關花卉的書',
   '去找找看現在適合種什麼吧！'
 ];
+const startWindow = () => say(WINDOW, () => { show(back); guide(...TIPS.back); });
 function enterWindow() {
   store.set('story_stage', 'window');
-  goScene('#s2', '#s3', 'background3', () => say(WINDOW, () => { show(back); guide(...TIPS.back); }));
+  preloadFlowers();                                              // 趁著在窗戶畫面時，先把花卉圖解碼好
+  goScene('#s2', '#s3', 'background3', startWindow);
 }
 back.addEventListener('click', () => {
   if (talking()) return;
@@ -578,44 +813,45 @@ const BOOK = [                      // b：書本狀態 0 封面 / 1 翻開 / 2 
   { t: '唉呦！先別想了，明天還要早起呢！', b: 2 },
   { t: '來去睡覺吧~', b: 2 }
 ];
-const fl = $('#flower'), fimg = fl.querySelector('img');
-let flowerNo = 0, flowerTry = '';
-const isWide = () => matchMedia('(min-aspect-ratio: 1/1)').matches;
-fimg.onload = () => fl.classList.remove('empty');
-fimg.onerror = () => {
-  if (flowerTry === 'wide') { flowerTry = 'base'; fimg.src = `images/flower${flowerNo}.png`; }   // 沒有橫式版就改用直式版
-  else fl.classList.add('empty');
-};
+const fl = $('#flower'), fps = [...fl.querySelectorAll('.fp')];
 function showFlower(n) {
-  if (!n) { show(fl, false); return; }
-  flowerNo = n; flowerTry = isWide() ? 'wide' : 'base';
-  const f = `flower${n}${flowerTry === 'wide' ? '-wide' : ''}.png`;
-  fl.querySelector('.ph').textContent = `${FLOWERS[n]}（${f}）`;
-  fimg.src = `images/${f}`;
-  show(fl); fl.classList.remove('enter'); void fl.offsetWidth; fl.classList.add('enter');   // 角色登場動畫
+  fps.forEach((e, i) => e.classList.toggle('show', i === n - 1));
+  show(fl, n > 0);
+  if (n > 0) { const c = fps[n - 1]; c.classList.remove('enter'); void c.offsetWidth; c.classList.add('enter'); }   // 角色登場動畫
 }
+function preloadFlowers() { fl.querySelectorAll('img').forEach(i => { if (i.decode) i.decode().catch(() => {}); }); }
 function popIn(el) { el.classList.remove('popin'); void el.offsetWidth; el.classList.add('popin'); }
 
-/* 書本：封面 → 翻開 → 內頁。換頁時舊的一頁往左翻走，露出下面的新頁 */
+/* 書本：封面 → 翻開 → 內頁。換頁時原地沿中軸旋轉：舊頁轉到側面消失，新頁再轉出來 */
 const bkItems = [...document.querySelectorAll('#book .bk')];
-let bk = 0;
-function setBook(k) { bkItems.forEach((e, i) => { e.classList.remove('turning'); e.classList.toggle('show', i === k); }); bk = k; }
+const FLIP_MS = 350;               // 單邊旋轉時間，整個翻面約 0.7 秒
+let bk = 0, flipTm = null;
+function setBook(k) {
+  clearTimeout(flipTm);
+  bkItems.forEach((e, i) => { e.classList.remove('flipout', 'flipin'); e.classList.toggle('show', i === k); });
+  bk = k;
+}
 function turnTo(k) {
   if (k === bk) return;
   if (reduce) { setBook(k); return; }
-  const old = bkItems[bk];
-  bkItems.forEach((e, i) => { if (e !== old) { e.classList.remove('turning'); e.classList.toggle('show', i === k); } });
-  old.classList.add('show', 'turning'); bk = k;
-  old.addEventListener('animationend', () => { if (bkItems[bk] !== old) old.classList.remove('show', 'turning'); }, { once: true });
+  clearTimeout(flipTm);
+  const old = bkItems[bk], nu = bkItems[k];
+  bkItems.forEach(e => { if (e !== old && e !== nu) e.classList.remove('show', 'flipout', 'flipin'); });
+  old.classList.remove('flipin'); old.classList.add('show', 'flipout');
+  nu.classList.remove('flipout'); nu.classList.add('show', 'flipin');
+  bk = k;
+  flipTm = setTimeout(() => setBook(k), FLIP_MS * 2 + 50);
 }
 
+const startBook = () => {
+  setBook(0); popIn($('#book'));
+  const lines = BOOK.map(o => ({ ...o, view: inst => { showFlower(o.f || 0); inst ? setBook(o.b) : turnTo(o.b); } }));
+  say(lines, () => { showFlower(0); show(back4); guide(...TIPS.back4); });
+};
 function enterBook() {
   store.set('story_stage', 'book');
-  goScene('#s2', '#s4', 'background4', () => {
-    setBook(0); popIn($('#book'));
-    const lines = BOOK.map(o => ({ ...o, view: inst => { showFlower(o.f || 0); inst ? setBook(o.b) : turnTo(o.b); } }));
-    say(lines, () => { showFlower(0); show(back4); guide(...TIPS.back4); });
-  });
+  preloadFlowers();
+  goScene('#s2', '#s4', 'background4', startBook);
 }
 back4.addEventListener('click', () => {
   if (talking()) return;
@@ -624,13 +860,143 @@ back4.addEventListener('click', () => {
 });
 
 /* ───── 畫面五：入睡（背景純黑），管理員鳥出現 ───── */
+const kpItems = [...document.querySelectorAll('#keeper .bk')];
+let pose = 0;
+function setPose(n) {              // 造型 1～3；該張圖還沒放時，改用第 1 張
+  let it = kpItems[n - 1];
+  if (!it || (it.classList.contains('empty') && !kpItems[0].classList.contains('empty'))) it = kpItems[0];
+  kpItems.forEach(e => e.classList.toggle('show', e === it));
+  pose = n;
+}
+const KEEPER = (t, p = 1) => ({ t, w: 1, view: () => setPose(p) });    // 鳥的發言（藍色對話框）
+const ME = (t, p = 1) => ({ t, w: 2, view: () => setPose(p) });        // 使用者的發言（原本顏色）
+const uname = () => store.get('user_name') || '';
+
+/* ═════ 畫面五文案（要改字，只改冒號後面的字就好）═════
+   一行 = 一句台詞，寫法：  誰＋造型數字 : 文字
+   誰　　：a = 鳥（藍色對話框）　u = 你（原本顏色的對話框）
+   造型數字：1、2、3，代表這一句鳥用第幾張圖（keeper1～3），可以省略，省略就是 1
+   {name}：會換成門牌上的名字　　\n：句子中間換行
+   注意：每一行最前面的 a: 或 u: 不要刪掉；一行只寫一句；想換句就換新的一行。 */
+const S5_INTRO = String.raw`
+a2:你來啦！ {name} 
+u:你是誰？
+a:我是你心靈花園的管理員
+a2:是一隻聰明的知更鳥哦！
+u:為什麼你會出現在我的夢裡出現
+a2:打開你手中的信就知道了！
+`;
+const S5_FEATHER = String.raw`
+a2:那是我的羽毛>"<
+u3:蛤？？？為什麼要給我羽毛
+a3:自從那件事發生之後
+a3:你心中的花園，花朵接連著消失了
+a3:我想一定是某件事情造成了遺憾困住了你的心情
+a2:雖然還不知道是花生什麼鳥事 (>_<。)
+a2:但我想陪你一起修復這片原本美好的土地！
+a1:這是我給你羽毛的原因\n那麼，你願意跟著我一起面對那個遺憾嗎？
+`;
+function script(raw) {             // 把上面的文案轉成對話
+  return raw.split('\n').map(l => l.replace(/^\s+/, '')).filter(l => l.trim()).map(l => {
+    const m = l.match(/^([au])(\d?)[:：]([\s\S]*)$/);
+    if (!m) { console.warn('文案格式不對（要寫成 a:文字 或 u:文字）：' + l); return KEEPER(l); }
+    const text = m[3].replace(/\{name\}/g, uname()).replace(/\\n/g, '\n');
+    return (m[1] === 'a' ? KEEPER : ME)(text, +m[2] || 1);
+  });
+}
+
+function startSleep() {            // 管理員鳥淡入，同時開始第一句台詞（第一句直接用該句的造型，不會先閃別的造型）
+  const k = $('#keeper'); pose = 0;
+  k.classList.remove('shown'); void k.offsetWidth; k.classList.add('shown');
+  say(script(S5_INTRO), openRemind);
+}
 function enterSleep() {
   store.set('story_stage', 'sleep');
-  goScene('#s2', '#s5', null, () => {
-    popIn($('#keeper'));
-    setTimeout(() => say([`你來啦！${store.get('user_name') || ''}`], () => { /* TODO：接下來的對話與選主題 */ }), 700);
-  }, '#000', 900);
+  goScene('#s2', '#s5', null, startSleep, '#000', 900);
 }
+
+/* ───── 通知框（一次只開一個）───── */
+const openBox = id => {
+  document.querySelectorAll('.ov').forEach(e => show(e, false));
+  show($(id));
+  if (id === '#choose' || id === '#onsite') return;                 // 這兩個畫面無法返回，不自動選到按鈕，避免誤按
+  const b = $(id).querySelector('button'); if (b) b.focus();
+};
+const remind = $('#remind');
+let endBack = null, readyLine = null;
+function openRemind() { openBox('#remind'); }
+function openEnd(back) { endBack = back; openBox('#endbox'); }          // 結束互動：back = 按「返回」要回到哪裡
+
+/* 提醒框：請打開信件拿出羽毛；沒領到信可以再次領信 */
+$('#remind-again').addEventListener('click', () => { show(remind, false); claimBack = () => openRemind(); openClaim(); });
+$('#remind-ok').addEventListener('click', () => { show(remind, false); askFeather(); });
+
+/* 對話框變成選單：看到羽毛了嗎？ */
+function askFeather() {
+  say([{ ...KEEPER('你有看到那羽毛狀的小卡嗎？'), choices: [
+    { label: '我看到了', go: () => startFeather() },
+    { label: '沒有！怎麼辦', go: () => { show(talk, false); openRemind(); } }   // 回到提醒框（可再次領信）
+  ] }]);
+}
+
+/* 羽毛之後的台詞；最後一句出現後，畫面正中間出現兩個選項 */
+function featherLines() {
+  const L = script(S5_FEATHER), last = L[L.length - 1];
+  last.center = true;
+  last.choices = [
+    { label: '我準備好了！', go: () => { show(talk, false); resetTheme(); openBox('#write'); } },
+    { label: '嗯...我再想想', go: () => { show(talk, false); openEnd(askReady); } }
+  ];
+  readyLine = last;
+  return L;
+}
+const startFeather = () => say(featherLines());
+function askReady() { if (!readyLine) featherLines(); say([{ ...readyLine }]); }   // 回到「兩個選項」那一句
+
+/* 寫卡提醒：先選主題，才能按「我寫好了！」 */
+const chips = [...document.querySelectorAll('#themes .chip')], wDone = $('#w-done'), wHint = $('#w-hint');
+function setTheme(t) {
+  store.set('selected_theme', t);
+  chips.forEach(c => c.setAttribute('aria-checked', String(c.dataset.t === t)));
+  wDone.disabled = !t; show(wHint, !t);
+}
+const resetTheme = () => setTheme('');
+chips.forEach(c => c.addEventListener('click', () => setTheme(c.dataset.t)));
+
+/* 工作人員用：依照使用者選的主題，滿版顯示對應的主題卡 */
+const CARD = { '友情': 'card-friend', '愛情': 'card-love', '未來規劃': 'card-future', '財務管理': 'card-money', '其他': 'card-other' };
+const cv = $('#cardview'), cvImg = $('#cv-img'), cvPh = $('#cv-ph');
+cvImg.onload = () => show(cvPh, false);
+cvImg.onerror = () => { cvImg.classList.add('hid'); show(cvPh); };
+function showCard() {
+  const t = store.get('selected_theme') || '（尚未選擇主題）', f = CARD[t];
+  cvPh.innerHTML = '';
+  cvPh.append(t);
+  const sm = document.createElement('small'); sm.textContent = f ? f + '.png' : '沒有對應的卡牌圖'; cvPh.append(sm);
+  show(cvPh, !f); cvImg.classList.toggle('hid', !f);
+  if (f) cvImg.src = `images/${f}.png`;
+  show(cv);
+}
+cv.addEventListener('click', () => show(cv, false));
+
+/* 1. 我準備好了！ → 寫卡提醒 → 公開或不公開 */
+$('#w-done').addEventListener('click', () => { if (store.get('selected_theme')) openBox('#choose'); });
+$('#w-stuck').addEventListener('click', () => openBox('#flowers'));           // 暫時想不到 → 四種花朵與遺憾主題介紹
+$('#f-done').addEventListener('click', () => { resetTheme(); openBox('#write'); });   // 我寫好了 → 回到寫卡提醒，選主題後才能繼續
+$('#f-think').addEventListener('click', () => openEnd(() => openBox('#flowers')));
+$('#c-onsite').addEventListener('click', () => openBox('#onsite'));           // 現場排卡 → 引導找現場人員
+$('#c-online').addEventListener('click', () => { location.href = 'cards.html'; });    // 線上排卡 → 首頁 B 支線
+$('#o-online').addEventListener('click', () => { location.href = 'cards.html'; });    // 改成線上排卡 → 首頁 B 支線
+$('#o-card').addEventListener('click', showCard);                              // 工作人員小按鈕 → 顯示主題卡
+/* 2. 嗯...我再想想 → 結束互動 */
+$('#end-draw').addEventListener('click', () => { location.href = 'quiz.html'; });     // 來抽個卡吧！ → 首頁 C 支線
+$('#end-home').addEventListener('click', () => { location.href = 'index.html'; });    // 結束旅行 → 回到頁首
+$('#end-back').addEventListener('click', () => {                               // 返回上一步：先讓這個畫面消失，再重新出現上一頁
+  const f = endBack; endBack = null;
+  show($('#endbox'), false);
+  if (f) setTimeout(f, 250);
+});
+resetTheme();
 
 /* ───── 左上角選單 ───── */
 const menuBtn = $('#menu-btn'), menu = $('#menu');
@@ -639,6 +1005,56 @@ menuBtn.addEventListener('click', e => { e.stopPropagation(); toggleMenu(menu.cl
 document.addEventListener('click', () => toggleMenu(false));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleMenu(false); });
 $('#reset').addEventListener('click', () => { store.reset(); location.reload(); });
+
+/* ═══ DEBUG-START：檢查用選單（做完請刪除 CSS、HTML、JS 三處 DEBUG 區塊） ═══ */
+(() => {
+  const keeperShow = p => { $('#keeper').classList.add('shown'); pose = 0; setPose(p); };
+  const mailOpen = () => { mail.querySelector('img').src = 'images/mailbox2.png'; mail.querySelector('.lbl').textContent = '信箱（有信）'; };
+  function jump(scene, bg, fn) {              // 清掉暫時狀態，直接跳到指定畫面
+    busy = false; clearTimeout(tm); typing = false; Q = []; done = null; claimBack = null; endBack = null;
+    show(talk, false); document.querySelectorAll('.ov').forEach(e => show(e, false)); show($('#cardview'), false);
+    hideExtras(); showFlower(0); $('#curtain').classList.remove('on');
+    document.querySelectorAll('.wall').forEach(w => show(w, false)); show($(scene));
+    document.body.classList.toggle('reserve', scene === '#s4');
+    document.body.classList.toggle('night', !bg);
+    if (bg) document.body.style.setProperty('--bg', `url("images/${bg}.png")`);
+    [back, back4].forEach(b => show(b, false)); guide(null); toggleMenu(false);
+    if (!store.get('user_name')) { store.set('user_name', '測試'); plate.querySelector('.nm').textContent = '測試'; }
+    step = 2; birdDone = false; roomReady = false; $('#keeper').classList.remove('shown');
+    fn();
+  }
+  const room = (phase, tip) => () => jump('#s2', 'background2', () => { roomReady = true; roomPhase = phase; guide(...tip); });
+  const card = th => () => jump('#s5', null, () => { keeperShow(1); setTheme(th); openBox('#onsite'); showCard(); });
+  const s5 = (p, fn) => () => jump('#s5', null, () => { keeperShow(p); fn(); });
+  const J = {
+    a1: () => { store.reset(); location.reload(); },
+    a2: () => jump('#s1', 'background1', () => { step = 1; mailOpen(); guide(...TIPS.mail); }),
+    a3: () => jump('#s1', 'background1', () => { mailOpen(); guide(...TIPS.door); }),
+    b1: () => jump('#s2', 'background2', startRoom),
+    b2: room(1, TIPS.win), b3: room(2, TIPS.shelf), b4: room(3, TIPS.bed),
+    c1: () => jump('#s3', 'background3', startWindow),
+    d1: () => jump('#s4', 'background4', startBook),
+    e1: () => jump('#s5', null, startSleep),
+    e2: s5(1, openRemind),
+    e3: s5(1, askFeather),
+    e4: s5(1, startFeather),
+    e5: s5(2, askReady),
+    e6: s5(1, () => openBox('#write')),
+    e7: s5(1, () => openBox('#choose')),
+    e8: s5(1, () => openBox('#onsite')),
+    e9: s5(1, () => openBox('#flowers')),
+    e10: s5(1, () => openEnd(askReady)),
+    t1: card('友情'), t2: card('愛情'), t3: card('未來規劃'), t4: card('財務管理'), t5: card('其他')
+  };
+  const panel = $('#dbg');
+  $('#dbg-btn').addEventListener('click', e => { e.stopPropagation(); show(panel, panel.classList.contains('hid')); });
+  panel.addEventListener('click', e => {
+    e.stopPropagation();
+    const b = e.target.closest('button[data-j]');
+    if (b) { show(panel, false); J[b.dataset.j](); }
+  });
+})();
+/* ═══ DEBUG-END ═══ */
 
 /* ───── 開始 ───── */
 store.reset();
