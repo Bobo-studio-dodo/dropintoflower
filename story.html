@@ -15,6 +15,7 @@
   畫面三   windowbig 大窗戶 ／ btn-back 返回按鈕
   畫面四   background4 ／ book-cover 書封面、book-open 書翻開、book-page 書內頁（三張同尺寸；換頁時原地中軸旋轉翻面）／ flower1 洋甘菊、flower2 桔梗花、flower3 繡球花、flower4 櫻花（滿版，提到時整個畫面角色登場；
            直式 flowerN.png 1080×1920，橫式 flowerN-wide.png 1920×1080 可省略，沒有橫式就用直式）
+  音樂     audio/music1.mp3（也可用 .m4a／.ogg／.wav，檔名都叫 music1）
   畫面五   背景直接是黑色 ／ keeper1、keeper2、keeper3 管理員鳥的三個造型（同尺寸，對話時依句子切換）／ remind 提醒框插圖（可省略）
            write 寫下遺憾的範例圖示（可省略，放在「請在卡片上寫下…」通知框上方）
            onsite 現場排卡引導圖（可省略，放在通知框上方，讓工作人員快速辨識）
@@ -63,6 +64,7 @@ function imgMiss(i){
                linear-gradient(160deg,var(--cream),var(--blush) 50%,var(--lav));
   }
   body.night{background:#000}
+  @media (max-aspect-ratio:1/1){ body.reserve3{--talk:var(--dlg)} }   /* 畫面三（手機直式）：跟畫面四的書本一樣，窗戶放在對話框上方 */
   body.reserve{--talk:var(--dlg)}                 /* 畫面四：書本與花卉要看得到，所以保留對話框空間 */
   .hid{display:none!important}
   button{font:inherit;color:inherit;cursor:pointer}
@@ -78,9 +80,9 @@ function imgMiss(i){
   #plate{--x:25%;--y:3%; --w:50%;--r:2deg;   --ar:3/2; --nm-x:58%;--nm-y:58%;--nm-size:14cqw;--nm-r:0deg}
   #door {--x:3%; --y:23%;--w:62%;--r:-1.5deg;--ar:3/5}
   #mail {--x:60%;--y:52%;--w:38%;--r:3deg;   --ar:4/5}
-  #win  {--x:44%;--y:4%; --w:54%;--r:1.5deg; --ar:4/5}
-  #shelf{--x:2%; --y:19%;--w:46%;--r:-2deg;  --ar:3/5}
-  #bed  {--x:3%; --y:63%;--w:94%;--r:1deg;   --ar:3/2}
+  #win  {--x:46%;--y:8%; --w:54%;--r:1.5deg; --ar:4/5}
+  #shelf{--x:0%; --y:12%;--w:50%;--r:-2deg;  --ar:3/5}
+  #bed  {--x:3%; --y:59%;--w:94%;--r:1deg;   --ar:3/2}
   /* 畫面三、四：單張大圖，填滿可用空間（手機貼近底部、電腦置中放大），返回鈕放在上方 */
   #s3,#s4{position:fixed;inset:var(--top) 0 var(--talk) 0;width:auto;aspect-ratio:auto}
   #bigwin,#book{left:0;top:0;width:100%;height:100%;--r:0deg;--ar:4/5}
@@ -223,7 +225,8 @@ function imgMiss(i){
   #choices button:hover{background:var(--lav)}
   #choices button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
   #talk.menu .ctrl{display:none}
-  .ctrl{position:relative;align-self:flex-end;display:flex;gap:8px}
+  .ctrl{position:relative;align-self:stretch;display:flex;justify-content:flex-end;gap:8px}
+  .ctrl #prev{margin-right:auto}
   .ctrl button{font-size:clamp(16px,.6vw + 12px,20px);padding:2px 16px;border-radius:999px;
     border:2px solid var(--blue);background:var(--blush);color:var(--ink)}
   .ctrl button:hover{background:var(--lav)}
@@ -405,6 +408,12 @@ function imgMiss(i){
   <div class="fp"><picture><source media="(min-aspect-ratio: 1/1)" srcset="images/flower3-wide.png"><img src="images/flower3.png" alt="" decoding="async" onload="flOk(this)" onerror="flErr(this)"></picture><div class="ph">繡球花（flower3.png）</div></div>
   <div class="fp"><picture><source media="(min-aspect-ratio: 1/1)" srcset="images/flower4-wide.png"><img src="images/flower4.png" alt="" decoding="async" onload="flOk(this)" onerror="flErr(this)"></picture><div class="ph">櫻花（flower4.png）</div></div>
 </div>
+<audio id="bgm" loop preload="auto">
+  <source src="audio/music1.mp3" type="audio/mpeg">
+  <source src="audio/music1.m4a" type="audio/mp4">
+  <source src="audio/music1.ogg" type="audio/ogg">
+  <source src="audio/music1.wav" type="audio/wav">
+</audio>
 <div id="curtain"></div>
 
 <button id="menu-btn" type="button" aria-label="選單" aria-expanded="false">
@@ -487,7 +496,7 @@ function imgMiss(i){
 <div id="onsite" class="ov hid" role="dialog" aria-modal="true">
   <div class="cbox">
     <img src="images/onsite.png" alt="" onerror="this.classList.add('hid')">
-    <p>請找現場的工作人員，我們會陪你一起排卡。（此段文字待編輯）</p>
+    <p>請保持這個畫面不動，帶著它來找我們吧！</p>
     <button type="button" id="o-online" class="big blue">改成線上排卡</button>
     <p class="small warn">這一步無法返回哦！</p>
   </div>
@@ -511,7 +520,7 @@ function imgMiss(i){
 
 <div id="endbox" class="ov hid" role="dialog" aria-modal="true">
   <div class="cbox">
-    <p>無論你目前心中是否帶著遺憾，都很感謝你今天的到來。我們在現場準備了一份神秘小禮物，只要出示這個畫面即可向工作人員領取！<br>如果對我們的卡牌套組感到好奇，或想了解更多細節，歡迎隨時找我們聊聊～</p>
+    <p>無論你目前心中是否帶著遺憾，都很感謝你今天的到來。<br>我們在現場準備了一份神秘小禮物🎁<br>只要出示這個畫面即可向工作人員領取！<br>如果對我們的卡牌套組感到好奇，或想了解更多細節，歡迎隨時找我們聊聊～</p>
     <div class="btns col">
       <button type="button" id="end-draw" class="rose">來抽個卡吧！</button>
       <button type="button" id="end-home">結束旅行</button>
@@ -755,6 +764,7 @@ function goScene(from, to, bg, after, color = 'var(--cream)', ms = 550) {
   setTimeout(() => {
     show($(from), false); show($(to));
     document.body.classList.toggle('reserve', to === '#s4');
+    document.body.classList.toggle('reserve3', to === '#s3');
     document.body.classList.toggle('night', !bg);
     if (bg) document.body.style.setProperty('--bg', `url("images/${bg}.png")`);
     c.classList.remove('on');
@@ -925,7 +935,7 @@ const openBox = id => {
 const remind = $('#remind');
 let endBack = null, readyLine = null;
 function openRemind() { openBox('#remind'); }
-function openEnd(back) { endBack = back; openBox('#endbox'); }          // 結束互動：back = 按「返回」要回到哪裡
+function openEnd(back) { endBack = back; stopMusic(); openBox('#endbox'); }          // 結束互動：back = 按「返回」要回到哪裡
 
 /* 提醒框：請打開信件拿出羽毛；沒領到信可以再次領信 */
 $('#remind-again').addEventListener('click', () => { show(remind, false); claimBack = () => openRemind(); openClaim(); });
@@ -969,6 +979,7 @@ const cv = $('#cardview'), cvImg = $('#cv-img'), cvPh = $('#cv-ph');
 cvImg.onload = () => show(cvPh, false);
 cvImg.onerror = () => { cvImg.classList.add('hid'); show(cvPh); };
 function showCard() {
+  stopMusic();
   const t = store.get('selected_theme') || '（尚未選擇主題）', f = CARD[t];
   cvPh.innerHTML = '';
   cvPh.append(t);
@@ -998,6 +1009,16 @@ $('#end-back').addEventListener('click', () => {                               /
 });
 resetTheme();
 
+/* ───── 背景音樂：第一次點畫面後開始（瀏覽器規定要先點一下才能播），重複播放；結束畫面或查看主題卡時淡出停止 ───── */
+const bgm = $('#bgm'); bgm.volume = 0.6;
+let musicOff = false, fadeTm = null;
+function playMusic() { if (musicOff || !bgm.paused) return; clearInterval(fadeTm); bgm.volume = 0.6; bgm.play().catch(() => {}); }
+function stopMusic() {
+  musicOff = true; clearInterval(fadeTm);
+  fadeTm = setInterval(() => { if (bgm.volume > 0.06) bgm.volume = Math.max(0, bgm.volume - 0.06); else { bgm.pause(); clearInterval(fadeTm); } }, 80);
+}
+['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, playMusic, { passive: true }));
+
 /* ───── 左上角選單 ───── */
 const menuBtn = $('#menu-btn'), menu = $('#menu');
 function toggleMenu(v) { show(menu, v); menuBtn.setAttribute('aria-expanded', v); }
@@ -1016,10 +1037,12 @@ $('#reset').addEventListener('click', () => { store.reset(); location.reload(); 
     hideExtras(); showFlower(0); $('#curtain').classList.remove('on');
     document.querySelectorAll('.wall').forEach(w => show(w, false)); show($(scene));
     document.body.classList.toggle('reserve', scene === '#s4');
+    document.body.classList.toggle('reserve3', scene === '#s3');
     document.body.classList.toggle('night', !bg);
     if (bg) document.body.style.setProperty('--bg', `url("images/${bg}.png")`);
     [back, back4].forEach(b => show(b, false)); guide(null); toggleMenu(false);
     if (!store.get('user_name')) { store.set('user_name', '測試'); plate.querySelector('.nm').textContent = '測試'; }
+    musicOff = false; clearInterval(fadeTm); bgm.volume = 0.6; playMusic();
     step = 2; birdDone = false; roomReady = false; $('#keeper').classList.remove('shown');
     fn();
   }
