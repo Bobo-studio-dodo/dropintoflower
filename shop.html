@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7eed0">
+<title>遺落成華｜購買卡牌</title>
+<!--
+  支線 C：購買卡牌（暫時版本，之後再補上商品內容）
+  - 「支持我們」區塊的 id 是 sponsor，排卡結果頁的贊助按鈕會直接跳到這裡
+  - 贊助 QR code：放 images/sponsor-qr.png 就會自動顯示
+-->
+<style>
+@font-face{font-family:"Crayon";src:url("fonts/HanyiSentyCrayon-non-color.woff2") format("woff2");font-display:swap}
+:root{--blue:#789baa;--pink:#e1beb9;--cream:#f7eed0;--rose:#f1e0e4;--ink:#5a4a42}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100dvh;font-family:"Crayon","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--ink);
+  background:var(--rose) url("images/background1.png") center/cover no-repeat fixed;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
+  padding:calc(76px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+a.home{position:fixed;top:calc(14px + env(safe-area-inset-top));left:14px;width:46px;height:46px;border-radius:50%;
+  background:rgba(247,238,208,.92);box-shadow:0 2px 8px rgba(90,74,66,.18);display:flex;align-items:center;justify-content:center;
+  font-size:22px;color:var(--ink);text-decoration:none}
+.box{width:min(100%,640px);background:rgba(250,244,228,.96);border:2px solid var(--pink);border-radius:20px;
+  padding:22px 20px;text-align:center;box-shadow:0 4px 14px rgba(90,74,66,.18)}
+h1,h2{font-weight:normal;color:#4e7486}
+h1{font-size:clamp(26px,7vw,36px);margin-bottom:8px}
+h2{font-size:clamp(22px,5.6vw,28px);margin-bottom:6px}
+p{font-size:clamp(17px,4.4vw,21px);line-height:1.7}
+.soon{display:inline-block;margin-top:14px;padding:10px 24px;border-radius:999px;background:#c78696;color:#fff;font-size:clamp(18px,4.6vw,22px)}
+#qr{display:none;width:min(60%,220px);margin:12px auto 0;border-radius:12px;background:#fff;padding:8px}
+.back{display:inline-block;padding:12px 26px;border-radius:999px;background:var(--cream);color:var(--ink);
+  text-decoration:none;font-size:clamp(18px,4.6vw,22px);box-shadow:0 3px 0 rgba(90,74,66,.18)}
+</style>
+</head>
+<body>
+  <a class="home" href="index.html" aria-label="回到首頁">⌂</a>
+
+  <section class="box" id="shop">
+    <h1>購買卡牌</h1>
+    <p>《遺落成華》卡牌套組，<br>有每張卡更完整的解讀與引導。</p>
+    <span class="soon">販售頁即將開放，敬請期待～</span>
+  </section>
+
+  <section class="box" id="sponsor">
+    <h2>支持我們</h2>
+    <p>歡迎支持我們！掃描下方的 QR code 就能贊助 🌷</p>
+    <img id="qr" src="images/sponsor-qr.png" alt="贊助 QR code" onload="this.style.display='block'">
+  </section>
+
+  <a class="back" href="index.html">回到首頁</a>
+</body>
+</html>

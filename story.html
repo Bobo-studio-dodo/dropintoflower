@@ -15,7 +15,6 @@
   畫面三   windowbig 大窗戶 ／ btn-back 返回按鈕
   畫面四   background4 ／ book-cover 書封面、book-open 書翻開、book-page 書內頁（三張同尺寸；換頁時原地中軸旋轉翻面）／ flower1 洋甘菊、flower2 桔梗花、flower3 繡球花、flower4 櫻花（滿版，提到時整個畫面角色登場；
            直式 flowerN.png 1080×1920，橫式 flowerN-wide.png 1920×1080 可省略，沒有橫式就用直式）
-  音樂     audio/music1.mp3（也可用 .m4a／.ogg／.wav，檔名都叫 music1）
   畫面五   背景直接是黑色 ／ keeper1、keeper2、keeper3 管理員鳥的三個造型（同尺寸，對話時依句子切換）／ remind 提醒框插圖（可省略）
            write 寫下遺憾的範例圖示（可省略，放在「請在卡片上寫下…」通知框上方）
            onsite 現場排卡引導圖（可省略，放在通知框上方，讓工作人員快速辨識）
@@ -64,7 +63,6 @@ function imgMiss(i){
                linear-gradient(160deg,var(--cream),var(--blush) 50%,var(--lav));
   }
   body.night{background:#000}
-  @media (max-aspect-ratio:1/1){ body.reserve3{--talk:var(--dlg)} }   /* 畫面三（手機直式）：跟畫面四的書本一樣，窗戶放在對話框上方 */
   body.reserve{--talk:var(--dlg)}                 /* 畫面四：書本與花卉要看得到，所以保留對話框空間 */
   .hid{display:none!important}
   button{font:inherit;color:inherit;cursor:pointer}
@@ -80,9 +78,9 @@ function imgMiss(i){
   #plate{--x:25%;--y:3%; --w:50%;--r:2deg;   --ar:3/2; --nm-x:58%;--nm-y:58%;--nm-size:14cqw;--nm-r:0deg}
   #door {--x:3%; --y:23%;--w:62%;--r:-1.5deg;--ar:3/5}
   #mail {--x:60%;--y:52%;--w:38%;--r:3deg;   --ar:4/5}
-  #win  {--x:46%;--y:8%; --w:54%;--r:1.5deg; --ar:4/5}
-  #shelf{--x:0%; --y:12%;--w:50%;--r:-2deg;  --ar:3/5}
-  #bed  {--x:3%; --y:59%;--w:94%;--r:1deg;   --ar:3/2}
+  #win  {--x:44%;--y:4%; --w:54%;--r:1.5deg; --ar:4/5}
+  #shelf{--x:2%; --y:19%;--w:46%;--r:-2deg;  --ar:3/5}
+  #bed  {--x:3%; --y:63%;--w:94%;--r:1deg;   --ar:3/2}
   /* 畫面三、四：單張大圖，填滿可用空間（手機貼近底部、電腦置中放大），返回鈕放在上方 */
   #s3,#s4{position:fixed;inset:var(--top) 0 var(--talk) 0;width:auto;aspect-ratio:auto}
   #bigwin,#book{left:0;top:0;width:100%;height:100%;--r:0deg;--ar:4/5}
@@ -225,8 +223,7 @@ function imgMiss(i){
   #choices button:hover{background:var(--lav)}
   #choices button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
   #talk.menu .ctrl{display:none}
-  .ctrl{position:relative;align-self:stretch;display:flex;justify-content:flex-end;gap:8px}
-  .ctrl #prev{margin-right:auto}
+  .ctrl{position:relative;align-self:flex-end;display:flex;gap:8px}
   .ctrl button{font-size:clamp(16px,.6vw + 12px,20px);padding:2px 16px;border-radius:999px;
     border:2px solid var(--blue);background:var(--blush);color:var(--ink)}
   .ctrl button:hover{background:var(--lav)}
@@ -313,16 +310,6 @@ function imgMiss(i){
   #flowers .fl-mid.empty img{display:none} #flowers .fl-mid.empty .ph{display:grid}
   #flowers .btns{width:min(92vw,520px);margin:0}
 
-  /* DEBUG-START：檢查用選單（做完請刪除 CSS、HTML、JS 三處 DEBUG 區塊） */
-  #dbg-btn{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:10px;z-index:60;font-size:16px;padding:4px 12px;
-    border-radius:999px;border:2px dashed #a0524a;background:rgba(247,238,208,.95);color:#a0524a}
-  #dbg{position:fixed;top:calc(env(safe-area-inset-top) + 52px);right:10px;z-index:60;max-width:min(320px,92vw);
-    max-height:calc(100svh - 70px);overflow:auto;display:flex;flex-direction:column;gap:6px;padding:10px;
-    border-radius:14px;border:2px dashed #a0524a;background:rgba(247,238,208,.97)}
-  #dbg .g{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-  #dbg b{font-weight:normal;font-size:16px;color:#a0524a;min-width:3.8em}
-  #dbg button{font-size:15px;padding:3px 10px;border-radius:10px;border:1.5px solid var(--blue);background:var(--blush);color:var(--ink)}
-  /* DEBUG-END */
 </style>
 </head>
 
@@ -408,12 +395,6 @@ function imgMiss(i){
   <div class="fp"><picture><source media="(min-aspect-ratio: 1/1)" srcset="images/flower3-wide.png"><img src="images/flower3.png" alt="" decoding="async" onload="flOk(this)" onerror="flErr(this)"></picture><div class="ph">繡球花（flower3.png）</div></div>
   <div class="fp"><picture><source media="(min-aspect-ratio: 1/1)" srcset="images/flower4-wide.png"><img src="images/flower4.png" alt="" decoding="async" onload="flOk(this)" onerror="flErr(this)"></picture><div class="ph">櫻花（flower4.png）</div></div>
 </div>
-<audio id="bgm" loop preload="auto">
-  <source src="audio/music1.mp3" type="audio/mpeg">
-  <source src="audio/music1.m4a" type="audio/mp4">
-  <source src="audio/music1.ogg" type="audio/ogg">
-  <source src="audio/music1.wav" type="audio/wav">
-</audio>
 <div id="curtain"></div>
 
 <button id="menu-btn" type="button" aria-label="選單" aria-expanded="false">
@@ -423,6 +404,7 @@ function imgMiss(i){
 <nav id="menu" class="hid">
   <a href="index.html">回到首頁</a>
   <button type="button" id="reset">重新開始</button>
+  <button type="button" id="staff-open">工作人員</button>
 </nav>
 
 <div id="cchoices" class="hid"></div>
@@ -496,7 +478,7 @@ function imgMiss(i){
 <div id="onsite" class="ov hid" role="dialog" aria-modal="true">
   <div class="cbox">
     <img src="images/onsite.png" alt="" onerror="this.classList.add('hid')">
-    <p>請保持這個畫面不動，帶著它來找我們吧！</p>
+    <p>請找現場的工作人員，我們會陪你一起排卡。（此段文字待編輯）</p>
     <button type="button" id="o-online" class="big blue">改成線上排卡</button>
     <p class="small warn">這一步無法返回哦！</p>
   </div>
@@ -520,9 +502,9 @@ function imgMiss(i){
 
 <div id="endbox" class="ov hid" role="dialog" aria-modal="true">
   <div class="cbox">
-    <p>無論你目前心中是否帶著遺憾，都很感謝你今天的到來。<br>我們在現場準備了一份神秘小禮物🎁<br>只要出示這個畫面即可向工作人員領取！<br>如果對我們的卡牌套組感到好奇，或想了解更多細節，歡迎隨時找我們聊聊～</p>
+    <p>無論你目前心中是否帶著遺憾，都很感謝你今天的到來。我們在現場準備了一份神秘小禮物，只要出示這個畫面即可向工作人員領取！<br>如果對我們的卡牌套組感到好奇，或想了解更多細節，歡迎隨時找我們聊聊～</p>
     <div class="btns col">
-      <button type="button" id="end-draw" class="rose">來抽個卡吧！</button>
+      <button type="button" id="end-draw" class="rose">看看卡牌套組</button>
       <button type="button" id="end-home">結束旅行</button>
       <button type="button" id="end-back" class="alt">返回上一步</button>
     </div>
@@ -548,18 +530,6 @@ function imgMiss(i){
   </div>
 </div>
 
-<!-- DEBUG-START：檢查用選單（做完請整段刪除） -->
-<button id="dbg-btn" type="button">檢查</button>
-<div id="dbg" class="hid">
-  <div class="g"><b>畫面一</b><button data-j="a1">重新開始</button><button data-j="a2">領信</button><button data-j="a3">進門</button></div>
-  <div class="g"><b>畫面二</b><button data-j="b1">旁白</button><button data-j="b2">窗戶</button><button data-j="b3">書架</button><button data-j="b4">床</button></div>
-  <div class="g"><b>畫面三</b><button data-j="c1">窗戶旁白</button></div>
-  <div class="g"><b>畫面四</b><button data-j="d1">書本旁白</button></div>
-  <div class="g"><b>畫面五</b><button data-j="e1">鳥登場</button><button data-j="e2">提醒框</button><button data-j="e3">羽毛選單</button><button data-j="e4">羽毛之後</button></div>
-  <div class="g"><b>主題卡</b><button data-j="t1">友情</button><button data-j="t2">愛情</button><button data-j="t3">未來規劃</button><button data-j="t4">財務管理</button><button data-j="t5">其他</button></div>
-  <div class="g"><b>結尾</b><button data-j="e5">兩個選項</button><button data-j="e6">寫卡提醒</button><button data-j="e7">現場/線上</button><button data-j="e8">現場引導</button><button data-j="e9">寫不出來</button><button data-j="e10">結束</button></div>
-</div>
-<!-- DEBUG-END -->
 
 <script>
 const $ = s => document.querySelector(s);
@@ -764,7 +734,6 @@ function goScene(from, to, bg, after, color = 'var(--cream)', ms = 550) {
   setTimeout(() => {
     show($(from), false); show($(to));
     document.body.classList.toggle('reserve', to === '#s4');
-    document.body.classList.toggle('reserve3', to === '#s3');
     document.body.classList.toggle('night', !bg);
     if (bg) document.body.style.setProperty('--bg', `url("images/${bg}.png")`);
     c.classList.remove('on');
@@ -935,7 +904,7 @@ const openBox = id => {
 const remind = $('#remind');
 let endBack = null, readyLine = null;
 function openRemind() { openBox('#remind'); }
-function openEnd(back) { endBack = back; stopMusic(); openBox('#endbox'); }          // 結束互動：back = 按「返回」要回到哪裡
+function openEnd(back) { endBack = back; openBox('#endbox'); }          // 結束互動：back = 按「返回」要回到哪裡
 
 /* 提醒框：請打開信件拿出羽毛；沒領到信可以再次領信 */
 $('#remind-again').addEventListener('click', () => { show(remind, false); claimBack = () => openRemind(); openClaim(); });
@@ -979,7 +948,6 @@ const cv = $('#cardview'), cvImg = $('#cv-img'), cvPh = $('#cv-ph');
 cvImg.onload = () => show(cvPh, false);
 cvImg.onerror = () => { cvImg.classList.add('hid'); show(cvPh); };
 function showCard() {
-  stopMusic();
   const t = store.get('selected_theme') || '（尚未選擇主題）', f = CARD[t];
   cvPh.innerHTML = '';
   cvPh.append(t);
@@ -996,11 +964,11 @@ $('#w-stuck').addEventListener('click', () => openBox('#flowers'));           //
 $('#f-done').addEventListener('click', () => { resetTheme(); openBox('#write'); });   // 我寫好了 → 回到寫卡提醒，選主題後才能繼續
 $('#f-think').addEventListener('click', () => openEnd(() => openBox('#flowers')));
 $('#c-onsite').addEventListener('click', () => openBox('#onsite'));           // 現場排卡 → 引導找現場人員
-$('#c-online').addEventListener('click', () => { location.href = 'cards.html'; });    // 線上排卡 → 首頁 B 支線
-$('#o-online').addEventListener('click', () => { location.href = 'cards.html'; });    // 改成線上排卡 → 首頁 B 支線
+$('#c-online').addEventListener('click', () => { location.href = 'cards.html?theme=' + encodeURIComponent(store.get('selected_theme') || ''); });    // 線上排卡 → 首頁 B 支線
+$('#o-online').addEventListener('click', () => { location.href = 'cards.html?theme=' + encodeURIComponent(store.get('selected_theme') || ''); });    // 改成線上排卡 → 首頁 B 支線
 $('#o-card').addEventListener('click', showCard);                              // 工作人員小按鈕 → 顯示主題卡
 /* 2. 嗯...我再想想 → 結束互動 */
-$('#end-draw').addEventListener('click', () => { location.href = 'quiz.html'; });     // 來抽個卡吧！ → 首頁 C 支線
+$('#end-draw').addEventListener('click', () => { location.href = 'shop.html'; });     // 看看卡牌套組 → 首頁 C 支線（購買卡牌）
 $('#end-home').addEventListener('click', () => { location.href = 'index.html'; });    // 結束旅行 → 回到頁首
 $('#end-back').addEventListener('click', () => {                               // 返回上一步：先讓這個畫面消失，再重新出現上一頁
   const f = endBack; endBack = null;
@@ -1008,16 +976,6 @@ $('#end-back').addEventListener('click', () => {                               /
   if (f) setTimeout(f, 250);
 });
 resetTheme();
-
-/* ───── 背景音樂：第一次點畫面後開始（瀏覽器規定要先點一下才能播），重複播放；結束畫面或查看主題卡時淡出停止 ───── */
-const bgm = $('#bgm'); bgm.volume = 0.6;
-let musicOff = false, fadeTm = null;
-function playMusic() { if (musicOff || !bgm.paused) return; clearInterval(fadeTm); bgm.volume = 0.6; bgm.play().catch(() => {}); }
-function stopMusic() {
-  musicOff = true; clearInterval(fadeTm);
-  fadeTm = setInterval(() => { if (bgm.volume > 0.06) bgm.volume = Math.max(0, bgm.volume - 0.06); else { bgm.pause(); clearInterval(fadeTm); } }, 80);
-}
-['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, playMusic, { passive: true }));
 
 /* ───── 左上角選單 ───── */
 const menuBtn = $('#menu-btn'), menu = $('#menu');
@@ -1027,7 +985,72 @@ document.addEventListener('click', () => toggleMenu(false));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleMenu(false); });
 $('#reset').addEventListener('click', () => { store.reset(); location.reload(); });
 
-/* ═══ DEBUG-START：檢查用選單（做完請刪除 CSS、HTML、JS 三處 DEBUG 區塊） ═══ */
+/* =========================================================
+   🛠 工作人員檢查點
+   開啟／關閉：點左上角選單 →「工作人員」→ 輸入 4 位數密碼
+   ========================================================= */
+const STAFF_CODE = '0806';   // ✏️ 工作人員密碼（只能是 4 位數字）
+function setupStaff(menuEl, groups, btnPos, panelPos, onOpen){
+  const KEY = 'staffMode';
+  const get = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch(e){ return false; } };
+  const set = v => { try { v ? sessionStorage.setItem(KEY, '1') : sessionStorage.removeItem(KEY); } catch(e){} };
+  const css = document.createElement('style');
+  css.textContent = `
+  #stf-btn{position:fixed;${btnPos};z-index:400;width:44px;height:44px;border-radius:50%;border:none;
+    background:#333;color:#fff;font-size:20px;opacity:.8;display:none;cursor:pointer}
+  #stf-btn.on{display:block}
+  #stf-panel{position:fixed;${panelPos};z-index:400;display:none;
+    max-width:min(340px,92vw);max-height:70dvh;overflow:auto;background:rgba(30,30,30,.92);color:#fff;
+    border-radius:12px;padding:10px;font:14px/1.4 sans-serif}
+  #stf-panel.open{display:block}
+  #stf-panel .g{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:8px}
+  #stf-panel b{font-weight:normal;color:#f3c7bd;width:100%}
+  #stf-panel button{border:none;border-radius:6px;padding:5px 9px;background:#555;color:#fff;font-size:14px;cursor:pointer}
+  #stf-lock{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
+  #stf-lock.open{display:flex}
+  #stf-lock .bx{background:#fff;border-radius:14px;padding:18px;width:min(280px,86vw);text-align:center;font:16px/1.5 sans-serif;color:#333}
+  #stf-lock input{width:100%;font-size:26px;letter-spacing:.5em;text-align:center;padding:6px;margin:10px 0 4px;border:2px solid #ccc;border-radius:10px}
+  #stf-lock .msg{min-height:1.4em;font-size:14px;color:#b0605a}
+  #stf-lock button{margin-top:8px;border:none;border-radius:999px;padding:6px 18px;background:#eee;font-size:15px;cursor:pointer}`;
+  document.head.appendChild(css);
+
+  const btn = document.createElement('button'); btn.id = 'stf-btn'; btn.type = 'button'; btn.textContent = '🛠';
+  const panel = document.createElement('div'); panel.id = 'stf-panel';
+  const lock = document.createElement('div'); lock.id = 'stf-lock';
+  lock.innerHTML = '<div class="bx"><div class="t"></div><input type="password" inputmode="numeric" maxlength="4" autocomplete="off"><div class="msg"></div><button type="button">取消</button></div>';
+  document.body.append(btn, panel, lock);
+  const inp = lock.querySelector('input'), msg = lock.querySelector('.msg');
+
+  groups.forEach(([title, items]) => {
+    const g = document.createElement('div'); g.className = 'g';
+    g.innerHTML = '<b>' + title + '</b>';
+    items.forEach(([label, fn]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = label;
+      b.onclick = e => { e.stopPropagation(); panel.classList.remove('open'); fn(); };
+      g.appendChild(b);
+    });
+    panel.appendChild(g);
+  });
+  [btn, panel, lock].forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+  btn.onclick = e => { e.stopPropagation(); panel.classList.toggle('open'); };
+
+  const apply = () => { const on = get(); btn.classList.toggle('on', on); if (!on) panel.classList.remove('open'); };
+  const openLock = () => {
+    lock.querySelector('.t').textContent = get() ? '輸入密碼關閉檢查點' : '輸入密碼開啟檢查點';
+    inp.value = ''; msg.textContent = ''; lock.classList.add('open'); setTimeout(() => inp.focus(), 50);
+  };
+  inp.addEventListener('input', () => {
+    inp.value = inp.value.replace(/\D/g, '').slice(0, 4);
+    if (inp.value.length < 4) return;
+    if (inp.value === STAFF_CODE){ set(!get()); apply(); lock.classList.remove('open'); }
+    else { msg.textContent = '密碼不對喔'; inp.value = ''; }
+  });
+  lock.querySelector('button').onclick = () => lock.classList.remove('open');
+
+  menuEl.addEventListener('click', e => { e.stopPropagation(); onOpen && onOpen(); openLock(); });
+  apply();
+}
+
 (() => {
   const keeperShow = p => { $('#keeper').classList.add('shown'); pose = 0; setPose(p); };
   const mailOpen = () => { mail.querySelector('img').src = 'images/mailbox2.png'; mail.querySelector('.lbl').textContent = '信箱（有信）'; };
@@ -1037,47 +1060,41 @@ $('#reset').addEventListener('click', () => { store.reset(); location.reload(); 
     hideExtras(); showFlower(0); $('#curtain').classList.remove('on');
     document.querySelectorAll('.wall').forEach(w => show(w, false)); show($(scene));
     document.body.classList.toggle('reserve', scene === '#s4');
-    document.body.classList.toggle('reserve3', scene === '#s3');
     document.body.classList.toggle('night', !bg);
     if (bg) document.body.style.setProperty('--bg', `url("images/${bg}.png")`);
     [back, back4].forEach(b => show(b, false)); guide(null); toggleMenu(false);
     if (!store.get('user_name')) { store.set('user_name', '測試'); plate.querySelector('.nm').textContent = '測試'; }
-    musicOff = false; clearInterval(fadeTm); bgm.volume = 0.6; playMusic();
     step = 2; birdDone = false; roomReady = false; $('#keeper').classList.remove('shown');
     fn();
   }
   const room = (phase, tip) => () => jump('#s2', 'background2', () => { roomReady = true; roomPhase = phase; guide(...tip); });
   const card = th => () => jump('#s5', null, () => { keeperShow(1); setTheme(th); openBox('#onsite'); showCard(); });
   const s5 = (p, fn) => () => jump('#s5', null, () => { keeperShow(p); fn(); });
-  const J = {
-    a1: () => { store.reset(); location.reload(); },
-    a2: () => jump('#s1', 'background1', () => { step = 1; mailOpen(); guide(...TIPS.mail); }),
-    a3: () => jump('#s1', 'background1', () => { mailOpen(); guide(...TIPS.door); }),
-    b1: () => jump('#s2', 'background2', startRoom),
-    b2: room(1, TIPS.win), b3: room(2, TIPS.shelf), b4: room(3, TIPS.bed),
-    c1: () => jump('#s3', 'background3', startWindow),
-    d1: () => jump('#s4', 'background4', startBook),
-    e1: () => jump('#s5', null, startSleep),
-    e2: s5(1, openRemind),
-    e3: s5(1, askFeather),
-    e4: s5(1, startFeather),
-    e5: s5(2, askReady),
-    e6: s5(1, () => openBox('#write')),
-    e7: s5(1, () => openBox('#choose')),
-    e8: s5(1, () => openBox('#onsite')),
-    e9: s5(1, () => openBox('#flowers')),
-    e10: s5(1, () => openEnd(askReady)),
-    t1: card('友情'), t2: card('愛情'), t3: card('未來規劃'), t4: card('財務管理'), t5: card('其他')
-  };
-  const panel = $('#dbg');
-  $('#dbg-btn').addEventListener('click', e => { e.stopPropagation(); show(panel, panel.classList.contains('hid')); });
-  panel.addEventListener('click', e => {
-    e.stopPropagation();
-    const b = e.target.closest('button[data-j]');
-    if (b) { show(panel, false); J[b.dataset.j](); }
-  });
+  setupStaff($('#staff-open'), [
+    ['畫面一 門口', [
+      ['重新開始', () => { store.reset(); location.reload(); }],
+      ['領信', () => jump('#s1', 'background1', () => { step = 1; mailOpen(); guide(...TIPS.mail); })],
+      ['進門', () => jump('#s1', 'background1', () => { mailOpen(); guide(...TIPS.door); })] ]],
+    ['畫面二 房間', [
+      ['房間開場', () => jump('#s2', 'background2', startRoom)],
+      ['去看窗戶', room(1, TIPS.win)], ['去翻書架', room(2, TIPS.shelf)], ['去睡覺', room(3, TIPS.bed)] ]],
+    ['畫面三、四', [
+      ['窗戶', () => jump('#s3', 'background3', startWindow)],
+      ['書本', () => jump('#s4', 'background4', startBook)] ]],
+    ['畫面五 睡著', [
+      ['知更鳥出現', () => jump('#s5', null, startSleep)],
+      ['打開信件提醒', s5(1, openRemind)],
+      ['有看到羽毛嗎', s5(1, askFeather)],
+      ['羽毛台詞', s5(1, startFeather)],
+      ['準備好了嗎', s5(2, askReady)],
+      ['寫下遺憾', s5(1, () => openBox('#write'))],
+      ['現場／線上', s5(1, () => openBox('#choose'))],
+      ['現場排卡', s5(1, () => openBox('#onsite'))],
+      ['四種花朵', s5(1, () => openBox('#flowers'))],
+      ['結束畫面', s5(1, () => openEnd(askReady))] ]],
+    ['主題卡', [['友情', card('友情')], ['愛情', card('愛情')], ['未來規劃', card('未來規劃')], ['財務管理', card('財務管理')], ['其他', card('其他')]]]
+  ], 'right:10px;top:calc(10px + env(safe-area-inset-top))', 'right:10px;top:calc(62px + env(safe-area-inset-top))', () => toggleMenu(false));
 })();
-/* ═══ DEBUG-END ═══ */
 
 /* ───── 開始 ───── */
 store.reset();

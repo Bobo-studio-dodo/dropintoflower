@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>遺落成華｜線上排卡</title>
+<style>
+/* ===================================================
+   可調整的樣式（只改數字即可）
+   =================================================== */
+:root{
+  /* 自定義卡（C12）上文字的位置與大小：x 左右、y 上下、size 字的大小 */
+  --custom-x: 50%;
+  --custom-y: 55%;
+  --custom-size: 10cqw;
+
+  /* 計分畫面：能力便條紙在卡牌上的位置、大小、角度 */
+  --note-x: 50%;      /* 左右（50% = 置中） */
+  --note-y: -4%;      /* 上下（負數 = 超出卡片上緣一點） */
+  --note-w: 78%;      /* 寬度（相對卡片寬度） */
+  --note-rotate: -4deg;
+
+  /* 主題色 */
+  --c-F:#b4a149;  /* 友情 */
+  --c-L:#a09285;  /* 愛情 */
+  --c-P:#80679e;  /* 未來規劃 */
+  --c-M:#c78696;  /* 財務管理 */
+  --c-O:#607479;  /* 共同因素／其他 */
+
+  /* 配色 */
+  --blue:#789baa;
+  --pink:#e1beb9;
+  --cream:#f7eed0;
+  --rose:#f1e0e4;
+  --lilac:#ede2ef;
+  --ink:#5a4a42;
+  --branch:#8b6a4e;
+}
+
+/* =================================================== */
+@font-face{
+  font-family:"Crayon";
+  src:url("fonts/HanyiSentyCrayon-non-color.woff2") format("woff2");
+  font-display:swap;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  font-family:"Crayon","PingFang TC","Microsoft JhengHei",sans-serif;
+  color:var(--ink);
+  background:var(--rose) url("images/background1.png") center/cover no-repeat fixed;
+  user-select:none;-webkit-user-select:none;
+}
+button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer}
+img{-webkit-user-drag:none;user-select:none}
+
+#app{position:fixed;inset:0;height:100dvh}
+
+/* ---------- 畫面切換 ---------- */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;
+  padding:calc(70px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom))}
+.screen.show{display:flex;animation:fadeIn .6s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ---------- 左上選單、右上音樂 ---------- */
+.corner{position:fixed;top:calc(14px + env(safe-area-inset-top));z-index:50;
+  width:46px;height:46px;border-radius:50%;background:rgba(247,238,208,.92);
+  box-shadow:0 2px 8px rgba(90,74,66,.18);font-size:22px;display:none;align-items:center;justify-content:center}
+.corner.show{display:flex}
+#menuBtn{left:14px}
+#cmenu{position:fixed;z-index:60;top:calc(68px + env(safe-area-inset-top));left:14px;display:none;flex-direction:column;
+  background:rgba(250,244,228,.97);border:2px solid var(--pink);border-radius:14px;overflow:hidden;box-shadow:0 4px 12px rgba(90,74,66,.2)}
+#cmenu.open{display:flex}
+#cmenu button{font-size:19px;padding:10px 22px;text-align:center}
+#cmenu button + button{border-top:1px dashed var(--pink)}
+#cmenu button:active{background:var(--lilac)}
+#musicBtn{right:14px}
+#musicBtn.off{opacity:.45;text-decoration:line-through}
+
+/* ---------- 共用按鈕 ---------- */
+.btn{padding:12px 26px;border-radius:999px;font-size:clamp(19px,5vw,24px);
+  background:var(--blue);color:#fff;box-shadow:0 3px 0 rgba(90,74,66,.18);transition:transform .15s,opacity .2s}
+.btn:active{transform:translateY(2px)}
+.btn.light{background:var(--cream);color:var(--ink)}
+.btn.pink{background:var(--pink);color:var(--ink)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+/* ---------- 知更鳥 ---------- */
+.keeper{position:relative;width:min(62vw,40dvh,360px);aspect-ratio:1;animation:float 3.6s ease-in-out infinite}
+.keeper img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .25s}
+.keeper img.k2{opacity:0}
+.keeper.alt img.k1{opacity:0}
+.keeper.alt img.k2{opacity:1}
+.keeper.noimg{background:rgba(120,155,170,.25);border-radius:50%}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ---------- 開場 ---------- */
+#s-load{justify-content:center;gap:28px;padding-top:20px}
+.cover{position:relative;max-width:86vw;animation:float 3.6s ease-in-out infinite}
+.cover img{display:block;height:100%;width:auto;max-width:100%;object-fit:contain}
+.cover img.c2{position:absolute;inset:0;margin:auto;opacity:0;animation:glow 2.8s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:0}50%{opacity:1}}
+.cover.noimg{aspect-ratio:5/8;background:rgba(120,155,170,.25);border-radius:24px}
+.cover.noimg img{display:none}
+#cover{height:min(64dvh,680px)}
+#coverTalk{height:min(40dvh,440px);flex:0 1 auto;min-height:110px}
+#loadText{font-size:clamp(20px,5vw,26px);letter-spacing:.1em;
+  background:rgba(247,238,208,.85);padding:8px 22px;border-radius:999px}
+#loadText.ready{animation:breathe 2.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* ---------- 對話 ---------- */
+#s-talk{justify-content:center;gap:18px}
+.dialog{width:min(100%,620px);background:rgba(250,244,228,.96);color:var(--ink);border-radius:18px;
+  border:2px solid var(--pink);padding:16px 20px 12px;box-shadow:0 4px 14px rgba(90,74,66,.2)}
+.dialog .text{font-size:clamp(21px,5.3vw,27px);line-height:1.6;min-height:1.6em}
+.dialog .text ul{list-style:none;margin-top:4px}
+.dialog .text li{margin:6px 0;font-size:.9em;line-height:1.45}
+.dialog .text b{color:#a85a54;font-weight:normal}
+.dialog .nav{display:flex;justify-content:space-between;margin-top:8px}
+.dialog .nav button{color:#8a7468;font-size:clamp(16px,4vw,19px);padding:6px 4px}
+#talkNext.end{background:#4e7486;color:#fff;padding:8px 20px;border-radius:999px}
+
+/* 三種分類的說明區塊（顏色對應分類按鈕） */
+#talkPanel{display:none;flex-direction:column;gap:12px;width:min(100%,620px);flex:0 1 auto;min-height:0;overflow-y:auto}
+#s-talk.panel #talkPanel{display:flex}
+#s-talk.panel #coverTalk{display:none}
+#talkPanel .pk{color:#fff;border-radius:16px;padding:14px 18px;border:2px solid rgba(255,255,255,.85);
+  box-shadow:0 4px 0 rgba(60,45,40,.25);animation:fadeIn .5s ease both}
+#talkPanel .pk:nth-child(2){animation-delay:.25s}
+#talkPanel .pk:nth-child(3){animation-delay:.5s}
+#talkPanel .pk h3{font-weight:normal;font-size:clamp(22px,5.6vw,28px);margin-bottom:4px}
+#talkPanel .pk p{font-size:clamp(17px,4.4vw,21px);line-height:1.5}
+#talkPanel .pk.a{background:#a85a54}
+#talkPanel .pk.b{background:#7a6694}
+#talkPanel .pk.c{background:#4e7486}
+
+/* ---------- 選主題 ---------- */
+#s-theme{justify-content:center;gap:22px}
+.title{font-size:clamp(21px,5.4vw,28px);text-align:center;line-height:1.5;
+  background:rgba(247,238,208,.88);padding:10px 20px;border-radius:16px}
+.themes{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(100%,420px)}
+.themes .btn{width:100%;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.themes .btn[data-t="F"]{background:var(--c-F)}
+.themes .btn[data-t="L"]{background:var(--c-L)}
+.themes .btn[data-t="P"]{background:var(--c-P)}
+.themes .btn[data-t="M"]{background:var(--c-M)}
+.themes .btn[data-t="O"]{background:var(--c-O)}
+.themes .btn:last-child{grid-column:1/-1}
+
+/* ---------- 卡牌 ---------- */
+.card{position:relative;aspect-ratio:804/1642;border-radius:8px;overflow:hidden;
+  background:#fff;box-shadow:0 4px 14px rgba(90,74,66,.25);container-type:inline-size}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+.card .ph{display:none}
+.card.noimg img{display:none}
+.card.noimg .ph{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;
+  background:#ddd;color:#888;font-size:18cqw}
+.card .ctext{position:absolute;left:var(--custom-x);top:var(--custom-y);transform:translate(-50%,-50%);
+  width:82%;text-align:center;font-size:var(--custom-size);line-height:1.3;color:var(--ink);word-break:break-all}
+.card .ctext.chint{color:#fff;font-size:calc(var(--custom-size)*.85);background:rgba(78,116,134,.88);
+  border-radius:8px;padding:.35em .2em;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+
+/* ---------- 旋轉盤 ---------- */
+#s-sort{gap:12px}
+.hint{font-size:clamp(17px,4.4vw,21px);background:rgba(247,238,208,.88);padding:6px 16px;border-radius:999px;text-align:center}
+.stage{position:relative;flex:1;width:100%;display:flex;align-items:center;justify-content:center;min-height:0}
+#ring{--cardH:min(50dvh,480px);--cardW:calc(var(--cardH)*804/1642);
+  position:relative;width:100%;height:var(--cardH);perspective:1100px;transform-style:preserve-3d;touch-action:pan-y}
+#ring .card{position:absolute;left:50%;top:0;width:var(--cardW);margin-left:calc(var(--cardW)/-2);
+  transition:transform .45s ease,opacity .45s ease}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:30;width:42px;height:42px;border-radius:50%;
+  background:rgba(247,238,208,.9);font-size:20px;box-shadow:0 2px 6px rgba(90,74,66,.2)}
+#prevArrow{left:0}#nextArrow{right:0}
+#sortDone{display:none;flex-direction:column;align-items:center;gap:16px}
+#sortDone.show{display:flex}
+#sortDoneBtn,#levelNext,#scoreOk{background:#4e7486;border:2px solid rgba(255,255,255,.85);box-shadow:0 4px 0 rgba(60,45,40,.28)}
+.piles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(100%,560px)}
+.pile{position:relative;padding:12px 4px;border-radius:14px;font-size:clamp(19px,5vw,24px);line-height:1.3;
+  color:#fff;border:2px solid rgba(255,255,255,.85);box-shadow:0 4px 0 rgba(60,45,40,.28)}
+.pile:active{transform:translateY(2px)}
+/* 三堆按鈕的顏色 */
+.pile.a{background:#a85a54}   /* 可以改變的：紅 */
+.pile.b{background:#7a6694}   /* 恆久不變的：紫 */
+.pile.c{background:#4e7486}   /* 沒有關聯的：藍 */
+.pile .count{position:absolute;top:-8px;right:-4px;min-width:26px;height:26px;border-radius:13px;
+  background:var(--cream);color:var(--ink);font-size:15px;line-height:26px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+#sortGuide{font-size:clamp(17px,4.5vw,21px);color:var(--ink);text-align:center;
+  background:rgba(247,238,208,.92);padding:6px 16px;border-radius:14px;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+.linkbtn{font-size:16px;text-decoration:underline;opacity:.8;padding:4px}
+#reviewBtn{font-size:clamp(16px,4.2vw,19px);padding:8px 18px;border-radius:999px;background:var(--cream);
+  color:var(--ink);border:2px dashed #a85a54;box-shadow:0 3px 0 rgba(90,74,66,.18)}
+#reviewBtn:disabled{opacity:.45}
+#reviewBtn.pulse{animation:pulse 1s ease-in-out 3}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.rv .tip{font-size:16px;line-height:1.5;background:#fff;border-radius:12px;padding:8px 12px;margin-bottom:6px;text-align:left}
+.rv h3{border-left:6px solid;padding-left:8px}
+.rv h3.a{border-color:#a85a54}.rv h3.b{border-color:#7a6694}.rv h3.c{border-color:#4e7486}
+
+/* ---------- 選五張 ---------- */
+#s-pick{gap:12px}
+.scroll{flex:1;width:100%;overflow-y:auto;min-height:0;padding:6px 2px 10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:min(100%,640px);margin:0 auto}
+.grid .card{transition:transform .2s,box-shadow .2s;cursor:pointer}
+.grid .card.sel{transform:scale(.95);box-shadow:0 0 0 4px var(--blue),0 4px 14px rgba(90,74,66,.25)}
+.grid .card .mark{display:none;position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;
+  background:var(--blue);color:#fff;font-size:18px;line-height:28px;text-align:center}
+.grid .card.sel .mark{display:block}
+
+/* ---------- 種子 ---------- */
+.seed{display:inline-block;width:30px;height:30px;background:url("images/seed.png") center/contain no-repeat}
+body.noseed .seed{background:none}
+body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12% auto;border-radius:50%;background:var(--branch)}
+.seed.ghost{opacity:.22}
+#s-seed{gap:10px}
+#seedPool{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:360px}
+.seedrow{display:flex;align-items:center;gap:12px;width:min(100%,560px);margin:0 auto 12px;
+  background:rgba(247,238,208,.88);border-radius:16px;padding:10px}
+.seedrow .card{width:68px;flex:none;cursor:zoom-in}
+.seedrow .mid{flex:1;display:flex;flex-wrap:wrap;gap:2px;align-items:center;min-width:0}
+.seedrow .ctrl{display:flex;flex-direction:column;align-items:center;gap:4px}
+.seedrow .ctrl button{width:42px;height:42px;border-radius:50%;background:var(--blue);color:#fff;font-size:24px;line-height:1}
+.seedrow .ctrl button:disabled{opacity:.3}
+.seedrow .num{font-size:20px}
+
+/* ---------- 計分 ---------- */
+#s-level{gap:12px}
+#levelWrap{position:relative;flex:none;height:min(38dvh,420px);aspect-ratio:804/1642;margin-top:4%}
+#levelWrap .card{width:100%;height:100%}
+#levelNote{position:absolute;left:var(--note-x);top:var(--note-y);width:var(--note-w);
+  transform:translateX(-50%) rotate(var(--note-rotate));z-index:2;pointer-events:none;
+  filter:drop-shadow(0 3px 4px rgba(90,74,66,.3))}
+#levelNote img{display:block;width:100%;height:auto}
+#levelNote .ph{display:none;aspect-ratio:4/3;background:#fff6b8;border:2px dashed #c9b25a;
+  align-items:center;justify-content:center;font-size:14px;color:#8a7a3a;text-align:center;line-height:1.3}
+#levelNote.noimg img{display:none}
+#levelNote.noimg .ph{display:flex}
+.levels{display:flex;flex-direction:column;gap:10px;width:min(100%,600px)}
+.levelBody{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;flex:1;min-height:0;justify-content:center}
+.level{text-align:left;padding:10px 16px;border-radius:14px;background:rgba(247,238,208,.94);
+  box-shadow:0 3px 0 rgba(90,74,66,.15);font-size:clamp(17px,4.5vw,22px);line-height:1.45}
+.level b{display:flex;justify-content:space-between;font-weight:normal;font-size:1.15em;color:var(--blue)}
+.level.sel{background:var(--blue);color:#fff}
+.level.sel b{color:var(--cream)}
+
+/* ---------- 樹枝計分 ---------- */
+#s-score{justify-content:center;gap:30px}
+.branch{position:relative;width:min(92%,640px);height:120px}
+.branch .bar{position:absolute;left:0;right:0;top:60px;height:14px;border-radius:7px;
+  background:linear-gradient(180deg,#a5805f,var(--branch) 60%,#6f523b)}
+.branch .leaf{position:absolute;width:22px;height:12px;border-radius:0 100% 0 100%;background:#9bb08a}
+.branch .tick{position:absolute;top:80px;transform:translateX(-50%);font-size:15px}
+.branch .tick::before{content:"";position:absolute;left:50%;top:-8px;width:2px;height:6px;background:var(--branch)}
+#marker{position:absolute;top:24px;left:0;width:38px;height:38px;margin-left:-19px;transition:left .8s ease}
+#marker .seed{width:38px;height:38px}
+#plus{position:absolute;top:0;transform:translateX(-50%);font-size:20px;color:var(--blue);opacity:0}
+#plus.pop{animation:pop 1s ease}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,10px)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,-14px)}}
+#scoreText{min-height:2em}
+
+/* ---------- 結果 ---------- */
+#s-result{justify-content:flex-start;gap:18px;overflow-y:auto}
+#s-result > *{flex:none}
+.result{width:min(100%,640px);background:var(--cream);border-radius:20px;padding:22px 24px;
+  box-shadow:0 6px 18px rgba(90,74,66,.22);border:3px solid var(--pink);text-align:center}
+.result .score{font-size:clamp(21px,5.4vw,26px);opacity:.85}
+.result h2{font-weight:normal;font-size:clamp(19px,4.8vw,23px);color:#8a7468;margin:14px 0 10px}
+.result p{font-size:clamp(17px,4.4vw,21px);line-height:1.75}
+.res-top{display:flex;gap:14px;align-items:center;text-align:left;background:#fff;border-radius:16px;padding:12px}
+.res-top .card{width:96px;flex:none;cursor:zoom-in}
+.res-top .nm{font-size:clamp(24px,6.4vw,32px);color:var(--ink);line-height:1.3;word-break:break-all}
+.res-top .sk{font-size:clamp(16px,4.2vw,19px);margin-top:4px;color:#4e7486}
+.res-top .lv{display:inline-block;margin-top:6px;font-size:clamp(15px,3.9vw,17px);background:#a85a54;color:#fff;border-radius:999px;padding:2px 12px}
+.res-sec{text-align:left;margin-top:14px}
+.res-sec h3{font-weight:normal;font-size:clamp(17px,4.4vw,20px);color:#a85a54;margin-bottom:2px}
+.res-sec p{font-size:clamp(18px,4.6vw,22px);line-height:1.65}
+.res-sec.tip{background:rgba(120,155,170,.16);border-radius:14px;padding:10px 14px}
+.res-note{margin-top:14px;font-size:clamp(15px,3.9vw,18px)!important;opacity:.75}
+.res-shop{margin-top:16px;padding-top:14px;border-top:2px dashed var(--pink)}
+.res-shop p{font-size:clamp(16px,4.2vw,19px);margin-bottom:10px}
+.panel2{width:min(100%,640px);background:rgba(250,244,228,.96);border-radius:20px;padding:18px 20px;
+  border:2px solid var(--pink);box-shadow:0 4px 14px rgba(90,74,66,.18);text-align:center}
+.panel2 h2{font-weight:normal;font-size:clamp(22px,5.6vw,28px);color:#4e7486;margin-bottom:4px}
+.panel2 .sub{font-size:clamp(15px,3.9vw,17px);opacity:.75;margin-bottom:12px;line-height:1.5}
+.panel2 .q{font-size:clamp(17px,4.4vw,20px);margin-bottom:6px}
+.rate{display:flex;justify-content:center;gap:6px;margin-bottom:12px}
+.rate button{font-size:32px;filter:grayscale(1);opacity:.4;transition:transform .15s}
+.rate button.on{filter:none;opacity:1;transform:scale(1.1)}
+/* 自己畫的花：亮 / 不亮兩張圖 */
+.rate.img button{filter:none;opacity:1;width:48px;height:48px;position:relative}
+.rate.img img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.rate.img img.on{opacity:0}
+.rate.img button.on img.on{opacity:1}
+.rate.img button.on img.off{opacity:0}
+#fbHp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+#fbText{width:100%;min-height:96px;font-family:inherit;font-size:18px;padding:10px 12px;border-radius:12px;
+  border:2px solid var(--pink);background:#fff;color:var(--ink);resize:vertical;margin-bottom:10px}
+#fbMsg{min-height:1.5em;font-size:16px;margin-top:8px}
+#fbSend{background:#4e7486}
+#spQR{display:none;width:min(60%,220px);margin:8px auto 12px;border-radius:12px;background:#fff;padding:8px}
+#spQR.show{display:block}
+#spBtn{background:#c78696}
+.endrow{margin-bottom:10px}
+
+/* ---------- 彈出視窗 ---------- */
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+  background:rgba(90,74,66,.45);padding:20px}
+.modal.show{display:flex;animation:fadeIn .3s}
+.box{width:min(100%,460px);max-height:86dvh;overflow-y:auto;background:var(--cream);border-radius:20px;
+  padding:22px 20px;text-align:center;font-size:clamp(18px,4.6vw,22px);line-height:1.6}
+.box p{margin-bottom:16px}
+.box input{width:100%;font-family:inherit;font-size:20px;padding:10px 14px;border-radius:12px;
+  border:2px solid var(--pink);background:#fff;color:var(--ink);margin-bottom:6px}
+.box .err{color:#b0605a;font-size:16px;min-height:1.4em;margin-bottom:10px}
+#zoomModal .card{height:min(78dvh,620px);margin:auto}
+.rv h3{font-weight:normal;font-size:19px;margin:10px 0 8px;text-align:left}
+.rv .list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+.rv .item{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:14px}
+.rv .item .card{width:62px}
+.rv .item button{font-size:14px;background:var(--blue);color:#fff;border-radius:999px;padding:3px 10px}
+.rv .empty{font-size:15px;opacity:.6}
+#toast{position:fixed;left:50%;top:calc(118px + env(safe-area-inset-top));transform:translateX(-50%);z-index:200;
+  background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;font-size:17px;opacity:0;pointer-events:none;
+  transition:opacity .3s;max-width:90vw;text-align:center}
+#toast.show{opacity:.92}
+
+/* ---------- 電腦、平板橫向 ---------- */
+@media (min-aspect-ratio:1/1) and (min-width:700px){
+  #ring{--cardH:min(60dvh,600px)}
+  .levelBody{flex-direction:row;gap:36px}
+  #levelWrap{height:min(68dvh,600px)}
+  .levels{width:min(48vw,560px)}
+  .grid{grid-template-columns:repeat(5,1fr)}
+  #coverTalk{height:min(46dvh,460px)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <button class="corner show" id="menuBtn" aria-label="選單">☰</button>
+  <nav id="cmenu">
+    <button type="button" id="cmHome">回到首頁</button>
+    <button type="button" id="cmStaff">工作人員</button>
+  </nav>
+  <button class="corner" id="musicBtn" aria-label="音樂">♪</button>
+
+  <!-- 開場 -->
+  <section class="screen show" id="s-load">
+    <div class="cover" id="cover"><img class="c1" alt=""><img class="c2" alt=""></div>
+    <p id="loadText">花園準備中…</p>
+  </section>
+
+  <!-- 知更鳥對話 -->
+  <section class="screen" id="s-talk">
+    <div class="cover" id="coverTalk"><img class="c1" alt=""><img class="c2" alt=""></div>
+    <div id="talkPanel"></div>
+    <div class="dialog" id="talkBox">
+      <div class="text" id="talkText"></div>
+      <div class="nav"><button id="talkPrev">◂ 上一句</button><button id="talkNext">下一句 ▸</button></div>
+    </div>
+  </section>
+
+  <!-- 選主題 -->
+  <section class="screen" id="s-theme">
+    <p class="title" id="themeTitle"></p>
+    <div class="themes" id="themeBtns"></div>
+  </section>
+
+  <!-- 旋轉盤分類 -->
+  <section class="screen" id="s-sort">
+    <p class="hint" id="sortHint"></p>
+    <div class="stage">
+      <div id="ring"></div>
+      <button class="arrow" id="prevArrow" aria-label="上一張">◂</button>
+      <button class="arrow" id="nextArrow" aria-label="下一張">▸</button>
+      <div id="sortDone"><p class="title">全部分類完成！</p><button class="btn" id="sortDoneBtn">完成分類</button></div>
+    </div>
+    <p id="sortGuide"></p>
+    <div class="piles">
+      <button class="pile a" data-p="a">可以<br>改變的<span class="count">0</span></button>
+      <button class="pile b" data-p="b">恆久<br>不變的<span class="count">0</span></button>
+      <button class="pile c" data-p="c">沒有<br>關聯的<span class="count">0</span></button>
+    </div>
+    <button id="reviewBtn"></button>
+  </section>
+
+  <!-- 選出五張 -->
+  <section class="screen" id="s-pick">
+    <p class="title" id="pickTitle"></p>
+    <div class="scroll"><div class="grid" id="pickGrid"></div></div>
+    <button class="btn" id="pickOk">確定</button>
+  </section>
+
+  <!-- 分配種子 -->
+  <section class="screen" id="s-seed">
+    <p class="hint" id="seedLeft"></p>
+    <div id="seedPool"></div>
+    <div class="scroll" id="seedList"></div>
+    <button class="btn" id="seedOk">分配好了</button>
+  </section>
+
+  <!-- 計分 -->
+  <section class="screen" id="s-level">
+    <p class="hint" id="levelHint"></p>
+    <div class="levelBody">
+      <div id="levelWrap">
+        <div class="card" id="levelCard"></div>
+        <div id="levelNote"><img alt=""><div class="ph"></div></div>
+      </div>
+      <div class="levels" id="levelBtns"></div>
+    </div>
+    <div class="row levelNav">
+      <button class="btn light" id="levelPrev">◂ 上一張</button>
+      <button class="btn" id="levelNext">下一張 ▸</button>
+    </div>
+  </section>
+
+  <!-- 樹枝計分動畫 -->
+  <section class="screen" id="s-score">
+    <p class="title" id="scoreTitle"></p>
+    <div class="branch" id="branch">
+      <div class="bar"></div>
+      <span id="plus"></span>
+      <div id="marker"><span class="seed"></span></div>
+    </div>
+    <p class="title" id="scoreText" style="visibility:hidden"></p>
+    <button class="btn" id="scoreOk" style="visibility:hidden">看看結果</button>
+  </section>
+
+  <!-- 結果 -->
+  <section class="screen" id="s-result">
+    <div class="result" id="resBox">
+      <p class="score" id="resScore"></p>
+      <h2 id="resTopTitle"></h2>
+      <div class="res-top">
+        <div id="resCard"></div>
+        <div><div class="nm" id="resName"></div><div class="sk" id="resSkill"></div><span class="lv" id="resLevel"></span></div>
+      </div>
+      <div class="res-sec"><h3 id="resStateT"></h3><p id="resState"></p></div>
+      <div class="res-sec tip"><h3 id="resTipT"></h3><p id="resTip"></p></div>
+      <p class="res-note" id="resNote"></p>
+      <div class="res-shop" id="resShop"><p id="shopText"></p><button class="btn" id="shopBtn"></button></div>
+    </div>
+
+    <!-- 回饋 -->
+    <div class="panel2" id="fbBox">
+      <h2 id="fbTitle"></h2>
+      <p class="sub" id="fbSub"></p>
+      <p class="q" id="fbRate"></p>
+      <div class="rate" id="rate"></div>
+      <textarea id="fbText" maxlength="500"></textarea>
+      <input id="fbHp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn" id="fbSend"></button>
+      <p id="fbMsg"></p>
+    </div>
+
+    <!-- 贊助 -->
+    <div class="panel2" id="spBox">
+      <h2 id="spTitle"></h2>
+      <p class="sub" id="spText"></p>
+      <img id="spQR" alt="贊助 QR code">
+      <button class="btn" id="spBtn"></button>
+    </div>
+
+    <div class="row endrow">
+      <button class="btn pink" id="again">重新來一次</button>
+      <button class="btn light" id="toHome">回到首頁</button>
+    </div>
+  </section>
+</div>
+
+<!-- 離開提醒 -->
+<div class="modal" id="leaveModal"><div class="box">
+  <p id="leaveText"></p>
+  <div class="row"><button class="btn light" id="leaveNo">繼續排卡</button><button class="btn" id="leaveYes">離開</button></div>
+</div></div>
+
+<!-- 自定義卡輸入 -->
+<div class="modal" id="inputModal"><div class="box">
+  <p id="inputText"></p>
+  <input id="customInput" type="text" autocomplete="off">
+  <div class="err" id="inputErr"></div>
+  <div class="row"><button class="btn light" id="inputNo">取消</button><button class="btn" id="inputYes">寫好了</button></div>
+</div></div>
+
+<!-- 沒有可改變的卡 -->
+<div class="modal" id="zeroModal"><div class="box">
+  <p id="zeroText"></p>
+  <div class="row"><button class="btn light" id="zeroBack">回去重新分類</button><button class="btn" id="zeroWrite">寫自定義卡</button></div>
+</div></div>
+
+<!-- 查看已分類 -->
+<div class="modal" id="reviewModal"><div class="box rv">
+  <div id="reviewBody"></div>
+  <button class="btn" id="reviewClose" style="margin-top:10px">關閉</button>
+</div></div>
+
+<!-- 放大看卡 -->
+<div class="modal" id="zoomModal"><div id="zoomBody"></div></div>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   ✏️ 文字與檔案設定：只要修改引號「' '」裡面的文字即可
+   ========================================================= */
+const IMG  = 'images/';                  // 共用圖片資料夾
+const CARD = 'images/cards/card/';       // 卡牌圖（C01.png、F01.png…）
+const NOTE = 'images/cards/ability/';    // 能力便條紙圖（檔名與卡牌相同：C01.png、F01.png…）
+const FILES = {
+  home:   'index.html',     // 回到首頁
+  shop:     'shop.html',          // 購買卡牌頁（首頁 C 支線）
+  sponsor:  'shop.html#sponsor',  // 贊助：連到購買卡牌頁的「支持我們」區塊
+  sponsorQR: IMG + 'sponsor-qr.png',   // 贊助 QR code 圖（沒有這張圖就不顯示）
+  feedback: 'https://script.google.com/macros/s/AKfycby0IrQq5lZt7b8Wv2QHy5VXmNtBHDzhBPWE1OdNWUV9PsJRWaI9b_J_NycdWC3zqk2d_w/exec',   // 回饋後台網址
+  flowerOn:  IMG + 'flower-on.png',    // 評分：亮的花
+  flowerOff: IMG + 'flower-off.png',   // 評分：不亮的花
+  cover1:  IMG + 'cover1.png',   // 開場知更鳥（直式）
+  cover2:  IMG + 'cover2.png',   // 開場知更鳥打光版
+  keeper1: IMG + 'keeper1.png',
+  keeper2: IMG + 'keeper2.png',
+  seed:    IMG + 'seed.png',
+  bg:      IMG + 'background1.png',
+  music:  'audio/music1.mp3'
+};
+
+const TEXT = {
+  loading: '花園準備中…',
+  ready:   '輕觸畫面，開始探索',
+
+  prep: [
+    '歡迎來到心靈花園～',
+    '在開始之前，先找一個讓你感到安心、能靜下來的地方吧。',
+    '如果願意，可以放一首喜歡的音樂，或點上喜歡的香氛。',
+    '準備好了，我們就出發囉！'
+  ],
+  prepEnd: '我準備好了',
+
+  themeTitle: '這次想探索的遺憾，<br>是關於哪一個主題呢？',
+
+  sortIntro: [
+    '試著回想遺憾發生的那一刻…',
+    '是哪些因素，讓當時的你做出了那個選擇呢？',
+    { text:'接下來，請把每張卡分到這三個地方：', panel:true },
+    '記得，要用「當時的自己」來判斷，而不是現在的想法喔！'
+  ],
+  sortIntroEnd: '開始分類',
+  // 三種分類的說明（會出現在畫面中央，顏色對應下方的分類按鈕）
+  piles: [
+    { title:'可以改變的', desc:'當時可以透過自己的行動、想法或選擇改變的' },
+    { title:'恆久不變的', desc:'當時難以由自己改變，或不論如何都存在的' },
+    { title:'沒有關聯的', desc:'當時並沒有影響你做選擇的' }
+  ],
+  reviewBtn:  '🗂 查看已分類的卡・分錯可以放回',
+  reviewHint: '分錯了也沒關係～按「放回轉盤」就能重新分類；點卡片可以放大看看。',
+  reviewTip:  '分錯了嗎？點下方「查看已分類的卡」可以放回重新分類喔',
+  sortHint: '以「當時的自己」判斷・還有 {n} 張',
+  sortGuide: '點選下方的選項，把中間這張卡分類 ↓',
+
+  customHint:  '點我寫下<br>你的因素',
+  customAsk:   '如果有卡片裡沒有提到的因素，可以寫在這裡～',
+  customEmpty: '請先寫下文字喔',
+  customLong:  '最多 {n} 個字喔',
+  customNeed:  '要放進「可以改變的」之前，請先寫下你的因素喔～',
+
+  pickTitle: '可以改變的因素超過 {max} 張囉！<br>請選出對你最重要的 {max} 張',
+  pickCount: '已選 {n} / {max}',
+  pickFull:  '最多只能選 {max} 張喔',
+
+  zero: '還沒有可以改變的因素喔～<br>請至少選一張，或在自定義卡寫下屬於你的因素。',
+
+  seedIntro: [
+    '這裡有 10 顆種子，請依照每個因素對你的重要程度，把種子放到卡片上吧。',
+    '越重要的因素，種子就越多；每張卡至少要有一顆種子喔！'
+  ],
+  seedIntroEnd: '開始分配',
+  seedLeft: '還剩 {n} 顆種子',
+
+  levelIntro: ['現在，回頭看看每個因素——現在的你，走到哪一步了呢？'],
+  levelIntroEnd: '開始',
+  levelHint: '第 {i} / {total} 張・這張卡有 {s} 顆種子',
+  levelDone: '確認完成',
+  levels: [
+    { title:'Level 1', desc:'有改善的意圖，但目前的能力並未出現明顯的提升。' },
+    { title:'Level 2', desc:'意識到改變的契機並改進行為，但相信自己還有進步的空間。' },
+    { title:'Level 3', desc:'認可自己已經有所改變，並對當下能力的進步感到滿足。' }
+  ],
+
+  scoreTitle: '種子正在慢慢長大…',
+  scoreFinal: '這次你獲得了 {n} 分',
+
+  leave: '確定要離開嗎？<br>離開後這次的排卡進度不會保留喔。',
+
+  // 結果頁
+  resTop:      '🌱 這次對你影響最深的因素',
+  resSkill:    '對應能力：{s}',
+  resLevel:    '你現在的階段：{l}',
+  resState:    '現在的你能夠做到的',
+  resTip:      '送給你的小練習',
+  resNote:     '分數沒有好壞之分，不論現在在哪個階段，都是給花園帶來不一樣的樣貌。',
+  shopText:    '想看每張卡更完整的解讀嗎？<br>《遺落成華》卡牌套組裡，有更多詳細的介紹與引導～',
+  shopBtn:     '看看卡牌套組',
+
+  fbTitle:   '給我們一點回饋吧',
+  fbSub:     '你的回饋會幫助花園長得更好～（不會傳送你寫下的遺憾內容）',
+  fbRate:    '這次的體驗感覺如何？',
+  fbPlace:   '想對我們說的話…（選填）',
+  fbSend:    '送出回饋',
+  fbNeed:    '請先選擇花朵數，或寫下想說的話喔',
+  fbSending: '傳送中…',
+  fbOk:      '收到了！謝謝你的回饋 🌷',
+  fbFail:    '網路好像不太穩，請稍後再試一次',
+  fbOff:     '回饋功能還沒開放喔',
+  fbWait:    '剛剛已經收到你的回饋囉，稍等一分鐘再送吧～',
+
+  spTitle: '支持我們',
+  spText:  '歡迎支持我們！掃描下方的 QR code 就能贊助 🌷',
+  spBtn:   '贊助我們',
+  soon:    '即將開放'
+};
+
+const THEMES = {
+  F:{ name:'友情',     cards:['F01','F02','F03'] },
+  L:{ name:'愛情',     cards:['L01','L02','L03'] },
+  P:{ name:'未來規劃', cards:['P01','P02','P03'] },
+  M:{ name:'財務管理', cards:['M01','M02','M03'] },
+  O:{ name:'其他',     cards:[] }
+};
+const COMMON = ['C01','C02','C03','C04','C05','C06','C07','C08','C09','C10','C11','C12'];
+const CUSTOM = 'C12';
+const MAX_CHANGE = 5, TOTAL_SEEDS = 10, CUSTOM_MAX = 12;
+
+/* =========================================================
+   ✏️ 因素卡資料：名稱、對應能力、三個階段的表現（state）與給使用者的小練習（tip）
+   ========================================================= */
+const FACTORS = {
+  C01:{ name:'時間分配', skill:'珍惜',
+    state:['看見時間的有限性，感受到時間的價值','會將時間留給值得的人事物','全神貫注地享受當下，感受這一切得來不易'],
+    tip:['今天睡前花一分鐘回想：「今天的時間裡，有哪一段讓我覺得很值得？」先從「看見」開始就好。',
+         '試著每週將一件重要的人事物「預留」時間，像約會一樣寫進行事曆，不讓它被雜事掩埋。',
+         '你已經懂得把時間留給重要的人與事。也記得那些願意陪你一起珍惜時間的人吧！'] },
+  C02:{ name:'資訊落差', skill:'查證',
+    state:['心態上不盲目全盤接收，在心中先留一個理性的問號','尋找不同的資料、詢問他人的看法，主動描繪事實的輪廓','獨立辨別真偽並洞察事實真相'],
+    tip:['下次聽到讓你不太清楚的消息時，先在心裡說聲「等等」，給自己一點時間判斷。',
+         '接收訊息後，試著找三個不同的來源，或問問立場不同的朋友，把事件拼得更完整。',
+         '你已經有辨別真偽的眼光。下次身邊的人在虛實中困住時，也可以溫柔地陪他一起尋找真相。'] },
+  C03:{ name:'價值底線', skill:'心理界線',
+    state:['願意回想感到困擾的場景，觀察自己面對事件的情緒反應','面對不舒服的場合，有信心地向他人表達與保衛自我','接受並尊重他人反應，定期反思自身價值觀與需求'],
+    tip:['找個安靜的時候，寫下最近一次讓你不舒服的場景，以及當下的感覺。看見它，就是界線的開始。',
+         '你能為自己發聲真的好棒！下次說出界線後，試著留意對方的反應和自己的感受，慢慢找到既堅定、又溫和的說法。',
+         '每隔一段時間問問自己：「我現在最在乎的是什麼？」讓你的界線跟著你一起長大。'] },
+  C04:{ name:'評斷風險', skill:'承擔決策',
+    state:['看見事物的兩面，理解背後帶來的代價與不確定性','認知結果是來於自己的選擇，不花時間過度指責或逃避','踏實面對結果，允許不完美發生'],
+    tip:['做決定前，嘗試看看把「最好會怎樣」和「最壞會怎樣」各寫一行。',
+         '結果不如預期時，可以問問自己：「我可以怎麼做，能夠讓現在更好？」而不拘泥於「這是誰的錯」，把力氣留給前進的路途！',
+         '恭喜你已經能踏實地面對結果。記得，允許不完美發生，也是一種對自己的溫柔，請別過度苛求自己。'] },
+  C05:{ name:'相似經驗', skill:'轉化與省思',
+    state:['覺察自己正在面對相似的事件，能夠停下舊有慣性思維','用跟過去不一樣的態度或思維，做出新的抉擇','清醒、踏實地往前走，不會被經驗綁架也不過度依賴'],
+    tip:['當你覺得「這好像以前發生過」時，先停下來深呼吸，問問自己：「這次想不想有點不一樣？」',
+         '回想上次的做法，挑一個小地方換個方式試試看，新的選擇就從這一小步開始。',
+         '經驗是你的地圖，不是你的牢籠。帶著學到的經驗，踏穩腳步走向新的路吧！'] },
+  C06:{ name:'沉沒成本', skill:'斷捨離',
+    state:['理智判斷損失已是既定且無法收回的','在不適合時能停止投入，雖然心會痛、會捨不得','注意力在現在與未來，規劃有價值的路'],
+    tip:['試著對自己說：「已經付出的，現在看似消逝了，感到不太舒服。」嘗試接受現在這個不舒服的感受。',
+         '捨不得是正常的，可以替要放下的事好好道別，寫下它曾帶給你的意義，不急著要現在釋懷。',
+         '你已經把目光放在現在與未來。替接下來的路程，寫下一個真正值得投入的小目標吧！'] },
+  C07:{ name:'外界期待', skill:'心理獨立',
+    state:['分辨自己真實擁有的能力和缺陷','接納外在的聲音，但不再全盤活成他人期待的樣貌','把發言權留給自己，保有前進的底氣'],
+    tip:['拿一張紙分成兩欄：「我真的擅長的」和「我還想加強的」。誠實地認識自己，是獨立的第一步。',
+         '聽到別人的期待時，可以先說「謝謝你的意見」，再問問自己：「那我自己怎麼想？」',
+         '你已經能把發言權留給自己。繼續相信你的步調，這份底氣是你一點一點累積來的。'] },
+  C08:{ name:'情緒狀態', skill:'調節情緒',
+    state:['能夠辨別並告訴自己有這些感覺是正常的','透過合適的方法緩解當下不適的感受','理解情緒產生的背後真實需求，找回內心的平靜'],
+    tip:['情緒來的時候，試著喊出它的名字：「我現在感到焦慮。」光是說出來，它就會變得更清楚一些。',
+         '先準備一個屬於你的「情緒紓壓」方式：一首歌、一條散步路線、一杯熱飲、打掃環境。',
+         '下次情緒湧上來時，問問它：「你想告訴我什麼？」聽懂背後的需求，嘗試攤開面對吧！'] },
+  C09:{ name:'理想投射', skill:'腳踏實地',
+    state:['不急躁，整理實際已經累積的努力','大目標拆解為可執行的小任務，專注做好當下','享受當下的狀態，將目標與現實連結、穩健推進'],
+    tip:['先別急著看終點，回頭列出你已經做到的三件事，你其實比想像中走得更遠。',
+         '把大目標切成「這週就能完成」的小任務，一次只專心做好一件。',
+         '你已經把夢想和現實連在一起了。記得在路上也別忘記幫自己撒花，慶祝每一個值得紀念的里程碑。'] },
+  C10:{ name:'個性特質', skill:'自我接納',
+    state:['覺察特質帶來的限制與情緒','看見特質的兩面性，用溫柔的語言替代苛責自己','坦然擁抱不完美，踏實與己共處'],
+    tip:['當你又在責怪自己的個性時，先注意到這個聲音就好，不用急著改變它，或許它也有好的一面呢？',
+         '試著替你的特質換個說法，例如「太敏感」也可以是「很細心」，用對好朋友說話的語氣對自己說話。',
+         '你已經能坦然擁抱自己的不完美。好好和自己相處，就是內心最穩定的力量。'] },
+  C11:{ name:'溝通誤解', skill:'真誠表達',
+    state:['察覺相處頻率的變動，不急於爭對錯，而是軟化態度','確認心裡真正想表達的是什麼','坦誠表達心聲，溫柔接住情緒和對方的聲音'],
+    tip:['感覺彼此溝通的頻率不太一樣時，先放下爭辯誰對誰錯，深呼吸，讓語氣軟下來一點。',
+         '開口前先問問自己：「我真正想讓對方知道的是什麼？」把它寫成一句話再說出口。',
+         '你已經能真誠地表達，也能接住對方的聲音。繼續保持這份溫柔，關係會越來越安心。'] },
+  F01:{ name:'社交壓力', skill:'社交邊界',
+    state:['知道自己正處於討好與內耗，察覺個人底線','說出自己的限制，把別人的情緒與自己的責任分開','相處時能守護界線，心裡保有自己的生活步調'],
+    tip:['留意自己什麼時候會說出違心的「好啊」。察覺就是守護自己的開始。',
+         '練習一句溫和的拒絕：「這次我可能沒辦法，但謝謝你想到我。」別人的情緒不需要全由你負責。',
+         '你已經能在友情裡守住界線。保持自己的步調，真正的朋友也會珍惜這樣的你。'] },
+  F02:{ name:'期待落差', skill:'接納差異',
+    state:['察覺彼此付出的不對等與失落，在期待落空與自責中感到心力交瘁','練習釐清互動方的相處限制，試著用平常心看待彼此步調的不同','接納彼此的不同與距離，也認可自己的真誠'],
+    tip:['覺得付出不對等時，先允許自己失落一下，這份真誠的在乎本身並沒有錯。',
+         '試著了解對方的生活節奏與限制，把「他不在乎我」換成「我們現在的步調不一樣」「我們是不同的個體」。',
+         '你已經能接納彼此的距離。記得，你付出的真誠一直都很有價值，也請留給重要的人一起經營這段關係。'] },
+  F03:{ name:'弦外之音', skill:'觀察與同理',
+    state:['不解於話語背後的試探與情緒，在反覆猜測與不安全感中迷茫','在情緒背後尋找真實需求，練習用更客觀的視角來看待相處的摩擦','用寬容與同理心看待相處中的起伏，不輕易隨對方情緒而擔憂'],
+    tip:['對方的話讓你反覆猜測時，先寫下「他說了什麼」和「我感覺到什麼」，把事實和推測分開。',
+         '試著想想：「對方說這句話時，可能需要的是什麼？」必要時，可以溫柔地直接問一句。',
+         '你已經能用同理心看待友情的起伏。不必隨著對方的情緒起伏不定，你可以穩穩地陪在他的身邊。'] },
+  L01:{ name:'自我保留', skill:'坦承與信任',
+    state:['接納害怕被背叛而受傷的自己，但仍習慣隱藏真實感受','坦然面對自己的不安全感，嘗試向對方敞開心扉，逐步建立安全的環境','在信任對方的同時，也擁有保護自己身心的底氣'],
+    tip:['害怕受傷是很正常的。先抱抱那個想保護自己的你，不用急著打開心門或是原諒誰。',
+         '試著從一件小事開始分享，例如今天的心情，讓對方慢慢認識真實的你，也看看他如何給你回應。',
+         '你已經能信任對方，也保有照顧自己的底氣。這份平衡，是很成熟的愛。'] },
+  L02:{ name:'責任承擔', skill:'責任感',
+    state:['對未來的承諾與牽絆感到沉重，逃避與責任之中感到無力','試著與對方一起梳理未來，在承擔責任的過程中找到平衡與共識','不因未知的壓力而退縮，擁有踏實的心意與責任感'],
+    tip:['覺得未來太沉重時，先把壓力寫下來，分成「現在就要面對的」和「還很遠的」。',
+         '找個輕鬆的時間，和對方聊聊彼此對未來的想像，把「我需要一個人扛下一切」變成「我們是可以一起面對的」。',
+         '你已經擁有踏實的心意。面對未知時，你們之間的共識將會互相營造最棒的避風港！'] },
+  L03:{ name:'情感失衡', skill:'共感力',
+    state:['過度吸收對方的情緒而感到精疲力竭，察覺自己的內耗','在相處中拉出適當的距離，看見雙方的核心需求差異','在理解彼此核心需求的基礎上，接住對方的脆弱同時心情安穩'],
+    tip:['留意自己是不是常因為對方的情緒而疲憊，你的感受同樣值得被照顧。',
+         '試著在相處中留下專屬於自己的時間，也和對方聊聊彼此最在意的需求是什麼。',
+         '你已經能接住對方的脆弱，同時保持安穩。記得，也讓對方有機會照顧你。'] },
+  P01:{ name:'社會標籤', skill:'自我了解',
+    state:['在社會框架的束縛中逐漸迷失自己真正喜歡或擅長，並感到內耗','摸索屬於自己的生活樣貌','不被外界的定義所左右，在自己的節奏裡生活'],
+    tip:['試著寫下三件「就算沒人稱讚，我也想做」的事，那裡藏著真正的你。',
+         '每個月嘗試一件新事物：一堂課、一個活動或一本書，慢慢拼出你想要的生活樣貌。',
+         '你已經活在自己的節奏裡。當外界又想替你貼標籤時，你可以微笑著繼續做自己。'] },
+  P02:{ name:'現實負擔', skill:'自我投資',
+    state:['分析現實的重擔與環境限制','學習特定技能、累積個人資本，為未來注入改變的可能','擁有保護自己的實力與底氣，脫離不合適環境與情緒勒索'],
+    tip:['把現實的壓力和限制一條一條列出來。看清楚會比模糊的擔心焦慮更好找到方法面對。',
+         '挑一項對未來有幫助的技能，每天向它投資 15 分鐘，時間會累積使你改變的力量。',
+         '你已經擁有保護自己的實力。需要的時候，你可以有底氣地離開不適合的環境。'] },
+  P03:{ name:'盲從世俗', skill:'思考獨立',
+    state:['缺乏自己的判斷而隨波逐流，關注太多不影響自己的消息','保有好奇心，不輕易接受表象也審視自己的思考盲點，避免個人偏見','建立屬於自己的認知框架，只看事實而不被情緒影響'],
+    tip:['這週試著少滑一點和自己無關的消息，把注意力還給真正會影響你的事。',
+         '遇到熱門風潮時，問問自己：「這是事實，還是大家的盲目？我同意的理由是什麼？」',
+         '你已經建立了自己的思考框架。保持好奇、願意聽聽不同的聲音，你的判斷會更有廣度。'] },
+  M01:{ name:'慾望', skill:'釐清需求',
+    state:['在追逐未擁有的事物中感到興奮，但總消費不完','區分想要與需要，摸索自己的表層欲望背後的真正渴望','學會取捨、尋找及專注於適當的慾望'],
+    tip:['想買東西時，先把它放進購物車等三天，再來看看那份衝勁還在不在。',
+         '問問自己：「我真正想要的是這個東西，還是它帶來的感覺？」找到慾望背後的真實心理。',
+         '你已經懂得取捨。把錢和心力專注在真正讓你快樂的事物上，生活會更踏實。'] },
+  M02:{ name:'情緒性消費', skill:'轉移匱乏感',
+    state:['在短暫的快感退去後感到懊悔，但找不到解方','看見自己內心的匱乏，尋找其他安撫心情的管道','肯定自己的價值來自於個人本質並常抱持感恩'],
+    tip:['下次在心情低落時想買東西，先記下當下的情緒。覺察，就是改變的第一步。',
+         '列一張「不用花錢的療癒清單」：散步、打給朋友、洗個熱水澡，難受時先試其中一項。',
+         '你知道自己的價值不需要靠擁有奢侈品來證明。每天寫下一件值得感謝的小事，讓這份富足被記錄下來。'] },
+  M03:{ name:'盲目摸索', skill:'資產規劃',
+    state:['缺乏理財規劃的盲目支配中，常為不確定的未來感到焦慮','理清自己的財務現狀，練習分配擁有的資源','游刃有餘面對自己的財務規劃，建立踏實的保障'],
+    tip:['先從生活上的記帳開始，不急著批判自己，只是看清楚錢都飛往了哪裡。',
+         '試著把收入分成「生活、存錢、想做的事」三份預算，細項目可以再慢慢調整。',
+         '你已經能從容地規劃財務。定期回顧一次目標，讓這份安全感一直陪著你。'] },
+  C12:{ name:'{t}', skill:'屬於你的因素',
+    state:['有改善的意圖，但目前的能力並未出現明顯的提升','意識到改變的契機並改進行為，但相信自己還有進步的空間','認可自己已經有所改變，並對當下能力的進步感到滿足'],
+    tip:['你寫下的「{t}」，是只有你自己知道的重要因素。先試著觀察它通常在什麼時候出現，就是改變的開始。',
+         '你已經開始為「{t}」做出改變。試著寫下一個這週就能做到的小步驟，讓改變更穩定。',
+         '你已經在「{t}」上看見自己的成長。好好肯定這段努力，它會成為你往後的底氣。'] }
+};
+
+
+/* =========================================================
+   以下為程式，不需要修改
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const fill = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k]);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const failed = new Set();
+
+let theme = null, cards = [], customText = '', music = null, guard = false;
+
+/* ---------- 主題（從故事頁帶入：cards.html?theme=F） ---------- */
+(function readTheme(){
+  const map = {F:'F',friendship:'F',friend:'F','友情':'F', L:'L',love:'L','愛情':'L',
+    P:'P',plan:'P','未來規劃':'P', M:'M',money:'M','財務管理':'M', O:'O',other:'O','其他':'O'};
+  const p = new URLSearchParams(location.search).get('theme');
+  if (p && map[p] !== undefined) theme = map[p];
+  else if (p && map[p.toUpperCase()]) theme = map[p.toUpperCase()];
+})();
+
+/* ---------- 畫面 ---------- */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('show'));
+  $('#' + id).classList.add('show');
+}
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.innerHTML = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), Math.max(2200, msg.length * 110));
+}
+const openM  = id => $('#' + id).classList.add('show');
+const closeM = id => $('#' + id).classList.remove('show');
+
+/* ---------- 卡片元素 ---------- */
+function cardEl(code, opt = {}){
+  const d = document.createElement('div');
+  d.className = 'card'; d.dataset.code = code;
+  const img = document.createElement('img');
+  img.alt = code; img.src = CARD + code + '.png';
+  if (failed.has(CARD + code + '.png')) d.classList.add('noimg');
+  img.onerror = () => d.classList.add('noimg');
+  const ph = document.createElement('div'); ph.className = 'ph'; ph.textContent = code;
+  d.append(img, ph);
+  if (code === CUSTOM){
+    const t = document.createElement('div'); t.className = 'ctext';
+    d.appendChild(t);
+    d._hint = !!opt.hint;
+  }
+  updateCustom(d);
+  return d;
+}
+function updateCustom(d){
+  const t = d.querySelector('.ctext'); if (!t) return;
+  if (customText){ t.textContent = customText; t.classList.remove('chint'); }
+  else if (d._hint){ t.innerHTML = TEXT.customHint; t.classList.add('chint'); }
+  else { t.textContent = ''; }
+}
+function refreshCustomAll(){ document.querySelectorAll('.card[data-code="'+CUSTOM+'"]').forEach(updateCustom); }
+
+function zoom(code){
+  const b = $('#zoomBody'); b.innerHTML = ''; b.appendChild(cardEl(code)); openM('zoomModal');
+}
+$('#zoomModal').onclick = () => closeM('zoomModal');
+
+/* ---------- 知更鳥換圖 ---------- */
+function setupKeeper(el){
+  const [a, b] = el.querySelectorAll('img');
+  a.src = FILES.keeper1; b.src = FILES.keeper2;
+  if (failed.has(FILES.keeper1) && failed.has(FILES.keeper2)) el.classList.add('noimg');
+}
+function setupCover(el){
+  const [a, b] = el.querySelectorAll('img');
+  // 沒有 cover 圖時，先用 keeper 圖代替
+  const pick = (f, alt) => failed.has(f) ? (failed.has(alt) ? null : alt) : f;
+  const s1 = pick(FILES.cover1, FILES.keeper1), s2 = pick(FILES.cover2, FILES.keeper2);
+  if (!s1){ el.classList.add('noimg'); return; }
+  a.src = s1; if (s2) b.src = s2; else b.remove();
+}
+let keeperTimer = null;
+function keeperBlink(el, ms){
+  clearInterval(keeperTimer);
+  if (!el || !el.classList.contains('keeper')) return;
+  keeperTimer = setInterval(() => el.classList.toggle('alt'), ms);
+}
+
+/* ---------- 預先載入 ---------- */
+function loadImg(src, ms = 12000){
+  return new Promise(res => {
+    const i = new Image(); let done = false;
+    const end = ok => { if (done) return; done = true; if (!ok) failed.add(src); res(); };
+    i.onload = () => end(true); i.onerror = () => end(false);
+    setTimeout(() => end(i.complete && i.naturalWidth > 0), ms);
+    i.src = src;
+  });
+}
+async function loadMusic(){
+  let src = FILES.music;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 15000);
+    const r = await fetch(FILES.music, {signal: ctrl.signal});
+    clearTimeout(t);
+    if (r.ok) src = URL.createObjectURL(await r.blob());
+  } catch(e) { /* 本機開檔或網路慢時，改用串流播放 */ }
+  music = new Audio(src); music.loop = true; music.volume = .6;
+}
+async function preload(){
+  await Promise.all([FILES.cover1, FILES.cover2, FILES.keeper1, FILES.keeper2].map(f => loadImg(f, 6000)));
+  setupCover($('#cover')); setupCover($('#coverTalk'));
+
+  const codes = [...COMMON, ...Object.values(THEMES).flatMap(t => t.cards)];
+  const list = [FILES.bg, FILES.seed, ...codes.map(c => CARD + c + '.png'), ...codes.map(c => NOTE + c + '.png'), FILES.sponsorQR, FILES.flowerOn, FILES.flowerOff];
+  let n = 0; const total = list.length + 2;
+  const step = () => { n++; $('#loadText').textContent = TEXT.loading + ' ' + Math.round(n / total * 100) + '%'; };
+  const font = Promise.race([document.fonts ? document.fonts.load('20px Crayon') : 0, sleep(8000)]).catch(()=>{}).then(step);
+  await Promise.all([...list.map(s => loadImg(s).then(step)), loadMusic().then(step), font]);
+  if (failed.has(FILES.seed)) document.body.classList.add('noseed');
+
+  const lt = $('#loadText'); lt.textContent = TEXT.ready; lt.classList.add('ready');
+  $('#s-load').addEventListener('click', start, {once:true});
+}
+
+/* ---------- 音樂與選單 ---------- */
+$('#musicBtn').onclick = () => {
+  if (!music) return;
+  if (music.paused){ music.play().catch(()=>{}); $('#musicBtn').classList.remove('off'); }
+  else { music.pause(); $('#musicBtn').classList.add('off'); }
+};
+$('#leaveText').innerHTML = TEXT.leave;
+$('#menuBtn').onclick = e => { e.stopPropagation(); $('#cmenu').classList.toggle('open'); };
+$('#cmHome').onclick = e => { e.stopPropagation(); $('#cmenu').classList.remove('open'); openM('leaveModal'); };
+document.addEventListener('click', () => $('#cmenu').classList.remove('open'));
+$('#leaveNo').onclick = () => closeM('leaveModal');
+$('#leaveYes').onclick = () => go(FILES.home);
+function go(url){ guard = false; location.href = url; }
+window.addEventListener('beforeunload', e => { if (guard){ e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------- 對話 ---------- */
+let typing = null;
+function talk(lines, endLabel, onDone){
+  show('s-talk');
+  const keeper = $('#coverTalk'), txt = $('#talkText'), prev = $('#talkPrev'), next = $('#talkNext');
+  let i = 0;
+  const finish = () => { if (typing){ clearInterval(typing.t); txt.innerHTML = typing.full; typing = null; keeperBlink(keeper, 1400); } };
+  const render = () => {
+    finish();
+    let line = lines[i];
+    const panel = typeof line === 'object' && line.panel;
+    if (typeof line === 'object') line = line.text;
+    $('#s-talk').classList.toggle('panel', !!panel);
+    if (panel) $('#talkPanel').innerHTML = TEXT.piles.map((p, k) =>
+      `<div class="pk ${'abc'[k]}"><h3>${p.title}</h3><p>${p.desc}</p></div>`).join('');
+    prev.style.visibility = i ? 'visible' : 'hidden';
+    const last = i === lines.length - 1;
+    next.textContent = last ? endLabel : '下一句 ▸';
+    next.classList.toggle('end', last);
+    if (line.includes('<')){ txt.innerHTML = line; return; }
+    txt.textContent = ''; let k = 0;
+    keeperBlink(keeper, 260);
+    typing = { full: line, t: setInterval(() => {
+      txt.textContent = line.slice(0, ++k);
+      if (k >= line.length) finish();
+    }, 45) };
+  };
+  prev.onclick = () => { if (i > 0){ i--; render(); } };
+  next.onclick = () => {
+    if (typing){ finish(); return; }
+    if (i < lines.length - 1){ i++; render(); } else { onDone(); }
+  };
+  $('#talkText').onclick = () => finish();
+  render();
+}
+
+/* ---------- 開始 ---------- */
+function start(){
+  guard = true;
+  if (music) music.play().catch(()=>{});
+  if (music) $('#musicBtn').classList.add('show');
+  $('#menuBtn').classList.add('show');
+  talk(TEXT.prep, TEXT.prepEnd, () => theme ? sortIntro() : chooseTheme());
+}
+
+function chooseTheme(){
+  $('#themeTitle').innerHTML = TEXT.themeTitle;
+  const box = $('#themeBtns'); box.innerHTML = '';
+  Object.entries(THEMES).forEach(([k, v], idx) => {
+    const b = document.createElement('button');
+    b.className = 'btn'; b.dataset.t = k; b.textContent = v.name;
+    b.onclick = () => { theme = k; sortIntro(); };
+    box.appendChild(b);
+  });
+  show('s-theme');
+}
+
+function sortIntro(){ talk(TEXT.sortIntro, TEXT.sortIntroEnd, startSort); }
+
+/* ---------- 旋轉盤 ---------- */
+let cur = 0, ringEls = {};
+const deck = () => cards.filter(c => !c.pile);
+
+function startSort(){
+  cards = [...THEMES[theme].cards, ...COMMON].map(code => ({code, pile:null, seeds:0, level:0}));
+  const ring = $('#ring'); ring.innerHTML = ''; ringEls = {};
+  cards.forEach(c => {
+    const el = cardEl(c.code, {hint:true});
+    el.onclick = () => onCardTap(c);
+    ring.appendChild(el); ringEls[c.code] = el;
+  });
+  cur = 0; show('s-sort'); renderRing();
+}
+
+function renderRing(){
+  const d = deck(), n = d.length;
+  const ring = $('#ring');
+  ring.style.display = n === 0 ? 'none' : '';
+  const w = ring.querySelector('.card') ? ring.querySelector('.card').offsetWidth : 150;
+  const wide = innerWidth >= 700 && innerWidth > innerHeight;
+  const gap = w * (wide ? .78 : .58);
+  if (cur >= n) cur = 0;
+  cards.forEach(c => { if (c.pile){ const e = ringEls[c.code]; e.style.opacity = 0; e.style.pointerEvents = 'none'; e.style.zIndex = 0; } });
+  d.forEach((c, i) => {
+    let off = i - cur;
+    if (n > 2){ if (off > n / 2) off -= n; if (off < -n / 2) off += n; }
+    const a = Math.abs(off), e = ringEls[c.code];
+    const vis = a <= (wide ? 3 : 2);
+    e.style.transform = `translateX(${off * gap}px) translateZ(${-a * 110}px) rotateY(${-off * 26}deg)`;
+    e.style.opacity = vis ? (1 - a * .22) : 0;
+    e.style.zIndex = 20 - a;
+    e.style.pointerEvents = vis ? 'auto' : 'none';
+  });
+  $('#sortHint').textContent = fill(TEXT.sortHint, {n});
+  $('#sortGuide').textContent = TEXT.sortGuide;
+  $('#reviewBtn').textContent = TEXT.reviewBtn;
+  $('#reviewBtn').disabled = cards.every(c => !c.pile);
+  $('#sortGuide').style.visibility = n ? 'visible' : 'hidden';
+  const done = n === 0;
+  $('#sortDone').classList.toggle('show', done);
+  $('#prevArrow').style.display = $('#nextArrow').style.display = n > 1 ? '' : 'none';
+  document.querySelectorAll('.pile').forEach(b => {
+    b.querySelector('.count').textContent = cards.filter(c => c.pile === b.dataset.p).length;
+    b.disabled = done;
+  });
+}
+function turn(dir){ const n = deck().length; if (n){ cur = (cur + dir + n) % n; renderRing(); } }
+$('#prevArrow').onclick = () => turn(-1);
+$('#nextArrow').onclick = () => turn(1);
+
+(function swipe(){
+  const ring = $('#ring'); let x0 = null, moved = false;
+  ring.addEventListener('pointerdown', e => { x0 = e.clientX; moved = false; });
+  ring.addEventListener('pointermove', e => { if (x0 !== null && Math.abs(e.clientX - x0) > 12) moved = true; });
+  ring.addEventListener('pointerup', e => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) turn(dx < 0 ? 1 : -1);
+  });
+  ring.addEventListener('click', e => { if (moved){ e.stopPropagation(); moved = false; } }, true);
+})();
+
+function onCardTap(c){
+  const d = deck(), i = d.indexOf(c);
+  if (i < 0) return;
+  if (i !== cur){ cur = i; renderRing(); return; }
+  if (c.code === CUSTOM) askCustom(); else zoom(c.code);
+}
+
+function classify(p){
+  const d = deck(); if (!d.length) return;
+  const c = d[cur];
+  if (c.code === CUSTOM && p === 'a' && !customText){
+    toast(TEXT.customNeed);
+    askCustom(() => classify('a'));
+    return;
+  }
+  const e = ringEls[c.code];
+  const dx = {a:-1, b:0, c:1}[p] * innerWidth * .3;
+  e.style.transform = `translate(${dx}px, ${innerHeight * .45}px) scale(.2)`;
+  e.style.opacity = 0;
+  c.pile = p;
+  setTimeout(renderRing, 280);
+  // 第一次分類後，提醒可以查看與放回
+  if (!tipShown){ tipShown = true; setTimeout(() => { toast(TEXT.reviewTip);
+    const r = $('#reviewBtn'); r.classList.remove('pulse'); void r.offsetWidth; r.classList.add('pulse'); }, 450); }
+}
+let tipShown = false;
+document.querySelectorAll('.pile').forEach(b => b.onclick = () => classify(b.dataset.p));
+
+/* 自定義卡輸入 */
+let afterCustom = null;
+function askCustom(cb){
+  afterCustom = cb || null;
+  $('#inputText').textContent = TEXT.customAsk;
+  const inp = $('#customInput'); inp.value = customText; inp.maxLength = CUSTOM_MAX + 5;
+  $('#inputErr').textContent = '';
+  openM('inputModal'); setTimeout(() => inp.focus(), 100);
+}
+$('#inputNo').onclick = () => { closeM('inputModal'); afterCustom = null; };
+$('#inputYes').onclick = () => {
+  const v = $('#customInput').value.trim();
+  if (!v){ $('#inputErr').textContent = TEXT.customEmpty; return; }
+  if ([...v].length > CUSTOM_MAX){ $('#inputErr').textContent = fill(TEXT.customLong, {n:CUSTOM_MAX}); return; }
+  customText = v; refreshCustomAll(); closeM('inputModal');
+  const cb = afterCustom; afterCustom = null; if (cb) cb();
+};
+$('#customInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('#inputYes').click(); });
+
+/* 查看已分類 */
+const PILE_NAME = {a:'可以改變的', b:'恆久不變的', c:'沒有關聯的'};
+function openReview(){
+  const body = $('#reviewBody'); body.innerHTML = '<p class="tip">' + TEXT.reviewHint + '</p>';
+  ['a','b','c'].forEach(p => {
+    const h = document.createElement('h3'); h.className = p; h.textContent = PILE_NAME[p]; body.appendChild(h);
+    const list = document.createElement('div'); list.className = 'list';
+    const items = cards.filter(c => c.pile === p);
+    if (!items.length){ list.innerHTML = '<span class="empty">（還沒有卡）</span>'; }
+    items.forEach(c => {
+      const it = document.createElement('div'); it.className = 'item';
+      const ce = cardEl(c.code); ce.onclick = () => zoom(c.code);
+      const b = document.createElement('button'); b.textContent = '放回轉盤';
+      b.onclick = () => { c.pile = null; cur = deck().indexOf(c); renderRing(); openReview(); };
+      it.append(ce, b); list.appendChild(it);
+    });
+    body.appendChild(list);
+  });
+  openM('reviewModal');
+}
+$('#reviewBtn').onclick = openReview;
+$('#reviewClose').onclick = () => closeM('reviewModal');
+
+/* 完成分類 */
+$('#sortDoneBtn').onclick = afterSort;
+function afterSort(){
+  const a = cards.filter(c => c.pile === 'a');
+  if (a.length === 0){ $('#zeroText').innerHTML = TEXT.zero; openM('zeroModal'); return; }
+  if (a.length > MAX_CHANGE){ startPick(); return; }
+  talk(TEXT.seedIntro, TEXT.seedIntroEnd, startSeeds);
+}
+$('#zeroBack').onclick = () => {
+  closeM('zeroModal');
+  cards.forEach(c => c.pile = null); cur = 0; show('s-sort'); renderRing();
+};
+$('#zeroWrite').onclick = () => {
+  closeM('zeroModal');
+  askCustom(() => { cards.find(c => c.code === CUSTOM).pile = 'a'; afterSort(); });
+};
+
+/* ---------- 選出五張 ---------- */
+let picked = new Set();
+function startPick(){
+  picked = new Set();
+  $('#pickTitle').innerHTML = fill(TEXT.pickTitle, {max:MAX_CHANGE});
+  const g = $('#pickGrid'); g.innerHTML = '';
+  cards.filter(c => c.pile === 'a').forEach(c => {
+    const el = cardEl(c.code);
+    const m = document.createElement('span'); m.className = 'mark'; m.textContent = '✓'; el.appendChild(m);
+    el.onclick = () => {
+      if (picked.has(c)){ picked.delete(c); el.classList.remove('sel'); }
+      else if (picked.size >= MAX_CHANGE){ toast(fill(TEXT.pickFull, {max:MAX_CHANGE})); return; }
+      else { picked.add(c); el.classList.add('sel'); }
+      updPick();
+    };
+    g.appendChild(el);
+  });
+  updPick(); show('s-pick');
+}
+function updPick(){
+  const b = $('#pickOk');
+  b.textContent = '確定（' + fill(TEXT.pickCount, {n:picked.size, max:MAX_CHANGE}) + '）';
+  b.disabled = picked.size !== MAX_CHANGE;
+}
+$('#pickOk').onclick = () => {
+  cards.forEach(c => { if (c.pile === 'a' && !picked.has(c)) c.pile = 'b'; });
+  talk(TEXT.seedIntro, TEXT.seedIntroEnd, startSeeds);
+};
+
+/* ---------- 分配種子 ---------- */
+const chosen = () => cards.filter(c => c.pile === 'a');
+const seedIcon = ghost => { const s = document.createElement('span'); s.className = 'seed' + (ghost ? ' ghost' : ''); return s; };
+function startSeeds(){
+  chosen().forEach(c => c.seeds = 1);
+  renderSeeds(); show('s-seed');
+}
+function renderSeeds(){
+  const list = chosen(), used = list.reduce((s, c) => s + c.seeds, 0), left = TOTAL_SEEDS - used;
+  $('#seedLeft').textContent = fill(TEXT.seedLeft, {n:left});
+  const pool = $('#seedPool'); pool.innerHTML = '';
+  for (let i = 0; i < TOTAL_SEEDS; i++) pool.appendChild(seedIcon(i >= left));
+  const box = $('#seedList'); box.innerHTML = '';
+  list.forEach(c => {
+    const row = document.createElement('div'); row.className = 'seedrow';
+    const ce = cardEl(c.code); ce.onclick = () => zoom(c.code);
+    const mid = document.createElement('div'); mid.className = 'mid';
+    for (let i = 0; i < c.seeds; i++) mid.appendChild(seedIcon());
+    const ctrl = document.createElement('div'); ctrl.className = 'ctrl';
+    const plus = document.createElement('button'); plus.textContent = '+'; plus.disabled = left === 0;
+    const num = document.createElement('span'); num.className = 'num'; num.textContent = c.seeds;
+    const minus = document.createElement('button'); minus.textContent = '−'; minus.disabled = c.seeds <= 1;
+    plus.onclick = () => { c.seeds++; renderSeeds(); };
+    minus.onclick = () => { c.seeds--; renderSeeds(); };
+    ctrl.append(plus, num, minus);
+    row.append(ce, mid, ctrl); box.appendChild(row);
+  });
+  $('#seedOk').disabled = left !== 0;
+}
+$('#seedOk').onclick = () => talk(TEXT.levelIntro, TEXT.levelIntroEnd, () => { lvIdx = 0; renderLevel(); show('s-level'); });
+
+/* ---------- 計分 ---------- */
+let lvIdx = 0;
+const points = c => c.level === 3 ? c.seeds : c.level === 2 ? c.seeds / 2 : 0;
+function renderLevel(){
+  const list = chosen(), c = list[lvIdx];
+  $('#levelHint').textContent = fill(TEXT.levelHint, {i:lvIdx + 1, total:list.length, s:c.seeds});
+  const old = $('#levelCard'), el = cardEl(c.code); el.id = 'levelCard';
+  el.onclick = () => zoom(c.code); old.replaceWith(el);
+  const note = $('#levelNote'), nimg = note.querySelector('img'), nsrc = NOTE + c.code + '.png';
+  note.querySelector('.ph').innerHTML = '能力便條紙<br>' + c.code;
+  note.classList.toggle('noimg', failed.has(nsrc));
+  nimg.onerror = () => note.classList.add('noimg');
+  nimg.src = nsrc;
+  const box = $('#levelBtns'); box.innerHTML = '';
+  TEXT.levels.forEach((lv, k) => {
+    const pts = k === 2 ? c.seeds : k === 1 ? c.seeds / 2 : 0;
+    const b = document.createElement('button');
+    b.className = 'level' + (c.level === k + 1 ? ' sel' : '');
+    b.innerHTML = `<b><span>${lv.title}</span><span>+${pts}</span></b>${lv.desc}`;
+    b.onclick = () => {
+      c.level = k + 1; renderLevel();
+      // 不是最後一張：選完自動到下一張；最後一張：等使用者按「確認完成」
+      if (lvIdx < list.length - 1){
+        const at = lvIdx;
+        setTimeout(() => { if (lvIdx === at){ lvIdx++; renderLevel(); } }, 400);
+      }
+    };
+    box.appendChild(b);
+  });
+  const last = lvIdx === list.length - 1, next = $('#levelNext');
+  $('#levelPrev').style.visibility = lvIdx ? 'visible' : 'hidden';
+  next.textContent = last ? TEXT.levelDone : '下一張 ▸';
+  next.disabled = last ? !list.every(x => x.level) : !c.level;
+}
+$('#levelPrev').onclick = () => { if (lvIdx > 0){ lvIdx--; renderLevel(); } };
+$('#levelNext').onclick = () => {
+  const list = chosen();
+  if (lvIdx < list.length - 1){ lvIdx++; renderLevel(); } else startScore();
+};
+
+/* ---------- 樹枝計分動畫 ---------- */
+function buildBranch(){
+  const br = $('#branch');
+  br.querySelectorAll('.tick,.leaf').forEach(e => e.remove());
+  for (let i = 0; i <= 10; i++){
+    const t = document.createElement('span'); t.className = 'tick'; t.textContent = i;
+    t.style.left = (i * 10) + '%'; br.appendChild(t);
+  }
+  [[8,46,-20],[27,76,160],[46,46,-30],[63,76,150],[84,46,-15]].forEach(([x, y, r]) => {
+    const l = document.createElement('span'); l.className = 'leaf';
+    l.style.left = x + '%'; l.style.top = y + 'px'; l.style.transform = `rotate(${r}deg)`; br.appendChild(l);
+  });
+}
+async function startScore(){
+  buildBranch();
+  $('#scoreTitle').textContent = TEXT.scoreTitle;
+  $('#scoreText').style.visibility = $('#scoreOk').style.visibility = 'hidden';
+  const marker = $('#marker'), plus = $('#plus');
+  marker.style.left = '0%';
+  show('s-score');
+  await sleep(900);
+  let total = 0;
+  for (const c of chosen()){
+    const p = points(c); total += p;
+    marker.style.left = (total * 10) + '%';
+    plus.textContent = '+' + p; plus.style.left = (total * 10) + '%';
+    plus.classList.remove('pop'); void plus.offsetWidth; plus.classList.add('pop');
+    await sleep(1000);
+  }
+  $('#scoreText').textContent = fill(TEXT.scoreFinal, {n:total});
+  $('#scoreText').style.visibility = $('#scoreOk').style.visibility = 'visible';
+  $('#scoreOk').onclick = () => showResult();
+}
+
+/* ---------- 結果 ---------- */
+let lastResult = null, fbRating = 0, fbSent = false, useFlowerImg = false;
+// 找出種子最多的卡；同樣多時取 Level 最高的；還是一樣就隨機選一張
+function pickTop(){
+  const list = chosen();
+  const maxS = Math.max(...list.map(c => c.seeds));
+  let cand = list.filter(c => c.seeds === maxS);
+  const maxL = Math.max(...cand.map(c => c.level));
+  cand = cand.filter(c => c.level === maxL);
+  return cand[Math.floor(Math.random() * cand.length)];
+}
+function showResult(){
+  const total = chosen().reduce((s, c) => s + points(c), 0);
+  const top = pickTop(), f = FACTORS[top.code], lv = Math.max(1, top.level) - 1;
+  const t = str => str.replace(/\{t\}/g, customText || '自定義因素');
+  $('#resScore').textContent = fill(TEXT.scoreFinal, {n:total});
+  $('#resTopTitle').textContent = TEXT.resTop;
+  const ce = cardEl(top.code); ce.onclick = () => zoom(top.code);
+  $('#resCard').replaceChildren(ce);
+  $('#resName').textContent = t(f.name);
+  $('#resSkill').textContent = fill(TEXT.resSkill, {s:f.skill});
+  $('#resLevel').textContent = fill(TEXT.resLevel, {l:TEXT.levels[lv].title});
+  $('#resStateT').textContent = TEXT.resState; $('#resState').textContent = t(f.state[lv]);
+  $('#resTipT').textContent = TEXT.resTip;     $('#resTip').textContent = t(f.tip[lv]);
+  $('#resNote').textContent = TEXT.resNote;
+  $('#shopText').innerHTML = TEXT.shopText;
+  $('#shopBtn').textContent = FILES.shop ? TEXT.shopBtn : TEXT.soon; $('#shopBtn').disabled = !FILES.shop;
+  lastResult = { theme: THEMES[theme] ? THEMES[theme].name : '', score: total,
+    card: top.code, factor: top.code === CUSTOM ? '自定義卡' : f.name, level: lv + 1 };
+  setupFeedback(); setupSponsor();
+  show('s-result'); $('#s-result').scrollTop = 0;
+}
+$('#shopBtn').onclick = () => window.open(FILES.shop, '_blank');
+
+/* 回饋 */
+function setupFeedback(){
+  fbRating = 0; fbSent = false;
+  useFlowerImg = !failed.has(FILES.flowerOn) && !failed.has(FILES.flowerOff);
+  $('#rate').classList.toggle('img', useFlowerImg);
+  $('#fbTitle').textContent = TEXT.fbTitle; $('#fbSub').textContent = TEXT.fbSub;
+  $('#fbRate').textContent = TEXT.fbRate; $('#fbText').placeholder = TEXT.fbPlace; $('#fbText').value = '';
+  $('#fbSend').textContent = TEXT.fbSend; $('#fbSend').disabled = false; $('#fbMsg').textContent = '';
+  const r = $('#rate'); r.innerHTML = '';
+  for (let i = 1; i <= 5; i++){
+    const b = document.createElement('button'); b.setAttribute('aria-label', i + ' 朵花');
+    if (useFlowerImg) b.innerHTML = `<img class="off" src="${FILES.flowerOff}" alt=""><img class="on" src="${FILES.flowerOn}" alt="">`;
+    else b.textContent = '🌸';
+    b.onclick = () => { fbRating = i; [...r.children].forEach((x, k) => x.classList.toggle('on', k < i)); };
+    r.appendChild(b);
+  }
+}
+$('#fbSend').onclick = async () => {
+  if (fbSent) return;
+  const msg = $('#fbText').value.trim(), out = $('#fbMsg');
+  if (!fbRating && !msg){ out.textContent = TEXT.fbNeed; return; }
+  if (!FILES.feedback){ out.textContent = TEXT.fbOff; return; }
+  // 同一台裝置 60 秒內只能送一次，避免連續狂按
+  let lastAt = 0; try { lastAt = +localStorage.getItem('fbLast') || 0; } catch(e){}
+  if (Date.now() - lastAt < 60000){ out.textContent = TEXT.fbWait; return; }
+  $('#fbSend').disabled = true; out.textContent = TEXT.fbSending;
+  const data = Object.assign({ rating: fbRating, message: msg, hp: $('#fbHp').value,
+    device: innerWidth < 700 ? '手機' : '電腦/平板' }, lastResult);
+  try {
+    const ctrl = new AbortController(), tm = setTimeout(() => ctrl.abort(), 12000);
+    await fetch(FILES.feedback, { method:'POST', mode:'no-cors', signal: ctrl.signal,
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(data) });
+    clearTimeout(tm);
+    fbSent = true; out.textContent = TEXT.fbOk;
+    try { localStorage.setItem('fbLast', Date.now()); } catch(e){}
+  } catch(e){
+    out.textContent = TEXT.fbFail; $('#fbSend').disabled = false;
+  }
+};
+
+/* 贊助 */
+function setupSponsor(){
+  const hasQR = !failed.has(FILES.sponsorQR);
+  $('#spTitle').textContent = TEXT.spTitle; $('#spText').textContent = TEXT.spText;
+  $('#spBtn').textContent = FILES.sponsor ? TEXT.spBtn : TEXT.soon; $('#spBtn').disabled = !FILES.sponsor;
+  $('#spBtn').style.display = (!FILES.sponsor && hasQR) ? 'none' : '';
+  const q = $('#spQR'); q.classList.toggle('show', hasQR); if (hasQR) q.src = FILES.sponsorQR;
+}
+$('#spBtn').onclick = () => window.open(FILES.sponsor, '_blank');
+
+$('#toHome').onclick = () => go(FILES.home);
+$('#again').onclick = () => {          // 重新來一次：清空這次的卡牌、種子與自定義文字，回到選主題
+  cards = []; customText = ''; theme = null; lvIdx = 0; cur = 0; tipShown = false;
+  chooseTheme();
+};
+
+/* =========================================================
+   🛠 工作人員檢查點
+   開啟／關閉：點左上角選單 →「工作人員」→ 輸入 4 位數密碼
+   ========================================================= */
+const STAFF_CODE = '0806';   // ✏️ 工作人員密碼（只能是 4 位數字）
+function setupStaff(menuEl, groups, btnPos, panelPos, onOpen){
+  const KEY = 'staffMode';
+  const get = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch(e){ return false; } };
+  const set = v => { try { v ? sessionStorage.setItem(KEY, '1') : sessionStorage.removeItem(KEY); } catch(e){} };
+  const css = document.createElement('style');
+  css.textContent = `
+  #stf-btn{position:fixed;${btnPos};z-index:400;width:44px;height:44px;border-radius:50%;border:none;
+    background:#333;color:#fff;font-size:20px;opacity:.8;display:none;cursor:pointer}
+  #stf-btn.on{display:block}
+  #stf-panel{position:fixed;${panelPos};z-index:400;display:none;
+    max-width:min(340px,92vw);max-height:70dvh;overflow:auto;background:rgba(30,30,30,.92);color:#fff;
+    border-radius:12px;padding:10px;font:14px/1.4 sans-serif}
+  #stf-panel.open{display:block}
+  #stf-panel .g{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:8px}
+  #stf-panel b{font-weight:normal;color:#f3c7bd;width:100%}
+  #stf-panel button{border:none;border-radius:6px;padding:5px 9px;background:#555;color:#fff;font-size:14px;cursor:pointer}
+  #stf-lock{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
+  #stf-lock.open{display:flex}
+  #stf-lock .bx{background:#fff;border-radius:14px;padding:18px;width:min(280px,86vw);text-align:center;font:16px/1.5 sans-serif;color:#333}
+  #stf-lock input{width:100%;font-size:26px;letter-spacing:.5em;text-align:center;padding:6px;margin:10px 0 4px;border:2px solid #ccc;border-radius:10px}
+  #stf-lock .msg{min-height:1.4em;font-size:14px;color:#b0605a}
+  #stf-lock button{margin-top:8px;border:none;border-radius:999px;padding:6px 18px;background:#eee;font-size:15px;cursor:pointer}`;
+  document.head.appendChild(css);
+
+  const btn = document.createElement('button'); btn.id = 'stf-btn'; btn.type = 'button'; btn.textContent = '🛠';
+  const panel = document.createElement('div'); panel.id = 'stf-panel';
+  const lock = document.createElement('div'); lock.id = 'stf-lock';
+  lock.innerHTML = '<div class="bx"><div class="t"></div><input type="password" inputmode="numeric" maxlength="4" autocomplete="off"><div class="msg"></div><button type="button">取消</button></div>';
+  document.body.append(btn, panel, lock);
+  const inp = lock.querySelector('input'), msg = lock.querySelector('.msg');
+
+  groups.forEach(([title, items]) => {
+    const g = document.createElement('div'); g.className = 'g';
+    g.innerHTML = '<b>' + title + '</b>';
+    items.forEach(([label, fn]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = label;
+      b.onclick = e => { e.stopPropagation(); panel.classList.remove('open'); fn(); };
+      g.appendChild(b);
+    });
+    panel.appendChild(g);
+  });
+  [btn, panel, lock].forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+  btn.onclick = e => { e.stopPropagation(); panel.classList.toggle('open'); };
+
+  const apply = () => { const on = get(); btn.classList.toggle('on', on); if (!on) panel.classList.remove('open'); };
+  const openLock = () => {
+    lock.querySelector('.t').textContent = get() ? '輸入密碼關閉檢查點' : '輸入密碼開啟檢查點';
+    inp.value = ''; msg.textContent = ''; lock.classList.add('open'); setTimeout(() => inp.focus(), 50);
+  };
+  inp.addEventListener('input', () => {
+    inp.value = inp.value.replace(/\D/g, '').slice(0, 4);
+    if (inp.value.length < 4) return;
+    if (inp.value === STAFF_CODE){ set(!get()); apply(); lock.classList.remove('open'); }
+    else { msg.textContent = '密碼不對喔'; inp.value = ''; }
+  });
+  lock.querySelector('button').onclick = () => lock.classList.remove('open');
+
+  menuEl.addEventListener('click', e => { e.stopPropagation(); onOpen && onOpen(); openLock(); });
+  apply();
+}
+
+(() => {
+  const ready = () => new Promise(r => { const t = setInterval(() => {
+    if ($('#loadText').classList.contains('ready')){ clearInterval(t); r(); } }, 100); });
+  const setup = (nA, seeds, levels) => {
+    if (!theme) theme = 'F';
+    cards = [...THEMES[theme].cards, ...COMMON].map((code, i) => ({code,
+      pile: i < nA ? 'a' : 'c', seeds: seeds ? (seeds[i] || 0) : 0, level: levels ? (levels[i] || 1) : 0}));
+  };
+  const go = fn => async () => {
+    await ready(); document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+    guard = false; $('#menuBtn').classList.add('show'); if (music) $('#musicBtn').classList.add('show');
+    fn();
+  };
+  const T = k => go(() => { theme = k; });
+  setupStaff($('#cmStaff'), [
+    ['主題（先選，再跳畫面）', [['友情', T('F')], ['愛情', T('L')], ['未來規劃', T('P')], ['財務管理', T('M')], ['其他', T('O')]]],
+    ['開始', [
+      ['開場', () => location.reload()],
+      ['準備對話', go(() => talk(TEXT.prep, TEXT.prepEnd, () => theme ? sortIntro() : chooseTheme()))],
+      ['選主題', go(chooseTheme)] ]],
+    ['分類', [
+      ['分類說明', go(() => { if (!theme) theme = 'F'; sortIntro(); })],
+      ['旋轉盤', go(() => { if (!theme) theme = 'F'; startSort(); })],
+      ['超過5張選卡', go(() => { setup(7); startPick(); })] ]],
+    ['種子與計分', [
+      ['分配種子', go(() => { setup(3); startSeeds(); })],
+      ['計分 Level', go(() => { setup(3, [5,3,2]); lvIdx = 0; renderLevel(); show('s-level'); })],
+      ['樹枝動畫', go(() => { setup(3, [5,3,2], [3,2,1]); startScore(); })] ]],
+    ['結果', [
+      ['Level 1', go(() => { setup(3, [5,3,2], [1,2,3]); showResult(); })],
+      ['Level 2', go(() => { setup(3, [5,3,2], [2,1,3]); showResult(); })],
+      ['Level 3', go(() => { setup(3, [5,3,2], [3,1,1]); showResult(); })],
+      ['同分隨機', go(() => { setup(3, [4,4,2], [3,3,1]); showResult(); })],
+      ['自定義卡', go(() => { if (!theme) theme = 'F'; customText = customText || '測試文字';
+          cards = [...THEMES[theme].cards, ...COMMON].map(code => ({code, pile: code === CUSTOM ? 'a' : 'c',
+            seeds: code === CUSTOM ? 10 : 0, level: code === CUSTOM ? 2 : 0})); showResult(); })] ]]
+  ], 'left:10px;bottom:calc(10px + env(safe-area-inset-bottom))', 'left:10px;bottom:calc(62px + env(safe-area-inset-bottom))', () => $('#cmenu').classList.remove('open'));
+})();
+
+window.addEventListener('resize', () => { if ($('#s-sort').classList.contains('show')) renderRing(); });
+preload();
+</script>
+</body>
+</html>
