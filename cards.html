@@ -9,10 +9,6 @@
    可調整的樣式（只改數字即可）
    =================================================== */
 :root{
-  /* 自定義卡（C12）上文字的位置與大小：x 左右、y 上下、size 字的大小 */
-  --custom-x: 50%;
-  --custom-y: 55%;
-  --custom-size: 10cqw;
 
   /* 計分畫面：能力便條紙在卡牌上的位置、大小、角度 */
   --note-x: 50%;      /* 左右（50% = 置中） */
@@ -43,7 +39,21 @@
   src:url("fonts/HanyiSentyCrayon-non-color.woff2") format("woff2");
   font-display:swap;
 }
+/* 文字較多的地方用粉筆字，比較好讀
+   這個字型檔只含這頁用到的字（約 300KB，載入快）。
+   ※ 之後如果改了文字、加了新的字，請 Claude 重新產生這個字型檔，不然新字會顯示成蠟筆字 */
+@font-face{
+  font-family:"ChalkSub";
+  src:url("fonts/HanyiSentyChalk-cards.woff2") format("woff2");
+  font-display:swap;
+}
+.dialog .text,#talkPanel .pk p,.level,#s-result,.box p,.rv .tip,#toast{
+  font-family:"ChalkSub","Crayon","PingFang TC","Microsoft JhengHei",sans-serif;
+  text-wrap:pretty;line-break:strict}
+.level b,#s-result button{font-family:"Crayon","PingFang TC",sans-serif}
+#s-result textarea{font-family:"Crayon","PingFang TC","Microsoft JhengHei",sans-serif}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{
   font-family:"Crayon","PingFang TC","Microsoft JhengHei",sans-serif;
@@ -87,12 +97,6 @@ img{-webkit-user-drag:none;user-select:none}
 .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 
 /* ---------- 知更鳥 ---------- */
-.keeper{position:relative;width:min(62vw,40dvh,360px);aspect-ratio:1;animation:float 3.6s ease-in-out infinite}
-.keeper img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .25s}
-.keeper img.k2{opacity:0}
-.keeper.alt img.k1{opacity:0}
-.keeper.alt img.k2{opacity:1}
-.keeper.noimg{background:rgba(120,155,170,.25);border-radius:50%}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
 /* ---------- 開場 ---------- */
@@ -114,7 +118,7 @@ img{-webkit-user-drag:none;user-select:none}
 #s-talk{justify-content:center;gap:18px}
 .dialog{width:min(100%,620px);background:rgba(250,244,228,.96);color:var(--ink);border-radius:18px;
   border:2px solid var(--pink);padding:16px 20px 12px;box-shadow:0 4px 14px rgba(90,74,66,.2)}
-.dialog .text{font-size:clamp(21px,5.3vw,27px);line-height:1.6;min-height:1.6em}
+.dialog .text{font-size:clamp(20px,5.2vw,26px);line-height:1.75;letter-spacing:.02em;min-height:1.75em}
 .dialog .text ul{list-style:none;margin-top:4px}
 .dialog .text li{margin:6px 0;font-size:.9em;line-height:1.45}
 .dialog .text b{color:#a85a54;font-weight:normal}
@@ -126,15 +130,18 @@ img{-webkit-user-drag:none;user-select:none}
 #talkPanel{display:none;flex-direction:column;gap:12px;width:min(100%,620px);flex:0 1 auto;min-height:0;overflow-y:auto}
 #s-talk.panel #talkPanel{display:flex}
 #s-talk.panel #coverTalk{display:none}
-#talkPanel .pk{color:#fff;border-radius:16px;padding:14px 18px;border:2px solid rgba(255,255,255,.85);
-  box-shadow:0 4px 0 rgba(60,45,40,.25);animation:fadeIn .5s ease both}
+#talkPanel .pk{animation:fadeIn .5s ease both}
 #talkPanel .pk:nth-child(2){animation-delay:.25s}
 #talkPanel .pk:nth-child(3){animation-delay:.5s}
-#talkPanel .pk h3{font-weight:normal;font-size:clamp(22px,5.6vw,28px);margin-bottom:4px}
-#talkPanel .pk p{font-size:clamp(17px,4.4vw,21px);line-height:1.5}
-#talkPanel .pk.a{background:#a85a54}
-#talkPanel .pk.b{background:#7a6694}
-#talkPanel .pk.c{background:#4e7486}
+/* 標題：獨立的色塊標籤，貼在說明框上方 */
+#talkPanel .pk h3{display:inline-block;font-weight:normal;font-size:clamp(22px,5.8vw,28px);color:#fff;
+  padding:4px 18px 2px;border-radius:12px 12px 0 0;margin-left:12px}
+/* 說明：淺色框、深色字 */
+#talkPanel .pk p{font-size:clamp(18px,4.6vw,22px);line-height:1.6;color:var(--ink);background:rgba(250,244,228,.97);
+  border:2.5px solid;border-radius:14px;padding:10px 16px;box-shadow:0 3px 0 rgba(60,45,40,.18)}
+#talkPanel .pk.a h3{background:#a85a54}  #talkPanel .pk.a p{border-color:#a85a54}
+#talkPanel .pk.b h3{background:#7a6694}  #talkPanel .pk.b p{border-color:#7a6694}
+#talkPanel .pk.c h3{background:#4e7486}  #talkPanel .pk.c p{border-color:#4e7486}
 
 /* ---------- 選主題 ---------- */
 #s-theme{justify-content:center;gap:22px}
@@ -157,10 +164,6 @@ img{-webkit-user-drag:none;user-select:none}
 .card.noimg img{display:none}
 .card.noimg .ph{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;
   background:#ddd;color:#888;font-size:18cqw}
-.card .ctext{position:absolute;left:var(--custom-x);top:var(--custom-y);transform:translate(-50%,-50%);
-  width:82%;text-align:center;font-size:var(--custom-size);line-height:1.3;color:var(--ink);word-break:break-all}
-.card .ctext.chint{color:#fff;font-size:calc(var(--custom-size)*.85);background:rgba(78,116,134,.88);
-  border-radius:8px;padding:.35em .2em;box-shadow:0 2px 4px rgba(0,0,0,.2)}
 
 /* ---------- 旋轉盤 ---------- */
 #s-sort{gap:12px}
@@ -240,7 +243,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .levels{display:flex;flex-direction:column;gap:10px;width:min(100%,600px)}
 .levelBody{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;flex:1;min-height:0;justify-content:center}
 .level{text-align:left;padding:10px 16px;border-radius:14px;background:rgba(247,238,208,.94);
-  box-shadow:0 3px 0 rgba(90,74,66,.15);font-size:clamp(17px,4.5vw,22px);line-height:1.45}
+  box-shadow:0 3px 0 rgba(90,74,66,.15);font-size:clamp(17px,4.5vw,22px);line-height:1.6}
 .level b{display:flex;justify-content:space-between;font-weight:normal;font-size:1.15em;color:var(--blue)}
 .level.sel{background:var(--blue);color:#fff}
 .level.sel b{color:var(--cream)}
@@ -255,36 +258,38 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .branch .tick::before{content:"";position:absolute;left:50%;top:-8px;width:2px;height:6px;background:var(--branch)}
 #marker{position:absolute;top:24px;left:0;width:38px;height:38px;margin-left:-19px;transition:left .8s ease}
 #marker .seed{width:38px;height:38px}
-#plus{position:absolute;top:0;transform:translateX(-50%);font-size:20px;color:var(--blue);opacity:0}
+#plus{position:absolute;top:-6px;transform:translateX(-50%);font-size:26px;color:var(--blue);opacity:0}
 #plus.pop{animation:pop 1s ease}
 @keyframes pop{0%{opacity:0;transform:translate(-50%,10px)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,-14px)}}
-#scoreText{min-height:2em}
+#scoreText{min-height:2em;font-size:clamp(22px,5.8vw,30px)}
+#scoreText .big{font-size:clamp(48px,13vw,72px);color:#4e7486;margin:0 .12em;line-height:1;vertical-align:-.12em}
 
 /* ---------- 結果 ---------- */
 #s-result{justify-content:flex-start;gap:18px;overflow-y:auto}
 #s-result > *{flex:none}
-.result{width:min(100%,640px);background:var(--cream);border-radius:20px;padding:22px 24px;
-  box-shadow:0 6px 18px rgba(90,74,66,.22);border:3px solid var(--pink);text-align:center}
-.result .score{font-size:clamp(21px,5.4vw,26px);opacity:.85}
-.result h2{font-weight:normal;font-size:clamp(19px,4.8vw,23px);color:#8a7468;margin:14px 0 10px}
-.result p{font-size:clamp(17px,4.4vw,21px);line-height:1.75}
-.res-top{display:flex;gap:14px;align-items:center;text-align:left;background:#fff;border-radius:16px;padding:12px}
-.res-top .card{width:96px;flex:none;cursor:zoom-in}
+.result{width:min(100%,640px);background:rgba(250,244,228,.97);border-radius:20px;padding:22px 22px 20px;
+  box-shadow:0 6px 18px rgba(90,74,66,.2);border:2px solid var(--pink);text-align:left}
+.result .score{font-size:clamp(20px,5.2vw,25px);color:var(--ink)}
+.result h2{font-weight:normal;font-size:clamp(18px,4.6vw,22px);color:#4e7486;margin:4px 0 12px}
+.result p{font-size:clamp(18px,4.6vw,22px);line-height:1.75}
+.res-top{display:flex;gap:16px;align-items:center}
+.res-top .card{width:92px;flex:none;cursor:zoom-in}
 .res-top .nm{font-size:clamp(24px,6.4vw,32px);color:var(--ink);line-height:1.3;word-break:break-all}
-.res-top .sk{font-size:clamp(16px,4.2vw,19px);margin-top:4px;color:#4e7486}
-.res-top .lv{display:inline-block;margin-top:6px;font-size:clamp(15px,3.9vw,17px);background:#a85a54;color:#fff;border-radius:999px;padding:2px 12px}
-.res-sec{text-align:left;margin-top:14px}
-.res-sec h3{font-weight:normal;font-size:clamp(17px,4.4vw,20px);color:#a85a54;margin-bottom:2px}
-.res-sec p{font-size:clamp(18px,4.6vw,22px);line-height:1.65}
-.res-sec.tip{background:rgba(120,155,170,.16);border-radius:14px;padding:10px 14px}
-.res-note{margin-top:14px;font-size:clamp(15px,3.9vw,18px)!important;opacity:.75}
-.res-shop{margin-top:16px;padding-top:14px;border-top:2px dashed var(--pink)}
-.res-shop p{font-size:clamp(16px,4.2vw,19px);margin-bottom:10px}
-.panel2{width:min(100%,640px);background:rgba(250,244,228,.96);border-radius:20px;padding:18px 20px;
-  border:2px solid var(--pink);box-shadow:0 4px 14px rgba(90,74,66,.18);text-align:center}
+.res-top .sk{font-size:clamp(17px,4.4vw,20px);margin-top:4px;color:#4e7486}
+.res-top .lv{display:inline-block;margin-top:8px;font-size:clamp(15px,3.9vw,17px);color:#4e7486;
+  border:1.5px solid #4e7486;border-radius:999px;padding:1px 12px}
+.res-sec{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--pink)}
+.res-sec h3{font-weight:normal;font-size:clamp(18px,4.6vw,21px);color:#4e7486;margin-bottom:4px}
+.res-note{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--pink);font-size:clamp(16px,4.2vw,19px)!important}
+.res-gift{margin-top:10px;color:#a85a54}
+.res-shop{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--pink);text-align:center}
+.res-shop p{font-size:clamp(16px,4.2vw,19px)!important;margin-bottom:10px}
+.panel2{width:min(100%,640px);background:rgba(250,244,228,.97);border-radius:20px;padding:20px 20px;
+  border:2px solid var(--pink);box-shadow:0 4px 14px rgba(90,74,66,.16);text-align:center}
+.panel2 .part + .part{margin-top:18px;padding-top:16px;border-top:1.5px dashed var(--pink)}
 .panel2 h2{font-weight:normal;font-size:clamp(22px,5.6vw,28px);color:#4e7486;margin-bottom:4px}
-.panel2 .sub{font-size:clamp(15px,3.9vw,17px);opacity:.75;margin-bottom:12px;line-height:1.5}
-.panel2 .q{font-size:clamp(17px,4.4vw,20px);margin-bottom:6px}
+.panel2 .sub{font-size:clamp(16px,4.2vw,18px);margin-bottom:12px;line-height:1.6;color:var(--ink)}
+.panel2 .q{font-size:clamp(17px,4.4vw,20px);margin-bottom:6px;color:var(--ink)}
 .rate{display:flex;justify-content:center;gap:6px;margin-bottom:12px}
 .rate button{font-size:32px;filter:grayscale(1);opacity:.4;transition:transform .15s}
 .rate button.on{filter:none;opacity:1;transform:scale(1.1)}
@@ -297,7 +302,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 #fbHp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 #fbText{width:100%;min-height:96px;font-family:inherit;font-size:18px;padding:10px 12px;border-radius:12px;
   border:2px solid var(--pink);background:#fff;color:var(--ink);resize:vertical;margin-bottom:10px}
-#fbMsg{min-height:1.5em;font-size:16px;margin-top:8px}
+#fbMsg{min-height:1.5em;font-size:16px;margin-top:8px;color:#a85a54}
 #fbSend{background:#4e7486}
 #spQR{display:none;width:min(60%,220px);margin:8px auto 12px;border-radius:12px;background:#fff;padding:8px}
 #spQR.show{display:block}
@@ -442,27 +447,28 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
       <div class="res-sec"><h3 id="resStateT"></h3><p id="resState"></p></div>
       <div class="res-sec tip"><h3 id="resTipT"></h3><p id="resTip"></p></div>
       <p class="res-note" id="resNote"></p>
+      <p class="res-gift" id="resGift"></p>
       <div class="res-shop" id="resShop"><p id="shopText"></p><button class="btn" id="shopBtn"></button></div>
     </div>
 
-    <!-- 回饋 -->
-    <div class="panel2" id="fbBox">
-      <h2 id="fbTitle"></h2>
-      <p class="sub" id="fbSub"></p>
-      <p class="q" id="fbRate"></p>
-      <div class="rate" id="rate"></div>
-      <textarea id="fbText" maxlength="500"></textarea>
-      <input id="fbHp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <button class="btn" id="fbSend"></button>
-      <p id="fbMsg"></p>
-    </div>
-
-    <!-- 贊助 -->
-    <div class="panel2" id="spBox">
-      <h2 id="spTitle"></h2>
-      <p class="sub" id="spText"></p>
-      <img id="spQR" alt="贊助 QR code">
-      <button class="btn" id="spBtn"></button>
+    <!-- 回饋＋贊助（同一張卡片） -->
+    <div class="panel2">
+      <div class="part" id="fbBox">
+        <h2 id="fbTitle"></h2>
+        <p class="sub" id="fbSub"></p>
+        <p class="q" id="fbRate"></p>
+        <div class="rate" id="rate"></div>
+        <textarea id="fbText" maxlength="500"></textarea>
+        <input id="fbHp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn" id="fbSend"></button>
+        <p id="fbMsg"></p>
+      </div>
+      <div class="part" id="spBox">
+        <h2 id="spTitle"></h2>
+        <p class="sub" id="spText"></p>
+        <img id="spQR" alt="贊助 QR code">
+        <button class="btn" id="spBtn"></button>
+      </div>
     </div>
 
     <div class="row endrow">
@@ -478,18 +484,10 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
   <div class="row"><button class="btn light" id="leaveNo">繼續排卡</button><button class="btn" id="leaveYes">離開</button></div>
 </div></div>
 
-<!-- 自定義卡輸入 -->
-<div class="modal" id="inputModal"><div class="box">
-  <p id="inputText"></p>
-  <input id="customInput" type="text" autocomplete="off">
-  <div class="err" id="inputErr"></div>
-  <div class="row"><button class="btn light" id="inputNo">取消</button><button class="btn" id="inputYes">寫好了</button></div>
-</div></div>
-
 <!-- 沒有可改變的卡 -->
 <div class="modal" id="zeroModal"><div class="box">
   <p id="zeroText"></p>
-  <div class="row"><button class="btn light" id="zeroBack">回去重新分類</button><button class="btn" id="zeroWrite">寫自定義卡</button></div>
+  <div class="row"><button class="btn" id="zeroBack">回去重新分類</button></div>
 </div></div>
 
 <!-- 查看已分類 -->
@@ -520,8 +518,6 @@ const FILES = {
   flowerOff: IMG + 'flower-off.png',   // 評分：不亮的花
   cover1:  IMG + 'cover1.png',   // 開場知更鳥（直式）
   cover2:  IMG + 'cover2.png',   // 開場知更鳥打光版
-  keeper1: IMG + 'keeper1.png',
-  keeper2: IMG + 'keeper2.png',
   seed:    IMG + 'seed.png',
   bg:      IMG + 'background1.png',
   music:  'audio/music1.mp3'
@@ -560,17 +556,12 @@ const TEXT = {
   sortHint: '以「當時的自己」判斷・還有 {n} 張',
   sortGuide: '點選下方的選項，把中間這張卡分類 ↓',
 
-  customHint:  '點我寫下<br>你的因素',
-  customAsk:   '如果有卡片裡沒有提到的因素，可以寫在這裡～',
-  customEmpty: '請先寫下文字喔',
-  customLong:  '最多 {n} 個字喔',
-  customNeed:  '要放進「可以改變的」之前，請先寫下你的因素喔～',
 
   pickTitle: '可以改變的因素超過 {max} 張囉！<br>請選出對你最重要的 {max} 張',
   pickCount: '已選 {n} / {max}',
   pickFull:  '最多只能選 {max} 張喔',
 
-  zero: '還沒有可以改變的因素喔～<br>請至少選一張，或在自定義卡寫下屬於你的因素。',
+  zero: '還沒有可以改變的因素喔～<br>請至少選一張「可以改變的」卡吧！',
 
   seedIntro: [
     '這裡有 10 顆種子，請依照每個因素對你的重要程度，把種子放到卡片上吧。',
@@ -601,7 +592,8 @@ const TEXT = {
   resState:    '現在的你能夠做到的',
   resTip:      '送給你的小練習',
   resNote:     '分數沒有好壞之分，不論現在在哪個階段，都是給花園帶來不一樣的樣貌。',
-  shopText:    '想看每張卡更完整的解讀嗎？<br>《遺落成華》卡牌套組裡，有更多詳細的介紹與引導～',
+  resGift:     '🎁 帶著這個畫面去找攤主，就能領取一份神秘小禮物喔！',
+  shopText:    '想看每張卡更完整的解讀嗎？<br>《遺落成華》卡牌套組裡，有更多詳細的介紹～',
   shopBtn:     '看看卡牌套組',
 
   fbTitle:   '給我們一點回饋吧',
@@ -629,9 +621,8 @@ const THEMES = {
   M:{ name:'財務管理', cards:['M01','M02','M03'] },
   O:{ name:'其他',     cards:[] }
 };
-const COMMON = ['C01','C02','C03','C04','C05','C06','C07','C08','C09','C10','C11','C12'];
-const CUSTOM = 'C12';
-const MAX_CHANGE = 5, TOTAL_SEEDS = 10, CUSTOM_MAX = 12;
+const COMMON = ['C01','C02','C03','C04','C05','C06','C07','C08','C09','C10','C11'];
+const MAX_CHANGE = 5, TOTAL_SEEDS = 10;
 
 /* =========================================================
    ✏️ 因素卡資料：名稱、對應能力、三個階段的表現（state）與給使用者的小練習（tip）
@@ -751,12 +742,8 @@ const FACTORS = {
     state:['缺乏理財規劃的盲目支配中，常為不確定的未來感到焦慮','理清自己的財務現狀，練習分配擁有的資源','游刃有餘面對自己的財務規劃，建立踏實的保障'],
     tip:['先從生活上的記帳開始，不急著批判自己，只是看清楚錢都飛往了哪裡。',
          '試著把收入分成「生活、存錢、想做的事」三份預算，細項目可以再慢慢調整。',
-         '你已經能從容地規劃財務。定期回顧一次目標，讓這份安全感一直陪著你。'] },
-  C12:{ name:'{t}', skill:'屬於你的因素',
-    state:['有改善的意圖，但目前的能力並未出現明顯的提升','意識到改變的契機並改進行為，但相信自己還有進步的空間','認可自己已經有所改變，並對當下能力的進步感到滿足'],
-    tip:['你寫下的「{t}」，是只有你自己知道的重要因素。先試著觀察它通常在什麼時候出現，就是改變的開始。',
-         '你已經開始為「{t}」做出改變。試著寫下一個這週就能做到的小步驟，讓改變更穩定。',
-         '你已經在「{t}」上看見自己的成長。好好肯定這段努力，它會成為你往後的底氣。'] }
+         '你已經能從容地規劃財務。定期回顧一次目標，讓這份安全感一直陪著你。'] }
+
 };
 
 
@@ -768,7 +755,7 @@ const fill = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k]);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const failed = new Set();
 
-let theme = null, cards = [], customText = '', music = null, guard = false;
+let theme = null, cards = [], music = null, guard = false;
 
 /* ---------- 主題（從故事頁帶入：cards.html?theme=F） ---------- */
 (function readTheme(){
@@ -797,51 +784,27 @@ function cardEl(code, opt = {}){
   const d = document.createElement('div');
   d.className = 'card'; d.dataset.code = code;
   const img = document.createElement('img');
-  img.alt = code; img.src = CARD + code + '.png';
-  if (failed.has(CARD + code + '.png')) d.classList.add('noimg');
-  img.onerror = () => d.classList.add('noimg');
+  img.alt = code; img.decoding = 'async'; img.src = CARD + code + '.webp';
+  if (failed.has(CARD + code + '.webp')) img.src = CARD + code + '.png';
+  img.onerror = () => {             // webp 讀不到時改用 png，再不行就顯示編號
+    if (img.src.endsWith('.webp')) img.src = CARD + code + '.png'; else d.classList.add('noimg'); };
   const ph = document.createElement('div'); ph.className = 'ph'; ph.textContent = code;
   d.append(img, ph);
-  if (code === CUSTOM){
-    const t = document.createElement('div'); t.className = 'ctext';
-    d.appendChild(t);
-    d._hint = !!opt.hint;
-  }
-  updateCustom(d);
   return d;
 }
-function updateCustom(d){
-  const t = d.querySelector('.ctext'); if (!t) return;
-  if (customText){ t.textContent = customText; t.classList.remove('chint'); }
-  else if (d._hint){ t.innerHTML = TEXT.customHint; t.classList.add('chint'); }
-  else { t.textContent = ''; }
-}
-function refreshCustomAll(){ document.querySelectorAll('.card[data-code="'+CUSTOM+'"]').forEach(updateCustom); }
 
 function zoom(code){
   const b = $('#zoomBody'); b.innerHTML = ''; b.appendChild(cardEl(code)); openM('zoomModal');
 }
 $('#zoomModal').onclick = () => closeM('zoomModal');
 
-/* ---------- 知更鳥換圖 ---------- */
-function setupKeeper(el){
-  const [a, b] = el.querySelectorAll('img');
-  a.src = FILES.keeper1; b.src = FILES.keeper2;
-  if (failed.has(FILES.keeper1) && failed.has(FILES.keeper2)) el.classList.add('noimg');
-}
+
+/* ---------- 知更鳥 ---------- */
 function setupCover(el){
   const [a, b] = el.querySelectorAll('img');
-  // 沒有 cover 圖時，先用 keeper 圖代替
-  const pick = (f, alt) => failed.has(f) ? (failed.has(alt) ? null : alt) : f;
-  const s1 = pick(FILES.cover1, FILES.keeper1), s2 = pick(FILES.cover2, FILES.keeper2);
-  if (!s1){ el.classList.add('noimg'); return; }
-  a.src = s1; if (s2) b.src = s2; else b.remove();
-}
-let keeperTimer = null;
-function keeperBlink(el, ms){
-  clearInterval(keeperTimer);
-  if (!el || !el.classList.contains('keeper')) return;
-  keeperTimer = setInterval(() => el.classList.toggle('alt'), ms);
+  if (failed.has(FILES.cover1)){ el.classList.add('noimg'); return; }
+  a.src = FILES.cover1;
+  if (failed.has(FILES.cover2)) b.remove(); else b.src = FILES.cover2;
 }
 
 /* ---------- 預先載入 ---------- */
@@ -854,28 +817,28 @@ function loadImg(src, ms = 12000){
     i.src = src;
   });
 }
-async function loadMusic(){
-  let src = FILES.music;
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 15000);
-    const r = await fetch(FILES.music, {signal: ctrl.signal});
-    clearTimeout(t);
-    if (r.ok) src = URL.createObjectURL(await r.blob());
-  } catch(e) { /* 本機開檔或網路慢時，改用串流播放 */ }
-  music = new Audio(src); music.loop = true; music.volume = .6;
-}
 async function preload(){
-  await Promise.all([FILES.cover1, FILES.cover2, FILES.keeper1, FILES.keeper2].map(f => loadImg(f, 6000)));
+  // 1. 先載開場知更鳥
+  await Promise.all([FILES.cover1, FILES.cover2].map(f => loadImg(f, 6000)));
   setupCover($('#cover')); setupCover($('#coverTalk'));
 
-  const codes = [...COMMON, ...Object.values(THEMES).flatMap(t => t.cards)];
-  const list = [FILES.bg, FILES.seed, ...codes.map(c => CARD + c + '.png'), ...codes.map(c => NOTE + c + '.png'), FILES.sponsorQR, FILES.flowerOn, FILES.flowerOff];
-  let n = 0; const total = list.length + 2;
+  // 音樂不用等，邊播邊下載
+  music = new Audio(FILES.music); music.loop = true; music.volume = .6; music.preload = 'auto';
+
+  // 2. 開始前一定要有的：背景、種子、字型
+  const must = [FILES.bg, FILES.seed];
+  let n = 0; const total = must.length + 1;
   const step = () => { n++; $('#loadText').textContent = TEXT.loading + ' ' + Math.round(n / total * 100) + '%'; };
-  const font = Promise.race([document.fonts ? document.fonts.load('20px Crayon') : 0, sleep(8000)]).catch(()=>{}).then(step);
-  await Promise.all([...list.map(s => loadImg(s).then(step)), loadMusic().then(step), font]);
+  const font = Promise.race([document.fonts ? Promise.all([document.fonts.load('20px Crayon'), document.fonts.load('20px ChalkSub')]) : 0, sleep(10000)]).catch(()=>{}).then(step);
+  await Promise.all([...must.map(s => loadImg(s).then(step)), font]);
   if (failed.has(FILES.seed)) document.body.classList.add('noseed');
+
+  // 3. 卡牌和其他圖片在背景慢慢載，不用等（這次主題的卡排最前面）
+  const first = [...COMMON, ...(theme ? THEMES[theme].cards : [])];
+  const rest = Object.values(THEMES).flatMap(t => t.cards).filter(c => !first.includes(c));
+  const later = [...[...first, ...rest].map(c => CARD + c + '.webp'), FILES.flowerOn, FILES.flowerOff,
+    ...[...first, ...rest].map(c => NOTE + c + '.png'), FILES.sponsorQR];
+  (async () => { for (let i = 0; i < later.length; i += 4) await Promise.all(later.slice(i, i + 4).map(s => loadImg(s, 20000))); })();
 
   const lt = $('#loadText'); lt.textContent = TEXT.ready; lt.classList.add('ready');
   $('#s-load').addEventListener('click', start, {once:true});
@@ -900,9 +863,9 @@ window.addEventListener('beforeunload', e => { if (guard){ e.preventDefault(); e
 let typing = null;
 function talk(lines, endLabel, onDone){
   show('s-talk');
-  const keeper = $('#coverTalk'), txt = $('#talkText'), prev = $('#talkPrev'), next = $('#talkNext');
+  const txt = $('#talkText'), prev = $('#talkPrev'), next = $('#talkNext');
   let i = 0;
-  const finish = () => { if (typing){ clearInterval(typing.t); txt.innerHTML = typing.full; typing = null; keeperBlink(keeper, 1400); } };
+  const finish = () => { if (typing){ clearInterval(typing.t); txt.innerHTML = typing.full; typing = null; } };
   const render = () => {
     finish();
     let line = lines[i];
@@ -917,7 +880,6 @@ function talk(lines, endLabel, onDone){
     next.classList.toggle('end', last);
     if (line.includes('<')){ txt.innerHTML = line; return; }
     txt.textContent = ''; let k = 0;
-    keeperBlink(keeper, 260);
     typing = { full: line, t: setInterval(() => {
       txt.textContent = line.slice(0, ++k);
       if (k >= line.length) finish();
@@ -1022,17 +984,12 @@ function onCardTap(c){
   const d = deck(), i = d.indexOf(c);
   if (i < 0) return;
   if (i !== cur){ cur = i; renderRing(); return; }
-  if (c.code === CUSTOM) askCustom(); else zoom(c.code);
+  zoom(c.code);
 }
 
 function classify(p){
   const d = deck(); if (!d.length) return;
   const c = d[cur];
-  if (c.code === CUSTOM && p === 'a' && !customText){
-    toast(TEXT.customNeed);
-    askCustom(() => classify('a'));
-    return;
-  }
   const e = ringEls[c.code];
   const dx = {a:-1, b:0, c:1}[p] * innerWidth * .3;
   e.style.transform = `translate(${dx}px, ${innerHeight * .45}px) scale(.2)`;
@@ -1046,24 +1003,6 @@ function classify(p){
 let tipShown = false;
 document.querySelectorAll('.pile').forEach(b => b.onclick = () => classify(b.dataset.p));
 
-/* 自定義卡輸入 */
-let afterCustom = null;
-function askCustom(cb){
-  afterCustom = cb || null;
-  $('#inputText').textContent = TEXT.customAsk;
-  const inp = $('#customInput'); inp.value = customText; inp.maxLength = CUSTOM_MAX + 5;
-  $('#inputErr').textContent = '';
-  openM('inputModal'); setTimeout(() => inp.focus(), 100);
-}
-$('#inputNo').onclick = () => { closeM('inputModal'); afterCustom = null; };
-$('#inputYes').onclick = () => {
-  const v = $('#customInput').value.trim();
-  if (!v){ $('#inputErr').textContent = TEXT.customEmpty; return; }
-  if ([...v].length > CUSTOM_MAX){ $('#inputErr').textContent = fill(TEXT.customLong, {n:CUSTOM_MAX}); return; }
-  customText = v; refreshCustomAll(); closeM('inputModal');
-  const cb = afterCustom; afterCustom = null; if (cb) cb();
-};
-$('#customInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('#inputYes').click(); });
 
 /* 查看已分類 */
 const PILE_NAME = {a:'可以改變的', b:'恆久不變的', c:'沒有關聯的'};
@@ -1099,10 +1038,6 @@ function afterSort(){
 $('#zeroBack').onclick = () => {
   closeM('zeroModal');
   cards.forEach(c => c.pile = null); cur = 0; show('s-sort'); renderRing();
-};
-$('#zeroWrite').onclick = () => {
-  closeM('zeroModal');
-  askCustom(() => { cards.find(c => c.code === CUSTOM).pile = 'a'; afterSort(); });
 };
 
 /* ---------- 選出五張 ---------- */
@@ -1234,7 +1169,7 @@ async function startScore(){
     plus.classList.remove('pop'); void plus.offsetWidth; plus.classList.add('pop');
     await sleep(1000);
   }
-  $('#scoreText').textContent = fill(TEXT.scoreFinal, {n:total});
+  $('#scoreText').innerHTML = fill(TEXT.scoreFinal, {n:'<span class="big">' + total + '</span>'});
   $('#scoreText').style.visibility = $('#scoreOk').style.visibility = 'visible';
   $('#scoreOk').onclick = () => showResult();
 }
@@ -1253,21 +1188,21 @@ function pickTop(){
 function showResult(){
   const total = chosen().reduce((s, c) => s + points(c), 0);
   const top = pickTop(), f = FACTORS[top.code], lv = Math.max(1, top.level) - 1;
-  const t = str => str.replace(/\{t\}/g, customText || '自定義因素');
   $('#resScore').textContent = fill(TEXT.scoreFinal, {n:total});
   $('#resTopTitle').textContent = TEXT.resTop;
   const ce = cardEl(top.code); ce.onclick = () => zoom(top.code);
   $('#resCard').replaceChildren(ce);
-  $('#resName').textContent = t(f.name);
+  $('#resName').textContent = f.name;
   $('#resSkill').textContent = fill(TEXT.resSkill, {s:f.skill});
   $('#resLevel').textContent = fill(TEXT.resLevel, {l:TEXT.levels[lv].title});
-  $('#resStateT').textContent = TEXT.resState; $('#resState').textContent = t(f.state[lv]);
-  $('#resTipT').textContent = TEXT.resTip;     $('#resTip').textContent = t(f.tip[lv]);
+  $('#resStateT').textContent = TEXT.resState; $('#resState').textContent = f.state[lv];
+  $('#resTipT').textContent = TEXT.resTip;     $('#resTip').textContent = f.tip[lv];
   $('#resNote').textContent = TEXT.resNote;
+  $('#resGift').textContent = TEXT.resGift;
   $('#shopText').innerHTML = TEXT.shopText;
   $('#shopBtn').textContent = FILES.shop ? TEXT.shopBtn : TEXT.soon; $('#shopBtn').disabled = !FILES.shop;
   lastResult = { theme: THEMES[theme] ? THEMES[theme].name : '', score: total,
-    card: top.code, factor: top.code === CUSTOM ? '自定義卡' : f.name, level: lv + 1 };
+    card: top.code, factor: f.name, level: lv + 1 };
   setupFeedback(); setupSponsor();
   show('s-result'); $('#s-result').scrollTop = 0;
 }
@@ -1325,7 +1260,7 @@ $('#spBtn').onclick = () => window.open(FILES.sponsor, '_blank');
 
 $('#toHome').onclick = () => go(FILES.home);
 $('#again').onclick = () => {          // 重新來一次：清空這次的卡牌、種子與自定義文字，回到選主題
-  cards = []; customText = ''; theme = null; lvIdx = 0; cur = 0; tipShown = false;
+  cards = []; theme = null; lvIdx = 0; cur = 0; tipShown = false;
   chooseTheme();
 };
 
@@ -1427,10 +1362,7 @@ function setupStaff(menuEl, groups, btnPos, panelPos, onOpen){
       ['Level 1', go(() => { setup(3, [5,3,2], [1,2,3]); showResult(); })],
       ['Level 2', go(() => { setup(3, [5,3,2], [2,1,3]); showResult(); })],
       ['Level 3', go(() => { setup(3, [5,3,2], [3,1,1]); showResult(); })],
-      ['同分隨機', go(() => { setup(3, [4,4,2], [3,3,1]); showResult(); })],
-      ['自定義卡', go(() => { if (!theme) theme = 'F'; customText = customText || '測試文字';
-          cards = [...THEMES[theme].cards, ...COMMON].map(code => ({code, pile: code === CUSTOM ? 'a' : 'c',
-            seeds: code === CUSTOM ? 10 : 0, level: code === CUSTOM ? 2 : 0})); showResult(); })] ]]
+      ['同分隨機', go(() => { setup(3, [4,4,2], [3,3,1]); showResult(); })] ]]
   ], 'left:10px;bottom:calc(10px + env(safe-area-inset-bottom))', 'left:10px;bottom:calc(62px + env(safe-area-inset-bottom))', () => $('#cmenu').classList.remove('open'));
 })();
 

@@ -54,6 +54,7 @@ function imgMiss(i){
     --talk:0px;                                        /* 預設不保留：對話框可蓋住圖片，要點選時對話框已消失 */
   }
   *,*::before,*::after{box-sizing:border-box}
+  html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
   html,body{margin:0;min-height:100%}
   body{
     --bg:url("images/background1.png");
@@ -84,7 +85,10 @@ function imgMiss(i){
   /* 畫面三、四：單張大圖，填滿可用空間（手機貼近底部、電腦置中放大），返回鈕放在上方 */
   #s3,#s4{position:fixed;inset:var(--top) 0 var(--talk) 0;width:auto;aspect-ratio:auto}
   #bigwin,#book{left:0;top:0;width:100%;height:100%;--r:0deg;--ar:4/5}
-  #bigwin img{height:100%;object-fit:contain;object-position:center bottom}
+  /* 大窗戶：放在畫面中央，手機上左右可以稍微裁掉 */
+  #s3{overflow:hidden}
+  #bigwin img{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);
+    width:auto;max-width:none;height:min(64svh, 104vw);object-fit:contain}
   #back {--x:24%;--y:4%;--w:52%;--r:0deg;   --ar:3/1}
   #back4{--x:24%;--y:4%;--w:52%;--r:0deg;   --ar:3/1}
   #keeper{--x:10%;--y:22%;--w:80%;--r:0deg;  --ar:1/1}
@@ -99,7 +103,8 @@ function imgMiss(i){
     #win  {--x:56%;--y:4%; --w:26%}
     #shelf{--x:12%;--y:8%; --w:20%}
     #bed  {--x:30%;--y:52%;--w:40%}
-    #bigwin img,.bk img{object-position:center}
+    .bk img{object-position:center}
+    #bigwin img{height:min(66svh, 100%)}
     #back {--x:79%;--y:78%;--w:18%}
     #back4{--x:81%;--y:74%;--w:17%}
     #keeper{--x:33%;--y:12%;--w:34%}
@@ -207,7 +212,7 @@ function imgMiss(i){
 
   /* ───── 對話框（含上一句 / 下一句）───── */
   #talk{position:fixed;z-index:30;left:50%;transform:translateX(-50%);bottom:max(16px,env(safe-area-inset-bottom));
-    font-size:var(--em);line-height:1.7;line-break:strict;
+    font-size:var(--em);line-height:1.7;line-break:strict;text-wrap:pretty;
     width:min(92vw,19em);padding:12px 1em 10px;border-radius:26px;display:flex;flex-direction:column;gap:4px;
     border:3px solid var(--blue);background:var(--tb);cursor:pointer;box-shadow:0 6px 0 rgba(120,155,170,.35)}
   #talk[data-w="1"]{--tb:var(--blue);color:var(--night)}   /* 鳥（管理員）：藍色底 */
@@ -223,10 +228,11 @@ function imgMiss(i){
   #choices button:hover{background:var(--lav)}
   #choices button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
   #talk.menu .ctrl{display:none}
-  .ctrl{position:relative;align-self:flex-end;display:flex;gap:8px}
-  .ctrl button{font-size:clamp(16px,.6vw + 12px,20px);padding:2px 16px;border-radius:999px;
-    border:2px solid var(--blue);background:var(--blush);color:var(--ink)}
-  .ctrl button:hover{background:var(--lav)}
+  .ctrl{position:relative;align-self:stretch;display:flex;justify-content:space-between;margin-top:2px}
+  .ctrl button{font-size:clamp(16px,.6vw + 12px,20px);padding:4px 2px;border:0;background:none;color:inherit;
+    opacity:.7;letter-spacing:.12em;transition:opacity .2s}
+  .ctrl button:hover{opacity:1}
+  #next{margin-left:auto}
   .ctrl button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
   .ch{opacity:0}
   .ch.on{opacity:1;transition:opacity .15s}
@@ -236,6 +242,10 @@ function imgMiss(i){
     background:rgba(61,83,93,.45);backdrop-filter:blur(3px)}
   .mbox,.cbox{width:min(92vw,480px);padding:28px;border-radius:24px;background:var(--cream);border:3px solid var(--blue);text-align:center}
   .cbox{max-height:92svh;overflow:auto}
+  /* 換行：優先在標點處斷行，避免最後一行只剩一兩個字 */
+  .cbox h3,.cbox p,.mbox h3,.mbox p{word-break:keep-all;overflow-wrap:anywhere;text-wrap:pretty;line-break:strict}
+  .cbox button{text-wrap:balance;line-break:strict}
+  @media (max-aspect-ratio:1/1){ .mbox,.cbox{padding:24px 20px} }
   .cbox img{display:block;width:100%;height:auto;border-radius:14px;margin-bottom:14px}
   .cbox h3{margin:0 0 4px;font-size:clamp(26px,1vw + 20px,32px);font-weight:normal}
   .cbox .cname{margin:0 0 10px;font-size:clamp(30px,1vw + 24px,36px);color:var(--blue)}
@@ -283,6 +293,22 @@ function imgMiss(i){
     border-radius:16px;border:2.5px solid var(--ink)}
   .big.rose{background:var(--rose);color:var(--ink)}
   .big.blue{background:var(--blue);color:var(--night)}
+  #onsite{padding-bottom:calc(84px + env(safe-area-inset-bottom))}   /* 留位置給右下角的工作人員按鈕 */
+  #onsite .cbox{max-height:100%}
+  /* 現場排卡：回饋區 */
+  .fb{margin-top:18px;padding-top:16px;border-top:2px dashed var(--blue)}
+  .fb h3{font-size:clamp(22px,.6vw + 18px,26px)!important}
+  .rate{display:flex;justify-content:center;gap:6px;margin:8px 0 10px}
+  .rate button{width:46px;height:46px;padding:0;border:0;background:none;position:relative;font-size:30px;line-height:1}
+  .rate img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .rate img.on,.rate button.on img.off{opacity:0}
+  .rate button.on img.on{opacity:1}
+  .rate.emoji button{filter:grayscale(1);opacity:.4}
+  .rate.emoji button.on{filter:none;opacity:1}
+  #o-fbtext{width:100%;min-height:90px;font:inherit;font-size:18px;padding:10px 12px;border-radius:12px;
+    border:2px solid var(--blue);background:#fff;color:var(--ink);resize:vertical;user-select:text}
+  #o-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+  #o-msg{min-height:1.4em}
   .big:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 
   /* 現場排卡畫面：畫面旁邊的工作人員小按鈕 */
@@ -448,7 +474,7 @@ function imgMiss(i){
   <div class="cbox">
     <img src="images/write.png" alt="" onerror="this.classList.add('hid')">
     <p>請在卡片上簡單地寫下，現在心中第一直覺想到的「遺憾」故事</p>
-    <p class="small">小提醒：如果沒有書寫工具，我們有筆提供可以借用~</p>
+    <p class="small">小提醒：如果沒有書寫工具，<br>我們有筆提供可以借用~</p>
     <p class="small">你寫下的遺憾故事，屬於哪一個主題呢？</p>
     <div class="chips" id="themes" role="radiogroup" aria-label="遺憾故事的主題">
       <button type="button" class="chip" role="radio" aria-checked="false" data-t="友情">友情</button>
@@ -478,9 +504,22 @@ function imgMiss(i){
 <div id="onsite" class="ov hid" role="dialog" aria-modal="true">
   <div class="cbox">
     <img src="images/onsite.png" alt="" onerror="this.classList.add('hid')">
-    <p>請找現場的工作人員，我們會陪你一起排卡。（此段文字待編輯）</p>
+    <p>請帶著這個畫面，找現場的攤主，<br>我們會陪著你一起使用卡牌。</p>
+    <p class="small">過程中不需要告訴我們事情的細節，<br>只要跟著卡牌，慢慢整理自己的感受就好。</p>
     <button type="button" id="o-online" class="big blue">改成線上排卡</button>
     <p class="small warn">這一步無法返回哦！</p>
+
+    <!-- 體驗完的回饋（和排卡結果頁共用同一個回饋後台） -->
+    <div class="fb">
+      <h3>體驗完之後，給我們一點回饋吧</h3>
+      <p class="small">你的回饋會幫助花園長得更好～（不會記錄你的遺憾內容）</p>
+      <div class="rate" id="o-rate"></div>
+      <textarea id="o-fbtext" maxlength="500" placeholder="想對我們說的話…（選填）"></textarea>
+      <input id="o-hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="button" id="o-send" class="big blue">送出回饋</button>
+      <p class="small" id="o-msg"></p>
+      <button type="button" id="o-shop" class="big rose hid">看看卡牌套組</button>
+    </div>
   </div>
   <div class="staff">
     <button type="button" id="o-card">查看主題卡</button>
@@ -760,7 +799,7 @@ const WINDOW = [
   '恩...？這個盆栽...似乎已經很久都沒有種東西',
   '是什麼時候開始忘記這個興趣呢...',
   '那現在來種點什麼好了',
-  '我想想...之前書櫃好像放了一本有關花卉的書',
+  '我想想...\n之前書櫃好像放了一本有關花卉的書',
   '去找找看現在適合種什麼吧！'
 ];
 const startWindow = () => say(WINDOW, () => { show(back); guide(...TIPS.back); });
@@ -967,6 +1006,40 @@ $('#c-onsite').addEventListener('click', () => openBox('#onsite'));           //
 $('#c-online').addEventListener('click', () => { location.href = 'cards.html?theme=' + encodeURIComponent(store.get('selected_theme') || ''); });    // 線上排卡 → 首頁 B 支線
 $('#o-online').addEventListener('click', () => { location.href = 'cards.html?theme=' + encodeURIComponent(store.get('selected_theme') || ''); });    // 改成線上排卡 → 首頁 B 支線
 $('#o-card').addEventListener('click', showCard);                              // 工作人員小按鈕 → 顯示主題卡
+
+/* 現場排卡的回饋：送到和排卡結果頁同一個回饋後台 */
+const FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycby0IrQq5lZt7b8Wv2QHy5VXmNtBHDzhBPWE1OdNWUV9PsJRWaI9b_J_NycdWC3zqk2d_w/exec';
+(() => {
+  const rate = $('#o-rate'), msg = $('#o-msg'), send = $('#o-send');
+  let rating = 0, sent = false;
+  for (let i = 1; i <= 5; i++) {
+    const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', i + ' 朵花');
+    b.innerHTML = '<img class="off" src="images/flower-off.png" alt=""><img class="on" src="images/flower-on.png" alt="">';
+    b.querySelector('img').onerror = () => { rate.classList.add('emoji'); rate.querySelectorAll('button').forEach(x => x.textContent = '🌸'); };
+    b.addEventListener('click', () => { rating = i; [...rate.children].forEach((x, k) => x.classList.toggle('on', k < i)); });
+    rate.append(b);
+  }
+  send.addEventListener('click', async () => {
+    if (sent) return;
+    const text = $('#o-fbtext').value.trim();
+    if (!rating && !text) { msg.textContent = '請先選擇花朵數，或寫下想說的話喔'; return; }
+    let last = 0; try { last = +localStorage.getItem('fbLast') || 0; } catch (e) {}
+    if (Date.now() - last < 60000) { msg.textContent = '剛剛已經收到你的回饋囉，稍等一分鐘再送吧～'; return; }
+    send.disabled = true; msg.textContent = '傳送中…';
+    try {
+      const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 12000);
+      await fetch(FEEDBACK_URL, { method: 'POST', mode: 'no-cors', signal: ctrl.signal,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ rating, message: text, hp: $('#o-hp').value, theme: store.get('selected_theme') || '',
+          score: '', card: '', factor: '現場排卡', level: '', device: innerWidth < 700 ? '手機' : '電腦/平板' }) });
+      clearTimeout(t);
+      sent = true; msg.textContent = '收到了！謝謝你的回饋 🌷';
+      try { localStorage.setItem('fbLast', Date.now()); } catch (e) {}
+      show($('#o-shop'));                                                      // 回饋完 → 引導到購買頁
+    } catch (e) { msg.textContent = '網路好像不太穩，請稍後再試一次'; send.disabled = false; }
+  });
+  $('#o-shop').addEventListener('click', () => { location.href = 'shop.html'; });
+})();
 /* 2. 嗯...我再想想 → 結束互動 */
 $('#end-draw').addEventListener('click', () => { location.href = 'shop.html'; });     // 看看卡牌套組 → 首頁 C 支線（購買卡牌）
 $('#end-home').addEventListener('click', () => { location.href = 'index.html'; });    // 結束旅行 → 回到頁首

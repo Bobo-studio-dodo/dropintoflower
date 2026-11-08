@@ -14,6 +14,7 @@
 @font-face{font-family:"Crayon";src:url("fonts/HanyiSentyCrayon-non-color.woff2") format("woff2");font-display:swap}
 :root{--blue:#789baa;--pink:#e1beb9;--cream:#f7eed0;--rose:#f1e0e4;--ink:#5a4a42}
 *{box-sizing:border-box;margin:0;padding:0}
+html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
 body{min-height:100dvh;font-family:"Crayon","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--ink);
   background:var(--rose) url("images/background1.png") center/cover no-repeat fixed;
   display:flex;flex-direction:column;align-items:center;gap:18px;
@@ -38,7 +39,7 @@ p{font-size:clamp(17px,4.4vw,21px);line-height:1.7}
 
   <section class="box" id="shop">
     <h1>購買卡牌</h1>
-    <p>《遺落成華》卡牌套組，<br>有每張卡更完整的解讀與引導。</p>
+    <p>《遺落成華》卡牌套組，<br>有每張卡更完整的解讀。</p>
     <span class="soon">販售頁即將開放，敬請期待～</span>
   </section>
 
