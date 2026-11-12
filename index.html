@@ -12,7 +12,7 @@
   story.html                  ← 支線 A：小故事
   cards.html                  ← 支線 B：開始排卡(陣)
   shop.html                   ← 支線 C：購買卡牌
-  fonts/HanyiSentyCrayon-non-color.woff2
+  fonts/HanyiSentyChalk-site.woff2（全站共用的粉筆字）
   images/background1.png      ← 背景（1920×1080）
   images/logo-vertical.png    ← 專案 logo（1283×1283，透明背景）
   images/btn-story.png        ← 支線 A：整張圖就是按鈕（長方形約 3.2:1，建議 1200×375，透明背景）
@@ -26,8 +26,13 @@
   html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
 
   @font-face {
-    font-family: "HanyiSentyCrayon";
-    src: url("fonts/HanyiSentyCrayon-non-color.woff2") format("woff2");
+    font-family: "Chalk";
+    src: url("fonts/HanyiSentyChalk-site.woff2") format("woff2");
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "FYSong";          /* 猫啃网风雅宋（已加寬 10% 的網站版） */
+    src: url("fonts/FengYaSong-site.woff2") format("woff2");
     font-display: swap;
   }
 
@@ -38,7 +43,10 @@
     --blush:    #f1e0e4;
     --lavender: #ede2ef;
     --ink:      #3d535d;   /* 由 789baa 加深，供淺色底上的文字使用 */
-    --font: "HanyiSentyCrayon", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    --font: "Chalk", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    --main: #3f6577;   /* 主色：深藍 */
+    --text: #3d5568;   /* 一般文字：藍 */
+    --accent: #a85a54; /* 重點：紅 */
 
     /* 按鈕顯示寬度（手機直式 / 橫式各自設定，要調大小改這裡） */
     --btn-w: min(88vw, 40svh, 440px);   /* 長條按鈕（約 3.2:1），手機一屏放得下 */
@@ -54,6 +62,7 @@
     -webkit-tap-highlight-color: transparent;
     overflow-x: hidden;
   }
+  html { max-width: 100%; overflow-x: clip; }   /* 手機不會左右滑動 */
 
   /* ───────── 背景（images/background1.png，1920×1080）─────────
      上層：完整顯示整張圖。下層：同圖放大模糊後鋪滿，讓任何比例都能延伸。
@@ -170,7 +179,48 @@
     .branches { flex-direction: row; align-items: flex-start; gap: clamp(8px, 2vw, 28px); }
   }
 
+  /* ───────── 往下滑提示 ───────── */
+  .page { position: relative; }
+  .more { position: absolute; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+    font-size: clamp(18px, .6vw + 14px, 23px); color: var(--main); background: rgba(247, 238, 208, .92);
+    padding: .2em 1.1em; border-radius: 999px; text-decoration: none; letter-spacing: .1em; white-space: nowrap;
+    animation: bob 2s ease-in-out infinite; }
+  @keyframes bob { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
+
+  /* ───────── 下半部：整條色塊 ───────── */
+  .band { width: 100%; padding: clamp(44px, 7vw, 90px) max(22px, 6vw); text-align: center; }
+  .band h2 { margin: 0 0 12px; font-weight: normal; font-size: clamp(26px, 1.4vw + 20px, 40px); letter-spacing: .1em; }
+  .band p { margin: 0 auto; max-width: 30em; font-size: clamp(18px, .5vw + 15px, 22px); line-height: 1.8;
+    word-break: keep-all; overflow-wrap: anywhere; text-wrap: pretty; }
+
+  /* 打卡拍照：淺色色塊 */
+  .photo { background: var(--cream); color: var(--text); }
+  .photo h2 { color: var(--main); }
+  .photo .frames { display: flex; justify-content: center; gap: clamp(10px, 2vw, 28px); margin: clamp(22px, 3vw, 40px) auto; }
+  .photo .frames a { display: block; border-radius: 10px; transition: transform .15s; }
+  .photo .frames a:hover { transform: translateY(-4px); }
+  .photo .frames a:active { transform: scale(.97); }
+  .photo .frames img { display: block; width: clamp(64px, 16vw, 170px); aspect-ratio: 9 / 16; object-fit: cover; border-radius: 10px;
+    background: var(--blue); box-shadow: 0 4px 14px rgba(61, 83, 93, .22); }
+  .photo .frames img.empty { content: url("data:image/gif;base64,R0lGODlhAQABAAAAACw="); }
+  .photo .go { display: inline-block; padding: .55em 2em; border-radius: 999px; background: var(--main); color: #fff;
+    text-decoration: none; font-size: clamp(19px, .5vw + 16px, 24px); letter-spacing: .1em; }
+  .photo .go:hover { filter: brightness(1.08); }
+
+  /* 頁尾：深藍色塊、白字 */
+  .foot { background: var(--main); color: #fff; text-align: left; padding-bottom: max(36px, env(safe-area-inset-bottom));
+    font-family: "FYSong", "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif; }
+  .foot .cols { display: grid; gap: 34px; max-width: 1100px; margin: 0 auto; }
+  .foot h3 { margin: 0 0 10px; font-weight: normal; font-size: clamp(22px, .6vw + 18px, 28px); letter-spacing: .08em;
+    padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.35); }
+  .foot p { margin: 0; max-width: none; font-size: clamp(18px, .5vw + 15px, 22px); line-height: 1.9; }
+  .foot a { color: #fff; text-underline-offset: 4px; }
+  .foot .copy { max-width: 1100px; margin: 36px auto 0; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.35);
+    font-size: clamp(15px, .3vw + 13px, 18px); line-height: 1.8; opacity: .9; word-break: keep-all; overflow-wrap: anywhere; text-wrap: pretty; }
+  @media (min-width: 760px) { .foot .cols { grid-template-columns: 1fr 1fr; } }
+
   @media (prefers-reduced-motion: reduce) {
+    .more { animation: none; }
     .logo { animation: none; }
     .branch { transition: none; }
   }
@@ -212,6 +262,40 @@
       </li>
     </ul>
 
+    <a class="more" href="#photo">打卡拍照 ↓</a>
   </main>
+
+  <!-- ═════ 打卡拍照 ═════ -->
+  <section class="band photo" id="photo">
+    <h2>打卡拍照</h2>
+    <p>點一張喜歡的花朵相框，<br>直接開始拍一張心靈花園照片吧！</p>
+    <div class="frames">
+      <a href="photo.html?f=1" aria-label="用洋甘菊相框拍照"><img src="images/frames/thumb1.webp" alt="" onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame1.png';else this.classList.add('empty')"></a>
+      <a href="photo.html?f=2" aria-label="用桔梗花相框拍照"><img src="images/frames/thumb2.webp" alt="" onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame2.png';else this.classList.add('empty')"></a>
+      <a href="photo.html?f=3" aria-label="用繡球花相框拍照"><img src="images/frames/thumb3.webp" alt="" onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame3.png';else this.classList.add('empty')"></a>
+      <a href="photo.html?f=4" aria-label="用櫻花相框拍照"><img src="images/frames/thumb4.webp" alt="" onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame4.png';else this.classList.add('empty')"></a>
+    </div>
+    <a class="go" href="photo.html">開始拍照</a>
+  </section>
+
+  <!-- ═════ 頁尾（文字可以直接改） ═════ -->
+  <footer class="band foot" id="about">
+    <div class="cols">
+      <div>
+        <h3>關於我們</h3>
+        <p>花生什麼鳥事團隊 製作</p>
+        <p>成員｜謝欣妤、李婉諭</p>
+        <p>指導老師｜涂卉</p>
+      </div>
+      <div>
+        <h3>社群與聯絡</h3>
+        <p><a href="https://www.instagram.com/below.regret/" target="_blank" rel="noopener">Instagram｜@below.regret</a></p>
+        <p><a href="mailto:below.regret@gmail.com">Email｜below.regret@gmail.com</a></p>
+      </div>
+    </div>
+    <p class="copy">© 2026 花生什麼鳥事團隊 版權所有。<br>
+      本網站與《遺落成華》卡牌中的插畫、圖像、文字與設計，著作權皆屬花生什麼鳥事團隊所有。
+      未經同意，請勿轉載、重製、改作或作商業使用；如需引用，請先來信聯繫。</p>
+  </footer>
 </body>
 </html>

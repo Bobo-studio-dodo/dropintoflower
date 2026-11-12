@@ -35,30 +35,24 @@
 
 /* =================================================== */
 @font-face{
-  font-family:"Crayon";
-  src:url("fonts/HanyiSentyCrayon-non-color.woff2") format("woff2");
+  font-family:"Chalk";
+  src:url("fonts/HanyiSentyChalk-site.woff2") format("woff2");
   font-display:swap;
 }
-/* 文字較多的地方用粉筆字，比較好讀
-   這個字型檔只含這頁用到的字（約 300KB，載入快）。
-   ※ 之後如果改了文字、加了新的字，請 Claude 重新產生這個字型檔，不然新字會顯示成蠟筆字 */
 @font-face{
-  font-family:"ChalkSub";
-  src:url("fonts/HanyiSentyChalk-cards.woff2") format("woff2");
+  font-family:"FYSong";             /* 猫啃网风雅宋（已加寬 10% 的網站版） */
+  src:url("fonts/FengYaSong-site.woff2") format("woff2");
   font-display:swap;
 }
-.dialog .text,#talkPanel .pk p,.level,#s-result,.box p,.rv .tip,#toast{
-  font-family:"ChalkSub","Crayon","PingFang TC","Microsoft JhengHei",sans-serif;
-  text-wrap:pretty;line-break:strict}
-.level b,#s-result button{font-family:"Crayon","PingFang TC",sans-serif}
-#s-result textarea{font-family:"Crayon","PingFang TC","Microsoft JhengHei",sans-serif}
+.dialog .text,#talkPanel .pk p,.level,#s-result,.box p,.rv .tip,#toast{text-wrap:pretty;line-break:strict}
+.result,.level,#talkPanel .pk p{font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
-html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+html,body{height:100%;max-width:100%;overflow:hidden;overscroll-behavior:none}
 body{
-  font-family:"Crayon","PingFang TC","Microsoft JhengHei",sans-serif;
+  font-family:"Chalk","PingFang TC","Microsoft JhengHei",sans-serif;
   color:var(--ink);
-  background:var(--rose) url("images/background1.png") center/cover no-repeat fixed;
+  background:#7697a6 url("images/background1.png") center/cover no-repeat;
   user-select:none;-webkit-user-select:none;
 }
 button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer}
@@ -73,17 +67,25 @@ img{-webkit-user-drag:none;user-select:none}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /* ---------- 左上選單、右上音樂 ---------- */
-.corner{position:fixed;top:calc(14px + env(safe-area-inset-top));z-index:50;
-  width:46px;height:46px;border-radius:50%;background:rgba(247,238,208,.92);
-  box-shadow:0 2px 8px rgba(90,74,66,.18);font-size:22px;display:none;align-items:center;justify-content:center}
+.corner{position:fixed;top:calc(10px + env(safe-area-inset-top));z-index:50;
+  width:clamp(44px,7vmin,60px);aspect-ratio:1;padding:0;border-radius:50%;border:2.5px solid #789baa;
+  background:rgba(247,238,208,.95);overflow:hidden;
+  font-size:22px;display:none;align-items:center;justify-content:center}
 .corner.show{display:flex}
-#menuBtn{left:14px}
-#cmenu{position:fixed;z-index:60;top:calc(68px + env(safe-area-inset-top));left:14px;display:none;flex-direction:column;
-  background:rgba(250,244,228,.97);border:2px solid var(--pink);border-radius:14px;overflow:hidden;box-shadow:0 4px 12px rgba(90,74,66,.2)}
+#menuBtn{left:calc(10px + env(safe-area-inset-left))}
+#menuBtn img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#menuBtn.empty img{display:none}
+#menuBtn .mt{display:none}
+#menuBtn.empty .mt{display:block}
+/* 選單：細線分隔的清單（與故事線相同） */
+#cmenu{position:fixed;z-index:60;top:calc(env(safe-area-inset-top) + 74px);left:calc(env(safe-area-inset-left) + 10px);
+  display:none;flex-direction:column;min-width:10em;padding:6px 0;border-radius:12px;
+  background:rgba(250,246,234,.97);border:1px solid rgba(78,116,134,.28);box-shadow:0 10px 28px rgba(31,43,49,.22)}
 #cmenu.open{display:flex}
-#cmenu button{font-size:19px;padding:10px 22px;text-align:center}
-#cmenu button + button{border-top:1px dashed var(--pink)}
-#cmenu button:active{background:var(--lilac)}
+#cmenu button{font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;font-size:18px;letter-spacing:.24em;
+  padding:12px 26px 12px calc(26px + .24em);text-align:center;color:#3d535d;transition:background .2s,color .2s}
+#cmenu button + button{border-top:1px solid rgba(78,116,134,.16)}
+#cmenu button:hover,#cmenu button:active{background:rgba(120,155,170,.12);color:#4e7486}
 #musicBtn{right:14px}
 #musicBtn.off{opacity:.45;text-decoration:line-through}
 
@@ -109,22 +111,25 @@ img{-webkit-user-drag:none;user-select:none}
 .cover.noimg img{display:none}
 #cover{height:min(64dvh,680px)}
 #coverTalk{height:min(40dvh,440px);flex:0 1 auto;min-height:110px}
-#loadText{font-size:clamp(20px,5vw,26px);letter-spacing:.1em;
+#loadText{font-size:clamp(19px,4.8vw,24px);letter-spacing:.1em;
   background:rgba(247,238,208,.85);padding:8px 22px;border-radius:999px}
 #loadText.ready{animation:breathe 2.2s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:1}50%{opacity:.45}}
 
 /* ---------- 對話 ---------- */
 #s-talk{justify-content:center;gap:18px}
-.dialog{width:min(100%,620px);background:rgba(250,244,228,.96);color:var(--ink);border-radius:18px;
-  border:2px solid var(--pink);padding:16px 20px 12px;box-shadow:0 4px 14px rgba(90,74,66,.2)}
-.dialog .text{font-size:clamp(20px,5.2vw,26px);line-height:1.75;letter-spacing:.02em;min-height:1.75em}
+/* 對話框：與故事線（A）相同的樣式與字級 */
+.dialog{--em:clamp(22px,min(1.5vw + 11px,4.6svh),34px);font-size:var(--em);
+  width:min(92vw,19em);background:#f7eed0;color:#3d535d;border-radius:26px;
+  border:3px solid #789baa;padding:12px 1em 10px;box-shadow:0 6px 0 rgba(120,155,170,.35);flex:none}
+.dialog .text{font-size:1em;line-height:1.7;line-break:strict;min-height:1.7em}
 .dialog .text ul{list-style:none;margin-top:4px}
 .dialog .text li{margin:6px 0;font-size:.9em;line-height:1.45}
 .dialog .text b{color:#a85a54;font-weight:normal}
-.dialog .nav{display:flex;justify-content:space-between;margin-top:8px}
-.dialog .nav button{color:#8a7468;font-size:clamp(16px,4vw,19px);padding:6px 4px}
-#talkNext.end{background:#4e7486;color:#fff;padding:8px 20px;border-radius:999px}
+.dialog .nav{display:flex;justify-content:space-between;margin-top:2px}
+.dialog .nav button{color:inherit;font-size:clamp(16px,.6vw + 12px,20px);padding:4px 2px;opacity:.7;letter-spacing:.12em;transition:opacity .2s}
+.dialog .nav button:hover{opacity:1}
+#talkNext.end{background:#4e7486;color:#fff;padding:6px 20px;border-radius:999px;opacity:1}
 
 /* 三種分類的說明區塊（顏色對應分類按鈕） */
 #talkPanel{display:none;flex-direction:column;gap:12px;width:min(100%,620px);flex:0 1 auto;min-height:0;overflow-y:auto}
@@ -134,7 +139,7 @@ img{-webkit-user-drag:none;user-select:none}
 #talkPanel .pk:nth-child(2){animation-delay:.25s}
 #talkPanel .pk:nth-child(3){animation-delay:.5s}
 /* 標題：獨立的色塊標籤，貼在說明框上方 */
-#talkPanel .pk h3{display:inline-block;font-weight:normal;font-size:clamp(22px,5.8vw,28px);color:#fff;
+#talkPanel .pk h3{display:inline-block;font-weight:normal;font-size:clamp(21px,5.4vw,26px);color:#fff;
   padding:4px 18px 2px;border-radius:12px 12px 0 0;margin-left:12px}
 /* 說明：淺色框、深色字 */
 #talkPanel .pk p{font-size:clamp(18px,4.6vw,22px);line-height:1.6;color:var(--ink);background:rgba(250,244,228,.97);
@@ -145,7 +150,7 @@ img{-webkit-user-drag:none;user-select:none}
 
 /* ---------- 選主題 ---------- */
 #s-theme{justify-content:center;gap:22px}
-.title{font-size:clamp(21px,5.4vw,28px);text-align:center;line-height:1.5;
+.title{font-size:clamp(20px,5.2vw,26px);text-align:center;line-height:1.5;
   background:rgba(247,238,208,.88);padding:10px 20px;border-radius:16px}
 .themes{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(100%,420px)}
 .themes .btn{width:100%;text-shadow:0 1px 2px rgba(0,0,0,.25)}
@@ -180,7 +185,7 @@ img{-webkit-user-drag:none;user-select:none}
 #sortDone.show{display:flex}
 #sortDoneBtn,#levelNext,#scoreOk{background:#4e7486;border:2px solid rgba(255,255,255,.85);box-shadow:0 4px 0 rgba(60,45,40,.28)}
 .piles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(100%,560px)}
-.pile{position:relative;padding:12px 4px;border-radius:14px;font-size:clamp(19px,5vw,24px);line-height:1.3;
+.pile{position:relative;padding:12px 4px;border-radius:14px;font-size:clamp(18px,4.8vw,22px);line-height:1.3;
   color:#fff;border:2px solid rgba(255,255,255,.85);box-shadow:0 4px 0 rgba(60,45,40,.28)}
 .pile:active{transform:translateY(2px)}
 /* 三堆按鈕的顏色 */
@@ -232,6 +237,22 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 #s-level{gap:12px}
 #levelWrap{position:relative;flex:none;height:min(38dvh,420px);aspect-ratio:804/1642;margin-top:4%}
 #levelWrap .card{width:100%;height:100%}
+/* 手機直式：卡片小一點，Level 區放不下時可以上下捲動，不會疊到按鈕 */
+@media (max-aspect-ratio:1/1){
+  #s-level .levelBody{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;gap:10px;padding:2px 2px 6px}
+  #s-level .levelBody > *{flex:none}
+  #levelWrap{height:min(25dvh,380px);margin-top:4px}
+  #s-level .levels{gap:4px}
+  #s-level .level{line-height:1.5}
+  #s-level .level .lv-tab{padding:2px 12px 0}
+  #s-level .level .lv-box{padding:6px 12px 7px}
+}
+/* 比較矮的手機（iPhone 的 Safari 有網址列時大約 660px 高）：卡片再小一點（點卡片可放大看） */
+@media (max-aspect-ratio:1/1) and (max-height:760px){
+  #s-level{gap:6px}
+  #levelWrap{height:16dvh}
+  #s-level .level{font-size:clamp(14px,3.8vw,16px)}
+}
 #levelNote{position:absolute;left:var(--note-x);top:var(--note-y);width:var(--note-w);
   transform:translateX(-50%) rotate(var(--note-rotate));z-index:2;pointer-events:none;
   filter:drop-shadow(0 3px 4px rgba(90,74,66,.3))}
@@ -242,11 +263,19 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 #levelNote.noimg .ph{display:flex}
 .levels{display:flex;flex-direction:column;gap:10px;width:min(100%,600px)}
 .levelBody{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;flex:1;min-height:0;justify-content:center}
-.level{text-align:left;padding:10px 16px;border-radius:14px;background:rgba(247,238,208,.94);
-  box-shadow:0 3px 0 rgba(90,74,66,.15);font-size:clamp(17px,4.5vw,22px);line-height:1.6}
-.level b{display:flex;justify-content:space-between;font-weight:normal;font-size:1.15em;color:var(--blue)}
-.level.sel{background:var(--blue);color:#fff}
-.level.sel b{color:var(--cream)}
+/* Level 選項：與「三種分類說明」相同的設計——上方標籤＋淺色框，三個統一用深藍 */
+.level{display:block;width:100%;text-align:left;font-size:clamp(15px,4vw,19px);line-height:1.6;color:#3d535d;transition:transform .15s}
+.level:active{transform:translateY(2px)}
+.level .lv-tab{display:inline-block;margin-left:12px;padding:3px 14px 1px;border-radius:10px 10px 0 0;
+  background:#4e7486;color:#fff;font-family:"Chalk","PingFang TC","Microsoft JhengHei",sans-serif;font-size:.95em;letter-spacing:.08em}
+.level .lv-box{display:block;background:rgba(250,244,228,.97);border:2px solid #4e7486;border-radius:12px;
+  padding:8px 14px 9px;box-shadow:0 3px 0 rgba(60,45,40,.15);transition:background .2s,color .2s}
+.level .lv-name{display:flex;justify-content:space-between;align-items:baseline;gap:10px;color:#4e7486;font-size:1.06em;letter-spacing:.06em}
+.level .lv-pts{flex:none;font-family:"Chalk","PingFang TC","Microsoft JhengHei",sans-serif;font-size:.9em}
+.level .lv-desc{display:block;margin-top:2px}
+.level.sel .lv-tab{background:#3d5568}
+.level.sel .lv-box{background:#4e7486;color:#fff}
+.level.sel .lv-name{color:#f7eed0}
 
 /* ---------- 樹枝計分 ---------- */
 #s-score{justify-content:center;gap:30px}
@@ -274,7 +303,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .result p{font-size:clamp(18px,4.6vw,22px);line-height:1.75}
 .res-top{display:flex;gap:16px;align-items:center}
 .res-top .card{width:92px;flex:none;cursor:zoom-in}
-.res-top .nm{font-size:clamp(24px,6.4vw,32px);color:var(--ink);line-height:1.3;word-break:break-all}
+.res-top .nm{font-size:clamp(23px,6vw,30px);color:var(--ink);line-height:1.3;word-break:break-all}
 .res-top .sk{font-size:clamp(17px,4.4vw,20px);margin-top:4px;color:#4e7486}
 .res-top .lv{display:inline-block;margin-top:8px;font-size:clamp(15px,3.9vw,17px);color:#4e7486;
   border:1.5px solid #4e7486;border-radius:999px;padding:1px 12px}
@@ -304,8 +333,6 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
   border:2px solid var(--pink);background:#fff;color:var(--ink);resize:vertical;margin-bottom:10px}
 #fbMsg{min-height:1.5em;font-size:16px;margin-top:8px;color:#a85a54}
 #fbSend{background:#4e7486}
-#spQR{display:none;width:min(60%,220px);margin:8px auto 12px;border-radius:12px;background:#fff;padding:8px}
-#spQR.show{display:block}
 #spBtn{background:#c78696}
 .endrow{margin-bottom:10px}
 
@@ -340,14 +367,46 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
   .grid{grid-template-columns:repeat(5,1fr)}
   #coverTalk{height:min(46dvh,460px)}
 }
+/* ---------- 電腦、平板：字放大 ---------- */
+@media (min-width:900px) and (min-height:620px){
+  #talkPanel{width:min(100%,760px)}
+  #talkPanel .pk h3{font-size:24px}
+  #talkPanel .pk p{font-size:21px;padding:10px 18px}
+  .title{font-size:25px}
+  .hint,#sortGuide{font-size:19px}
+  .btn{font-size:21px}
+  .piles{width:min(100%,680px)}
+  .pile{font-size:22px}
+  #reviewBtn{font-size:18px}
+  .levels{width:min(46vw,620px)}
+  .level{font-size:18px}
+  .seedrow{width:min(100%,640px)}
+  .seedrow .num{font-size:20px}
+  .result,.panel2{width:min(100%,760px)}
+  .result{padding:28px 34px 24px}
+  .result p{font-size:21px}
+  .result .score{font-size:23px}
+  .result h2{font-size:21px}
+  .res-top .card{width:108px}
+  .res-top .nm{font-size:30px}
+  .res-top .sk{font-size:20px}
+  .res-top .lv{font-size:17px}
+  .res-sec h3{font-size:20px}
+  .res-note,.res-shop p{font-size:18px!important}
+  .panel2 h2{font-size:25px}
+  .panel2 .sub,.panel2 .q{font-size:19px}
+  .box{width:min(100%,540px);font-size:21px}
+  #scoreText{font-size:25px}
+}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <button class="corner show" id="menuBtn" aria-label="選單">☰</button>
+  <button class="corner show" id="menuBtn" aria-label="選單"><img src="images/btn-menu.png" alt="" onerror="this.parentElement.classList.add('empty')"><span class="mt">☰</span></button>
   <nav id="cmenu">
     <button type="button" id="cmHome">回到首頁</button>
+    <button type="button" id="cmRestart">重新開始</button>
     <button type="button" id="cmStaff">工作人員</button>
   </nav>
   <button class="corner" id="musicBtn" aria-label="音樂">♪</button>
@@ -466,7 +525,6 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
       <div class="part" id="spBox">
         <h2 id="spTitle"></h2>
         <p class="sub" id="spText"></p>
-        <img id="spQR" alt="贊助 QR code">
         <button class="btn" id="spBtn"></button>
       </div>
     </div>
@@ -482,6 +540,12 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 <div class="modal" id="leaveModal"><div class="box">
   <p id="leaveText"></p>
   <div class="row"><button class="btn light" id="leaveNo">繼續排卡</button><button class="btn" id="leaveYes">離開</button></div>
+</div></div>
+
+<!-- 重新開始提醒 -->
+<div class="modal" id="restartModal"><div class="box">
+  <p>要重新開始排卡嗎？<br>目前的進度不會保留。</p>
+  <div class="row"><button class="btn light" id="restartNo">繼續排卡</button><button class="btn" id="restartYes">重新開始</button></div>
 </div></div>
 
 <!-- 沒有可改變的卡 -->
@@ -512,7 +576,6 @@ const FILES = {
   home:   'index.html',     // 回到首頁
   shop:     'shop.html',          // 購買卡牌頁（首頁 C 支線）
   sponsor:  'shop.html#sponsor',  // 贊助：連到購買卡牌頁的「支持我們」區塊
-  sponsorQR: IMG + 'sponsor-qr.png',   // 贊助 QR code 圖（沒有這張圖就不顯示）
   feedback: 'https://script.google.com/macros/s/AKfycby0IrQq5lZt7b8Wv2QHy5VXmNtBHDzhBPWE1OdNWUV9PsJRWaI9b_J_NycdWC3zqk2d_w/exec',   // 回饋後台網址
   flowerOn:  IMG + 'flower-on.png',    // 評分：亮的花
   flowerOff: IMG + 'flower-off.png',   // 評分：不亮的花
@@ -575,9 +638,9 @@ const TEXT = {
   levelHint: '第 {i} / {total} 張・這張卡有 {s} 顆種子',
   levelDone: '確認完成',
   levels: [
-    { title:'Level 1', desc:'有改善的意圖，但目前的能力並未出現明顯的提升。' },
-    { title:'Level 2', desc:'意識到改變的契機並改進行為，但相信自己還有進步的空間。' },
-    { title:'Level 3', desc:'認可自己已經有所改變，並對當下能力的進步感到滿足。' }
+    { title:'Level. I',   name:'開始看得見、意識到', desc:'能察覺此因素對自己的影響，但反應模式仍隨過往習慣動搖，尚未採取實際改變行動。' },
+    { title:'Level. II',  name:'開始嘗試、主動調整', desc:'能主動調整不同的應對方式，雖然過程仍需要花心思拿捏，但已看見改變的發生。' },
+    { title:'Level. III', name:'自然流暢、融入心態', desc:'已不再輕易動搖自己，能坦然接納並穩定應對，新的思維方式已完全融入生活中。' }
   ],
 
   scoreTitle: '種子正在慢慢長大…',
@@ -597,7 +660,7 @@ const TEXT = {
   shopBtn:     '看看卡牌套組',
 
   fbTitle:   '給我們一點回饋吧',
-  fbSub:     '你的回饋會幫助花園長得更好～（不會傳送你寫下的遺憾內容）',
+  fbSub:     '你的回饋能夠幫助我們更加完整！歡迎寫下這次的體驗～',
   fbRate:    '這次的體驗感覺如何？',
   fbPlace:   '想對我們說的話…（選填）',
   fbSend:    '送出回饋',
@@ -609,8 +672,8 @@ const TEXT = {
   fbWait:    '剛剛已經收到你的回饋囉，稍等一分鐘再送吧～',
 
   spTitle: '支持我們',
-  spText:  '歡迎支持我們！掃描下方的 QR code 就能贊助 🌷',
-  spBtn:   '贊助我們',
+  spText:  '歡迎支持我們！可以私訊 IG 贊助，或到現場購買周邊、現金贊助 🌷',
+  spBtn:   '看看支持方式',
   soon:    '即將開放'
 };
 
@@ -829,7 +892,7 @@ async function preload(){
   const must = [FILES.bg, FILES.seed];
   let n = 0; const total = must.length + 1;
   const step = () => { n++; $('#loadText').textContent = TEXT.loading + ' ' + Math.round(n / total * 100) + '%'; };
-  const font = Promise.race([document.fonts ? Promise.all([document.fonts.load('20px Crayon'), document.fonts.load('20px ChalkSub')]) : 0, sleep(10000)]).catch(()=>{}).then(step);
+  const font = Promise.race([document.fonts ? Promise.all([document.fonts.load('20px Chalk')]) : 0, sleep(10000)]).catch(()=>{}).then(step);
   await Promise.all([...must.map(s => loadImg(s).then(step)), font]);
   if (failed.has(FILES.seed)) document.body.classList.add('noseed');
 
@@ -837,7 +900,7 @@ async function preload(){
   const first = [...COMMON, ...(theme ? THEMES[theme].cards : [])];
   const rest = Object.values(THEMES).flatMap(t => t.cards).filter(c => !first.includes(c));
   const later = [...[...first, ...rest].map(c => CARD + c + '.webp'), FILES.flowerOn, FILES.flowerOff,
-    ...[...first, ...rest].map(c => NOTE + c + '.png'), FILES.sponsorQR];
+    ...[...first, ...rest].map(c => NOTE + c + '.png')];
   (async () => { for (let i = 0; i < later.length; i += 4) await Promise.all(later.slice(i, i + 4).map(s => loadImg(s, 20000))); })();
 
   const lt = $('#loadText'); lt.textContent = TEXT.ready; lt.classList.add('ready');
@@ -853,6 +916,9 @@ $('#musicBtn').onclick = () => {
 $('#leaveText').innerHTML = TEXT.leave;
 $('#menuBtn').onclick = e => { e.stopPropagation(); $('#cmenu').classList.toggle('open'); };
 $('#cmHome').onclick = e => { e.stopPropagation(); $('#cmenu').classList.remove('open'); openM('leaveModal'); };
+$('#cmRestart').onclick = e => { e.stopPropagation(); $('#cmenu').classList.remove('open'); openM('restartModal'); };
+$('#restartNo').onclick = () => closeM('restartModal');
+$('#restartYes').onclick = () => go('cards.html');
 document.addEventListener('click', () => $('#cmenu').classList.remove('open'));
 $('#leaveNo').onclick = () => closeM('leaveModal');
 $('#leaveYes').onclick = () => go(FILES.home);
@@ -1118,7 +1184,9 @@ function renderLevel(){
     const pts = k === 2 ? c.seeds : k === 1 ? c.seeds / 2 : 0;
     const b = document.createElement('button');
     b.className = 'level' + (c.level === k + 1 ? ' sel' : '');
-    b.innerHTML = `<b><span>${lv.title}</span><span>+${pts}</span></b>${lv.desc}`;
+    b.innerHTML = `<span class="lv-tab">${lv.title}</span><span class="lv-box">`
+      + `<span class="lv-name"><span>「${lv.name}」</span><span class="lv-pts">+${pts}</span></span>`
+      + `<span class="lv-desc">${lv.desc}</span></span>`;
     b.onclick = () => {
       c.level = k + 1; renderLevel();
       // 不是最後一張：選完自動到下一張；最後一張：等使用者按「確認完成」
@@ -1250,11 +1318,8 @@ $('#fbSend').onclick = async () => {
 
 /* 贊助 */
 function setupSponsor(){
-  const hasQR = !failed.has(FILES.sponsorQR);
   $('#spTitle').textContent = TEXT.spTitle; $('#spText').textContent = TEXT.spText;
   $('#spBtn').textContent = FILES.sponsor ? TEXT.spBtn : TEXT.soon; $('#spBtn').disabled = !FILES.sponsor;
-  $('#spBtn').style.display = (!FILES.sponsor && hasQR) ? 'none' : '';
-  const q = $('#spQR'); q.classList.toggle('show', hasQR); if (hasQR) q.src = FILES.sponsorQR;
 }
 $('#spBtn').onclick = () => window.open(FILES.sponsor, '_blank');
 

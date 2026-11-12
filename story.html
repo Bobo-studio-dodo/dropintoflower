@@ -40,14 +40,26 @@ function imgMiss(i){
 </script>
 <style>
   @font-face {
-    font-family: "HanyiSentyCrayon";
-    src: url("fonts/HanyiSentyCrayon-non-color.woff2") format("woff2");
+    font-family: "Chalk";
+    src: url("fonts/HanyiSentyChalk-site.woff2") format("woff2");
+    font-display: swap;
+  }
+  /* 使用者輸入的名字如果有網站沒用到的字，才會下載完整字型 */
+  @font-face {
+    font-family: "ChalkFull";
+    src: url("fonts/HanyiSentyChalk2018.woff2") format("woff2");
+    font-display: swap;
+    unicode-range: U+3400-4DBF, U+4E00-91CF, U+91D1-9FFF;
+  }
+  @font-face {
+    font-family: "FYSong";          /* 猫啃网风雅宋（已加寬 10% 的網站版）：選單用 */
+    src: url("fonts/FengYaSong-site.woff2") format("woff2");
     font-display: swap;
   }
   :root {
     --blue:#789baa; --rose:#e1beb9; --cream:#f7eed0; --blush:#f1e0e4; --lav:#ede2ef;
     --ink:#3d535d; --night:#1f2b31;
-    --font:"HanyiSentyCrayon","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    --font:"Chalk","ChalkFull","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
     --top:64px;      /* 頂部留給選單按鈕 */
     --em:clamp(22px,min(1.5vw + 11px,4.6svh),34px);   /* 對話框文字大小（手機 22px → 電腦約 32px） */
     --dlg:calc(var(--em) * 5.1 + 86px);                /* 對話框最高約 3 行的高度（手機直式） */
@@ -55,13 +67,14 @@ function imgMiss(i){
   }
   *,*::before,*::after{box-sizing:border-box}
   html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
-  html,body{margin:0;min-height:100%}
+  html,body{margin:0;min-height:100%;max-width:100%;overflow-x:clip}
   body{
     --bg:url("images/background1.png");
     font-family:var(--font);color:var(--ink);overflow:hidden;
     -webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;
-    background:var(--bg) center/cover no-repeat fixed,
+    background:var(--bg) center/cover no-repeat,
                linear-gradient(160deg,var(--cream),var(--blush) 50%,var(--lav));
+    background-color:#7697a6;
   }
   body.night{background:#000}
   body.reserve{--talk:var(--dlg)}                 /* 畫面四：書本與花卉要看得到，所以保留對話框空間 */
@@ -92,6 +105,15 @@ function imgMiss(i){
   #back {--x:24%;--y:4%;--w:52%;--r:0deg;   --ar:3/1}
   #back4{--x:24%;--y:4%;--w:52%;--r:0deg;   --ar:3/1}
   #keeper{--x:10%;--y:22%;--w:80%;--r:0deg;  --ar:1/1}
+  /* ★ 書本（手機/平板直式）：放在畫面正中間、書的左右邊貼齊螢幕邊緣。
+       書本圖是 1200×900：翻開的書在 x=99～1101、封面在 x=620～1129，
+       所以圖放大到 116vw、再往左移 1.17%，讓「翻開的書左邊」和「封面右邊」都剛好貼齊螢幕。
+       這段已確認過位置，之後修改其他東西時請不要動到。 */
+  @media (max-aspect-ratio:1/1){
+    #s4{overflow:hidden}
+    #book .bk img{position:absolute;left:50%;top:50%;transform:translate(-51.17%,-50%);
+      width:min(116vw, calc((100svh - var(--top) - var(--talk)) * 4 / 3));height:auto;max-width:none;object-position:center}
+  }
   /* 電腦 / 平板 / 手機橫放（牆比例 16:10） */
   @media (min-aspect-ratio:1/1){
     :root{--top:12px;--dlg:calc(var(--em) * 3.4 + 86px)}
@@ -203,11 +225,15 @@ function imgMiss(i){
   #menu-btn img{width:100%;height:100%;object-fit:cover;display:block}
   #menu-btn .t{display:none;font-size:14px}
   #menu-btn.empty img{display:none} #menu-btn.empty .t{display:block}
+  /* 選單：細線分隔的清單（與排卡頁相同） */
   #menu{position:fixed;z-index:50;top:calc(env(safe-area-inset-top) + 74px);left:calc(env(safe-area-inset-left) + 10px);
-    display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:18px;background:var(--cream);border:2.5px solid var(--blue)}
-  #menu a,#menu button{display:block;text-align:center;text-decoration:none;font-size:20px;padding:8px 22px;
-    border-radius:12px;border:2px solid var(--rose);background:var(--blush);color:var(--ink)}
-  #menu a:hover,#menu button:hover{background:var(--lav)}
+    display:flex;flex-direction:column;min-width:10em;padding:6px 0;border-radius:12px;
+    background:rgba(250,246,234,.97);border:1px solid rgba(78,116,134,.28);box-shadow:0 10px 28px rgba(31,43,49,.22)}
+  #menu a,#menu button{display:block;text-align:center;text-decoration:none;
+    font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;font-size:18px;letter-spacing:.24em;
+    padding:12px 26px 12px calc(26px + .24em);border:0;border-radius:0;background:none;color:#3d535d;transition:background .2s,color .2s}
+  #menu a + a,#menu a + button,#menu button + a,#menu button + button{border-top:1px solid rgba(78,116,134,.16)}
+  #menu a:hover,#menu button:hover{background:rgba(120,155,170,.12);color:#4e7486}
   #menu-btn:focus-visible,#menu a:focus-visible,#menu button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 
   /* ───── 對話框（含上一句 / 下一句）───── */
@@ -246,6 +272,7 @@ function imgMiss(i){
   .cbox h3,.cbox p,.mbox h3,.mbox p{word-break:keep-all;overflow-wrap:anywhere;text-wrap:pretty;line-break:strict}
   .cbox button{text-wrap:balance;line-break:strict}
   @media (max-aspect-ratio:1/1){ .mbox,.cbox{padding:24px 20px} }
+  @media (min-width:900px) and (min-height:620px){ .mbox,.cbox{width:min(92vw,580px);padding:32px 36px} }
   .cbox img{display:block;width:100%;height:auto;border-radius:14px;margin-bottom:14px}
   .cbox h3{margin:0 0 4px;font-size:clamp(26px,1vw + 20px,32px);font-weight:normal}
   .cbox .cname{margin:0 0 10px;font-size:clamp(30px,1vw + 24px,36px);color:var(--blue)}
@@ -289,15 +316,28 @@ function imgMiss(i){
   .btns.col button{flex:none;width:100%}
   #w-stuck{background:#7597a5;color:#ffffff;border-color:#7597a5}      /* 我好像寫不太出來... */
   .btns .rose{background:var(--rose);color:var(--ink);border-color:var(--ink)}
-  .big{display:block;width:100%;margin:10px 0 14px;font-size:clamp(22px,.8vw + 17px,27px);padding:12px 16px;
-    border-radius:16px;border:2.5px solid var(--ink)}
-  .big.rose{background:var(--rose);color:var(--ink)}
-  .big.blue{background:var(--blue);color:var(--night)}
+  /* 按鈕：與排卡頁相同（深藍＝主要、淺藍＝次要，圓角膠囊） */
+  .big{display:block;width:100%;margin:10px 0 14px;font-size:clamp(19px,.6vw + 15px,23px);padding:11px 18px;
+    border-radius:999px;border:0;letter-spacing:.06em;box-shadow:0 3px 0 rgba(61,83,93,.2);transition:transform .15s}
+  .big:active{transform:translateY(2px)}
+  .big.blue{background:#4e7486;color:#fff}
+  .big.rose{background:var(--blue);color:#fff}
+  #o-online{background:var(--blue)}
+  #endbox .btns button{border:0;border-radius:999px;font-size:clamp(19px,.6vw + 15px,23px);padding:11px 18px;
+    letter-spacing:.06em;box-shadow:0 3px 0 rgba(61,83,93,.2);background:#4e7486;color:#fff}
+  #endbox .btns .rose{background:var(--blue);color:#fff}
+  #endbox .btns .alt{background:none;box-shadow:none;color:#4e7486;text-decoration:underline;text-underline-offset:4px;
+    font-size:clamp(17px,.4vw + 14px,20px);padding:6px}
+  /* 結束頁、現場排卡、現場/線上的文字：小一級，避免換行太零碎 */
+  #choose .cbox p,#onsite .cbox p,#endbox .cbox p{font-size:clamp(17px,min(4.9vw,.8vw + 14px),24px);
+    word-break:normal;line-break:strict}   /* 已用 <br> 分好句；放不下時照中文規則換行（標點不會跑到行首） */
+  #choose .cbox .small,#onsite .cbox .small,#endbox .cbox .small{font-size:clamp(15px,min(4.3vw,.5vw + 13px),20px)}
+  @media (max-width:380px){ #choose .cbox,#onsite .cbox,#endbox .cbox{padding:22px 14px} }
   #onsite{padding-bottom:calc(84px + env(safe-area-inset-bottom))}   /* 留位置給右下角的工作人員按鈕 */
   #onsite .cbox{max-height:100%}
   /* 現場排卡：回饋區 */
   .fb{margin-top:18px;padding-top:16px;border-top:2px dashed var(--blue)}
-  .fb h3{font-size:clamp(22px,.6vw + 18px,26px)!important}
+  .fb h3{font-size:clamp(20px,.6vw + 15px,23px)!important;font-weight:normal;margin:0 0 4px;color:#4e7486}
   .rate{display:flex;justify-content:center;gap:6px;margin:8px 0 10px}
   .rate button{width:46px;height:46px;padding:0;border:0;background:none;position:relative;font-size:30px;line-height:1}
   .rate img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
@@ -305,14 +345,14 @@ function imgMiss(i){
   .rate button.on img.on{opacity:1}
   .rate.emoji button{filter:grayscale(1);opacity:.4}
   .rate.emoji button.on{filter:none;opacity:1}
-  #o-fbtext{width:100%;min-height:90px;font:inherit;font-size:18px;padding:10px 12px;border-radius:12px;
+  .fbtext{width:100%;min-height:90px;font:inherit;font-size:18px;padding:10px 12px;border-radius:12px;
     border:2px solid var(--blue);background:#fff;color:var(--ink);resize:vertical;user-select:text}
-  #o-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
-  #o-msg{min-height:1.4em}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+  #o-msg,#e-msg{min-height:1.4em}
   .big:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 
   /* 現場排卡畫面：畫面旁邊的工作人員小按鈕 */
-  .staff{position:absolute;right:8px;bottom:max(14px,env(safe-area-inset-bottom));width:120px;display:flex;flex-direction:column;
+  .staff{position:absolute;right:8px;bottom:max(14px,env(safe-area-inset-bottom));width:150px;display:flex;flex-direction:column;
     align-items:flex-end;gap:4px;font-size:13px;line-height:1.4;text-align:right;color:rgba(247,238,208,.85)}
   .staff button{font-size:14px;padding:3px 10px;border-radius:10px;border:1.5px solid rgba(247,238,208,.6);
     background:transparent;color:rgba(247,238,208,.9)}
@@ -496,7 +536,7 @@ function imgMiss(i){
     <button type="button" id="c-onsite" class="big rose">現場排卡</button>
     <p>透過「實體卡牌」，解讀你心中的遺憾。我們會陪著你一起梳理遺憾，並尊重你的意願，隨時可以停止。</p>
     <button type="button" id="c-online" class="big blue">線上排卡</button>
-    <p>透過線上簡易版卡牌，在專屬且安心的私人空間裡自我探索遺憾的回憶。</p>
+    <p>透過線上簡易版卡牌，<br>在專屬且安心的私人空間裡<br>自我探索遺憾的回憶。</p>
     <p class="small warn">這一步無法返回，要注意不要按錯啦~</p>
   </div>
 </div>
@@ -512,10 +552,10 @@ function imgMiss(i){
     <!-- 體驗完的回饋（和排卡結果頁共用同一個回饋後台） -->
     <div class="fb">
       <h3>體驗完之後，給我們一點回饋吧</h3>
-      <p class="small">你的回饋會幫助花園長得更好～（不會記錄你的遺憾內容）</p>
+      <p class="small">你的回饋能夠幫助我們更加完整！<br>歡迎寫下這次的體驗～</p>
       <div class="rate" id="o-rate"></div>
-      <textarea id="o-fbtext" maxlength="500" placeholder="想對我們說的話…（選填）"></textarea>
-      <input id="o-hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <textarea id="o-fbtext" class="fbtext" maxlength="500" placeholder="想對我們說的話…（選填）"></textarea>
+      <input id="o-hp" class="hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
       <button type="button" id="o-send" class="big blue">送出回饋</button>
       <p class="small" id="o-msg"></p>
       <button type="button" id="o-shop" class="big rose hid">看看卡牌套組</button>
@@ -523,7 +563,7 @@ function imgMiss(i){
   </div>
   <div class="staff">
     <button type="button" id="o-card">查看主題卡</button>
-    <span>由工作人員按下此按鈕，請勿自行按下</span>
+    <span>由工作人員按下此按鈕<br>請勿自行按下</span>
   </div>
 </div>
 
@@ -541,11 +581,24 @@ function imgMiss(i){
 
 <div id="endbox" class="ov hid" role="dialog" aria-modal="true">
   <div class="cbox">
-    <p>無論你目前心中是否帶著遺憾，都很感謝你今天的到來。我們在現場準備了一份神秘小禮物，只要出示這個畫面即可向工作人員領取！<br>如果對我們的卡牌套組感到好奇，或想了解更多細節，歡迎隨時找我們聊聊～</p>
+    <p>無論你目前心中是否帶著遺憾，<br>都很感謝你今天的到來。</p>
+    <p>我們在現場準備了<br>一份神秘小禮物，<br>只要出示這個畫面<br>即可向工作人員領取！</p>
+    <p>如果對我們的卡牌套組感到好奇，<br>或想了解更多細節，<br>歡迎隨時找我們聊聊～</p>
     <div class="btns col">
       <button type="button" id="end-draw" class="rose">看看卡牌套組</button>
       <button type="button" id="end-home">結束旅行</button>
       <button type="button" id="end-back" class="alt">返回上一步</button>
+    </div>
+
+    <!-- 回饋（和現場排卡、排卡結果頁共用同一個回饋後台） -->
+    <div class="fb">
+      <h3>給我們一點回饋吧</h3>
+      <p class="small">你的回饋能夠幫助我們更加完整！<br>歡迎寫下這次的體驗～</p>
+      <div class="rate" id="e-rate"></div>
+      <textarea id="e-fbtext" class="fbtext" maxlength="500" placeholder="想對我們說的話…（選填）"></textarea>
+      <input id="e-hp" class="hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="button" id="e-send" class="big blue">送出回饋</button>
+      <p class="small" id="e-msg"></p>
     </div>
   </div>
 </div>
@@ -1009,8 +1062,8 @@ $('#o-card').addEventListener('click', showCard);                              /
 
 /* 現場排卡的回饋：送到和排卡結果頁同一個回饋後台 */
 const FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycby0IrQq5lZt7b8Wv2QHy5VXmNtBHDzhBPWE1OdNWUV9PsJRWaI9b_J_NycdWC3zqk2d_w/exec';
-(() => {
-  const rate = $('#o-rate'), msg = $('#o-msg'), send = $('#o-send');
+function setupFeedback(px, factor, onSent) {          // px：o＝現場排卡、e＝結束畫面
+  const rate = $('#' + px + '-rate'), msg = $('#' + px + '-msg'), send = $('#' + px + '-send');
   let rating = 0, sent = false;
   for (let i = 1; i <= 5; i++) {
     const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', i + ' 朵花');
@@ -1021,7 +1074,7 @@ const FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycby0IrQq5lZt7b8Wv2Q
   }
   send.addEventListener('click', async () => {
     if (sent) return;
-    const text = $('#o-fbtext').value.trim();
+    const text = $('#' + px + '-fbtext').value.trim();
     if (!rating && !text) { msg.textContent = '請先選擇花朵數，或寫下想說的話喔'; return; }
     let last = 0; try { last = +localStorage.getItem('fbLast') || 0; } catch (e) {}
     if (Date.now() - last < 60000) { msg.textContent = '剛剛已經收到你的回饋囉，稍等一分鐘再送吧～'; return; }
@@ -1030,16 +1083,18 @@ const FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycby0IrQq5lZt7b8Wv2Q
       const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 12000);
       await fetch(FEEDBACK_URL, { method: 'POST', mode: 'no-cors', signal: ctrl.signal,
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ rating, message: text, hp: $('#o-hp').value, theme: store.get('selected_theme') || '',
-          score: '', card: '', factor: '現場排卡', level: '', device: innerWidth < 700 ? '手機' : '電腦/平板' }) });
+        body: JSON.stringify({ rating, message: text, hp: $('#' + px + '-hp').value, theme: store.get('selected_theme') || '',
+          score: '', card: '', factor, level: '', device: innerWidth < 700 ? '手機' : '電腦/平板' }) });
       clearTimeout(t);
       sent = true; msg.textContent = '收到了！謝謝你的回饋 🌷';
       try { localStorage.setItem('fbLast', Date.now()); } catch (e) {}
-      show($('#o-shop'));                                                      // 回饋完 → 引導到購買頁
+      if (onSent) onSent();
     } catch (e) { msg.textContent = '網路好像不太穩，請稍後再試一次'; send.disabled = false; }
   });
-  $('#o-shop').addEventListener('click', () => { location.href = 'shop.html'; });
-})();
+}
+setupFeedback('o', '現場排卡', () => show($('#o-shop')));        // 回饋完 → 出現「看看卡牌套組」
+setupFeedback('e', '結束旅行');                                   // 結束畫面（試算表「因素」欄會寫「結束旅行」）
+$('#o-shop').addEventListener('click', () => { location.href = 'shop.html'; });
 /* 2. 嗯...我再想想 → 結束互動 */
 $('#end-draw').addEventListener('click', () => { location.href = 'shop.html'; });     // 看看卡牌套組 → 首頁 C 支線（購買卡牌）
 $('#end-home').addEventListener('click', () => { location.href = 'index.html'; });    // 結束旅行 → 回到頁首
