@@ -14,7 +14,8 @@
   - 顏色只用三種：深藍（主色、按鈕）、藍（一般文字）、紅（重點）；深藍底上用白字
 -->
 <style>
-@font-face{font-family:"Chalk";src:url("fonts/HanyiSentyChalk-site.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R-site.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M-site.woff2") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
 @font-face{font-family:"FYSong";src:url("fonts/FengYaSong-site.woff2") format("woff2");font-display:swap}  /* 猫啃网风雅宋（加寬10%網站版） */
 :root{
   --main:#3f6577;     /* 主色：深藍（按鈕、標題、色塊） */
@@ -27,7 +28,7 @@
 html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
 html{scroll-behavior:smooth}
 html,body{max-width:100%;overflow-x:clip}   /* 手機不會左右滑動 */
-body{font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;color:var(--text);background:var(--paper);
+body{font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;color:var(--text);background:#cfdbe1;
   font-size:clamp(18px,.5vw + 16px,22px);line-height:1.8}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
@@ -43,7 +44,7 @@ p,li,dd,h1,h2,h3{word-break:normal;overflow-wrap:anywhere;text-wrap:pretty;line-
 .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
   padding:calc(10px + env(safe-area-inset-top)) max(16px,4vw) 10px;background:var(--main);color:#fff}
 .top a{color:#fff;text-decoration:none;font-size:clamp(17px,.4vw + 15px,20px);letter-spacing:.08em;
-  font-family:"Chalk","PingFang TC","Microsoft JhengHei",sans-serif}
+  font-family:"Rounded","PingFang TC","Microsoft JhengHei",sans-serif}
 
 /* ───── 商品主區 ───── */
 .hero{max-width:1120px;margin:0 auto;padding:clamp(18px,4vw,56px) max(16px,4vw);display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(20px,4vw,56px)}
@@ -82,7 +83,7 @@ h1{font-size:clamp(28px,1.2vw + 22px,40px);line-height:1.4;margin:4px 0 10px}
 
 /* ───── 內容區（整條色塊、不加框） ───── */
 .band{padding:clamp(40px,6vw,80px) max(18px,5vw)}
-.band.white{background:#fff}
+.band.white{background:rgba(251,248,240,.72)}
 .inner{max-width:880px;margin:0 auto}
 .band h2{font-size:clamp(25px,.9vw + 20px,34px);margin-bottom:18px;text-align:center}
 .keywords{text-align:center;color:var(--main);font-size:clamp(20px,.6vw + 17px,26px);letter-spacing:.12em;margin-bottom:22px}
@@ -100,7 +101,7 @@ h1{font-size:clamp(28px,1.2vw + 22px,40px);line-height:1.4;margin:4px 0 10px}
 .notes li.em::before{background:var(--accent)}
 
 /* ───── 支持我們：深藍色塊、白字 ───── */
-.band.dark{background:var(--main);color:#fff;font-family:"Chalk","PingFang TC","Microsoft JhengHei",sans-serif}
+.band.dark{background:var(--main);color:#fff;font-family:"Rounded","PingFang TC","Microsoft JhengHei",sans-serif}
 .band.dark h2{color:#fff}
 .band.dark p{text-align:center}
 .amount{display:flex;align-items:center;justify-content:center;gap:10px;margin:22px 0 12px}
@@ -132,12 +133,68 @@ h1{font-size:clamp(28px,1.2vw + 22px,40px);line-height:1.4;margin:4px 0 10px}
 #hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 #zoom{background:rgba(0,0,0,.88)}
 #zoom img{max-width:100%;max-height:100%;object-fit:contain}
+
+/* ═════ 版面調整（精緻文青風格、平板放大）═════ */
+:root{--hair:rgba(63,101,119,.28)}
+.top{position:static!important;height:calc(env(safe-area-inset-top) + 72px);padding:0!important;background:none!important}
+.top a{font-size:clamp(18px,1.2vw + 12px,22px)}
+/* 標題下方的細線＋小點 */
+.band h2{position:relative;padding-bottom:18px;margin-bottom:26px;letter-spacing:.2em}
+.band h2::after{content:"";position:absolute;left:50%;bottom:0;width:72px;height:1px;transform:translateX(-50%);
+  background:linear-gradient(90deg,transparent,var(--main) 30%,var(--main) 70%,transparent);opacity:.55}
+.band.dark h2::after{background:linear-gradient(90deg,transparent,#fff 30%,#fff 70%,transparent)}
+/* 照片：圓角柔和、縮圖置中 */
+.main-img{border-radius:18px;box-shadow:0 10px 30px rgba(63,101,119,.12)}
+.arr{background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:none;border:1px solid rgba(255,255,255,.9)}
+.thumbs{justify-content:safe center;gap:10px;margin-top:14px;padding:2px}
+@media (min-width:860px){ .thumbs img{width:calc((100% - 50px) / 6 - 1px)} }
+.thumbs img{border-radius:10px;border:1px solid transparent}
+.thumbs img.on{border-color:var(--main);box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--main)}
+/* 商品文字 */
+.info{text-align:left}
+.brand{letter-spacing:.2em;opacity:.85}
+.themes{margin-top:14px}
+.themes .tl{display:block;font-size:.8em;letter-spacing:.3em;color:var(--text);opacity:.8;margin-bottom:2px}
+.themes .nw{letter-spacing:.12em}
+/* 按鈕：圓角膠囊、細框線 */
+.btn{border-radius:999px;border-width:1px;padding:.72em 1em;letter-spacing:.18em}
+.btn.line{border-color:var(--hair);background:rgba(255,255,255,.55)}
+.points li{padding:6px 0;border-bottom:1px solid var(--line)}
+.points li:last-child{border-bottom:0}
+@media (min-width:760px){ .points{grid-template-columns:1fr} }
+@media (min-width:1000px){ .points{grid-template-columns:1fr 1fr} .points li:nth-last-child(2){border-bottom:0} }
+.spec dt,.spec dd{border-color:var(--line)}
+/* 支持我們 */
+.band.dark{padding-bottom:calc(clamp(40px,6vw,80px) + env(safe-area-inset-bottom))}
+.amount input{border-radius:999px;padding:.35em .8em}
+.copytext{border:1px solid rgba(255,255,255,.45);border-radius:14px;background:rgba(255,255,255,.06)}
+.sheet{border-radius:22px}
+.field input,.field textarea,.field select{border-radius:12px;border-width:1px}
+/* 平板直放（600–859px）：照片不要佔滿整個畫面，文字放大、置中排列 */
+@media (min-width:600px) and (max-width:859px){
+  .hero{max-width:720px;gap:28px}
+  .main-img{width:min(100%,50svh);margin:0 auto}
+  .thumbs img{width:76px}
+  .info{text-align:center}
+  .price{justify-content:center}
+  .tagline{font-size:24px}
+  .btns{max-width:520px;margin-left:auto;margin-right:auto}
+  body{font-size:21px}
+  .inner{max-width:620px}
+}
+/* 平板橫放、電腦：左右並排，資訊垂直置中 */
+@media (min-width:860px){
+  .hero{max-width:1180px;align-items:center;min-height:calc(100svh - 60px)}
+  .gallery{position:static}
+}
 </style>
+<link rel="stylesheet" href="site-bg.css">
 </head>
 <body>
+<div class="site-bg" aria-hidden="true"></div>
   <header class="top">
-    <a href="index.html">⌂ 遺落成華</a>
-    <a href="#sponsor">支持我們</a>
+    <button class="site-menu-btn" type="button" aria-label="選單" aria-expanded="false"><img src="images/btn-menu.png" alt="" onerror="this.parentElement.classList.add('empty')"><span class="t">選單</span></button>
+    <nav class="site-menu"><a href="index.html">回到首頁</a><a href="#sponsor">支持我們</a></nav>
   </header>
 
   <!-- 商品主區 -->
@@ -204,8 +261,6 @@ h1{font-size:clamp(28px,1.2vw + 22px,40px);line-height:1.4;margin:4px 0 10px}
     </div>
   </section>
 
-  <div class="foot"><a href="index.html">回到首頁</a></div>
-
   <!-- 現貨：私訊討論 -->
   <div class="modal" id="nowModal"><div class="sheet">
     <h2>現貨購買</h2>
@@ -251,13 +306,13 @@ const BACKEND = 'https://script.google.com/macros/s/AKfycby0IrQq5lZt7b8Wv2QHy5VX
 const PHOTOS = ['photo1','photo2','photo3','photo4','photo5','photo6'];   // images/shop/ 裡的照片檔名（.png）
 
 const SHOP = {
-  brand: '花生什麼鳥事｜原創心靈卡牌',
+  brand: '花森什麼鳥事｜原創心靈卡牌',
   title: '《遺落成華》卡牌套組',
   priceSale: 'NT$ 899',
   priceOrig: '定價 NT$ 999',
   priceNote: '',                              // 價格下方的小字（空白＝不顯示）
   tagline: '遺憾會跨越時間，縈繞不散，<br>直到你願意直面它，把故事攤開。',
-  themes: ['四大主題｜', '友情・愛情・未來規劃・財務管理'],   // 兩段各自不拆開，放不下時在｜處換行
+  themes: ['四大主題', '友情・愛情・未來規劃・財務管理'],     // 第一段是小標，第二段整行不拆開
   stock: '',                                   // 按鈕下方的小字（空白＝不顯示）
   feature: '遺憾解惑・心靈成長・自我療癒',
   points: [
@@ -310,7 +365,7 @@ async function copy(text){
 /* 文字 */
 $('#brand').textContent = SHOP.brand; $('#title').textContent = SHOP.title;
 $('#pSale').textContent = SHOP.priceSale; $('#pOrig').textContent = SHOP.priceOrig; $('#pNote').textContent = SHOP.priceNote; $('#pNote').classList.toggle('hid', !SHOP.priceNote);
-$('#tagline').innerHTML = SHOP.tagline; $('#themes').innerHTML = SHOP.themes.map(t => `<span class="nw">${t}</span>`).join('');
+$('#tagline').innerHTML = SHOP.tagline; $('#themes').innerHTML = `<span class="tl">${SHOP.themes[0]}</span><span class="nw">${SHOP.themes[1]}</span>`;
 $('#stock').textContent = SHOP.stock; $('#stock').classList.toggle('hid', !SHOP.stock);
 $('#feature').textContent = SHOP.feature;
 $('#points').innerHTML = SHOP.points.map(t => `<li>${t}</li>`).join('');
@@ -386,6 +441,15 @@ $('#preForm').addEventListener('submit', async e => {
   } catch(err){ msg.textContent = '網路好像不太穩，請稍後再試一次'; }
   $('#preSend').disabled = false;
 });
+</script>
+<script>
+/* 左上「選單」：和小故事、線上排卡一樣 */
+(() => {
+  const b = document.querySelector('.site-menu-btn'), m = document.querySelector('.site-menu');
+  const set = o => { m.classList.toggle('open', o); b.setAttribute('aria-expanded', o); };
+  b.addEventListener('click', e => { e.stopPropagation(); set(!m.classList.contains('open')); });
+  document.addEventListener('click', () => set(false));
+})();
 </script>
 </body>
 </html>

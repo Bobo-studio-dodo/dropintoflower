@@ -26,6 +26,8 @@
   /* 配色 */
   --blue:#789baa;
   --pink:#e1beb9;
+  --frame:#f8f5ee;                 /* 黃色底框線＝購買頁底色 */
+  --hair:rgba(63,101,119,.22);     /* 細線（與購買頁相同） */
   --cream:#f7eed0;
   --rose:#f1e0e4;
   --lilac:#ede2ef;
@@ -34,11 +36,8 @@
 }
 
 /* =================================================== */
-@font-face{
-  font-family:"Chalk";
-  src:url("fonts/HanyiSentyChalk-site.woff2") format("woff2");
-  font-display:swap;
-}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R-site.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M-site.woff2") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
 @font-face{
   font-family:"FYSong";             /* 猫啃网风雅宋（已加寬 10% 的網站版） */
   src:url("fonts/FengYaSong-site.woff2") format("woff2");
@@ -50,9 +49,9 @@
 html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
 html,body{height:100%;max-width:100%;overflow:hidden;overscroll-behavior:none}
 body{
-  font-family:"Chalk","PingFang TC","Microsoft JhengHei",sans-serif;
+  font-family:"Rounded","PingFang TC","Microsoft JhengHei",sans-serif;
   color:var(--ink);
-  background:#7697a6 url("images/background1.png") center/cover no-repeat;
+  background:#cfdbe1;                      /* 背景：全站共用（site-bg.css） */
   user-select:none;-webkit-user-select:none;
 }
 button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer}
@@ -119,7 +118,7 @@ img{-webkit-user-drag:none;user-select:none}
 /* ---------- 對話 ---------- */
 #s-talk{justify-content:center;gap:18px}
 /* 對話框：與故事線（A）相同的樣式與字級 */
-.dialog{--em:clamp(22px,min(1.5vw + 11px,4.6svh),34px);font-size:var(--em);
+.dialog{--em:clamp(22px,3.6vmin,38px);font-size:var(--em);
   width:min(92vw,19em);background:#f7eed0;color:#3d535d;border-radius:26px;
   border:3px solid #789baa;padding:12px 1em 10px;box-shadow:0 6px 0 rgba(120,155,170,.35);flex:none}
 .dialog .text{font-size:1em;line-height:1.7;line-break:strict;min-height:1.7em}
@@ -267,11 +266,11 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .level{display:block;width:100%;text-align:left;font-size:clamp(15px,4vw,19px);line-height:1.6;color:#3d535d;transition:transform .15s}
 .level:active{transform:translateY(2px)}
 .level .lv-tab{display:inline-block;margin-left:12px;padding:3px 14px 1px;border-radius:10px 10px 0 0;
-  background:#4e7486;color:#fff;font-family:"Chalk","PingFang TC","Microsoft JhengHei",sans-serif;font-size:.95em;letter-spacing:.08em}
+  background:#4e7486;color:#fff;font-family:"Rounded","PingFang TC","Microsoft JhengHei",sans-serif;font-size:.95em;letter-spacing:.08em}
 .level .lv-box{display:block;background:rgba(250,244,228,.97);border:2px solid #4e7486;border-radius:12px;
   padding:8px 14px 9px;box-shadow:0 3px 0 rgba(60,45,40,.15);transition:background .2s,color .2s}
 .level .lv-name{display:flex;justify-content:space-between;align-items:baseline;gap:10px;color:#4e7486;font-size:1.06em;letter-spacing:.06em}
-.level .lv-pts{flex:none;font-family:"Chalk","PingFang TC","Microsoft JhengHei",sans-serif;font-size:.9em}
+.level .lv-pts{flex:none;font-family:"Rounded","PingFang TC","Microsoft JhengHei",sans-serif;font-size:.9em}
 .level .lv-desc{display:block;margin-top:2px}
 .level.sel .lv-tab{background:#3d5568}
 .level.sel .lv-box{background:#4e7486;color:#fff}
@@ -297,7 +296,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 #s-result{justify-content:flex-start;gap:18px;overflow-y:auto}
 #s-result > *{flex:none}
 .result{width:min(100%,640px);background:rgba(250,244,228,.97);border-radius:20px;padding:22px 22px 20px;
-  box-shadow:0 6px 18px rgba(90,74,66,.2);border:2px solid var(--pink);text-align:left}
+  box-shadow:0 6px 18px rgba(90,74,66,.2);border:2px solid var(--frame);text-align:left}
 .result .score{font-size:clamp(20px,5.2vw,25px);color:var(--ink)}
 .result h2{font-weight:normal;font-size:clamp(18px,4.6vw,22px);color:#4e7486;margin:4px 0 12px}
 .result p{font-size:clamp(18px,4.6vw,22px);line-height:1.75}
@@ -307,15 +306,15 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .res-top .sk{font-size:clamp(17px,4.4vw,20px);margin-top:4px;color:#4e7486}
 .res-top .lv{display:inline-block;margin-top:8px;font-size:clamp(15px,3.9vw,17px);color:#4e7486;
   border:1.5px solid #4e7486;border-radius:999px;padding:1px 12px}
-.res-sec{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--pink)}
+.res-sec{margin-top:16px;padding-top:14px;border-top:1px solid var(--hair)}
 .res-sec h3{font-weight:normal;font-size:clamp(18px,4.6vw,21px);color:#4e7486;margin-bottom:4px}
-.res-note{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--pink);font-size:clamp(16px,4.2vw,19px)!important}
+.res-note{margin-top:16px;padding-top:14px;border-top:1px solid var(--hair);font-size:clamp(16px,4.2vw,19px)!important}
 .res-gift{margin-top:10px;color:#a85a54}
-.res-shop{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--pink);text-align:center}
+.res-shop{margin-top:16px;padding-top:14px;border-top:1px solid var(--hair);text-align:center}
 .res-shop p{font-size:clamp(16px,4.2vw,19px)!important;margin-bottom:10px}
 .panel2{width:min(100%,640px);background:rgba(250,244,228,.97);border-radius:20px;padding:20px 20px;
-  border:2px solid var(--pink);box-shadow:0 4px 14px rgba(90,74,66,.16);text-align:center}
-.panel2 .part + .part{margin-top:18px;padding-top:16px;border-top:1.5px dashed var(--pink)}
+  border:2px solid var(--frame);box-shadow:0 4px 14px rgba(90,74,66,.16);text-align:center}
+.panel2 .part + .part{margin-top:18px;padding-top:16px;border-top:1px solid var(--hair)}
 .panel2 h2{font-weight:normal;font-size:clamp(22px,5.6vw,28px);color:#4e7486;margin-bottom:4px}
 .panel2 .sub{font-size:clamp(16px,4.2vw,18px);margin-bottom:12px;line-height:1.6;color:var(--ink)}
 .panel2 .q{font-size:clamp(17px,4.4vw,20px);margin-bottom:6px;color:var(--ink)}
@@ -330,7 +329,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .rate.img button.on img.off{opacity:0}
 #fbHp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 #fbText{width:100%;min-height:96px;font-family:inherit;font-size:18px;padding:10px 12px;border-radius:12px;
-  border:2px solid var(--pink);background:#fff;color:var(--ink);resize:vertical;margin-bottom:10px}
+  border:1.5px solid rgba(63,101,119,.3);background:#fff;color:var(--ink);resize:vertical;margin-bottom:10px}
 #fbMsg{min-height:1.5em;font-size:16px;margin-top:8px;color:#a85a54}
 #fbSend{background:#4e7486}
 #spBtn{background:#c78696}
@@ -344,7 +343,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
   padding:22px 20px;text-align:center;font-size:clamp(18px,4.6vw,22px);line-height:1.6}
 .box p{margin-bottom:16px}
 .box input{width:100%;font-family:inherit;font-size:20px;padding:10px 14px;border-radius:12px;
-  border:2px solid var(--pink);background:#fff;color:var(--ink);margin-bottom:6px}
+  border:1.5px solid rgba(63,101,119,.3);background:#fff;color:var(--ink);margin-bottom:6px}
 .box .err{color:#b0605a;font-size:16px;min-height:1.4em;margin-bottom:10px}
 #zoomModal .card{height:min(78dvh,620px);margin:auto}
 .rv h3{font-weight:normal;font-size:19px;margin:10px 0 8px;text-align:left}
@@ -398,9 +397,228 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
   .box{width:min(100%,540px);font-size:21px}
   #scoreText{font-size:25px}
 }
+/* ═════ 對話框：與小故事相同的精緻版（半透明霧面、細框線、文字帶光暈） ═════ */
+.dialog{background:rgba(44,64,73,.58);-webkit-backdrop-filter:blur(10px) saturate(1.1);backdrop-filter:blur(10px) saturate(1.1);
+  border:1px solid rgba(247,238,208,.38);border-radius:18px;box-shadow:0 8px 30px rgba(31,43,49,.18);
+  color:#f7eed0;text-shadow:0 0 3px rgba(31,43,49,.85),0 0 3px rgba(31,43,49,.85),0 1px 10px rgba(31,43,49,.7)}
+.dialog .nav button{color:#f7eed0}
+#talkNext.end{background:rgba(247,238,208,.92);color:#4e7486;text-shadow:none}
+.dialog .text b{color:#ffd7c8}
+
+/* ═════ 小知名牌（與小故事相同） ═════ */
+.dialog .who{font-size:.56em;letter-spacing:.3em;color:rgba(247,238,208,.75);margin-bottom:-2px}
+/* ═════ 底部按鈕：還不能按時是細框線，能按時是實心 ═════ */
+#pickOk,#seedOk,#levelNext,#levelPrev,#sortDoneBtn,#scoreOk{min-width:min(78vw,320px);letter-spacing:.14em}
+#pickOk:disabled,#seedOk:disabled,#levelNext:disabled{opacity:1;background:rgba(247,238,208,.92);color:rgba(78,116,134,.62);
+  border:1px dashed rgba(78,116,134,.45);box-shadow:none}
+#pickOk:not(:disabled),#seedOk:not(:disabled){background:#4e7486;color:#fff;border:1px solid rgba(255,255,255,.85);box-shadow:0 4px 12px rgba(31,43,49,.25)}
+/* 種子列：中間是因素名稱＋種子 */
+.seedrow .mid{flex-direction:column;align-items:flex-start;flex-wrap:nowrap;gap:6px}
+.seedrow .nm{font-family:"FYSong","Noto Serif TC",serif;font-size:clamp(18px,4.6vw,22px);color:#3d535d;letter-spacing:.08em}
+.seedrow .sd{display:flex;flex-wrap:wrap;gap:2px;min-height:30px}
+#seedPool{max-width:none;flex-wrap:nowrap}
+
+/* ═════ 能力評分：問題句＋卡片與能力＋三個選項 ═════ */
+.lvq{font-size:clamp(19px,5vw,24px);text-align:center;line-height:1.5;color:var(--ink);
+  background:rgba(247,238,208,.9);padding:8px 20px;border-radius:16px;flex:none}
+#s-level .hint{font-size:clamp(15px,3.8vw,18px);padding:3px 14px;opacity:.9}
+.lv-head{display:flex;align-items:center;justify-content:center;gap:clamp(14px,4vw,28px);flex:none}
+#s-level #levelWrap{margin-top:10px}
+@media (max-aspect-ratio:1/1) and (max-width:599px){
+  #s-level{gap:6px}
+  #s-level .hint{font-size:14px;padding:2px 12px}
+  .lvq{font-size:18px;padding:6px 14px}
+  #s-level #levelWrap{height:19dvh;margin-top:10px}
+  #s-level .level{font-size:15px;line-height:1.45}
+  #s-level .level .lv-box{padding:5px 12px 6px}
+}
+@media (max-aspect-ratio:1/1) and (max-width:599px) and (max-height:700px){ #s-level #levelWrap{height:17dvh} .lvq{font-size:16px} }
+@media (min-width:600px) and (max-aspect-ratio:1/1){
+  .lvq{font-size:27px;padding:10px 26px}
+  #s-level .hint{font-size:19px}
+  #s-level #levelWrap{height:min(27dvh,380px)}
+}
+@media (min-aspect-ratio:1/1) and (min-width:700px){
+  .lv-head{flex-direction:column;gap:14px}
+  #s-level #levelWrap{height:min(50dvh,520px)}
+}
+
+/* ═════ 花園紀錄卡 ═════ */
+.record{width:min(100%,560px);display:flex;flex-direction:column;align-items:center;gap:12px}
+.rec-title{font-size:clamp(20px,5.2vw,26px);letter-spacing:.2em;color:var(--ink);background:rgba(247,238,208,.9);padding:6px 22px;border-radius:999px}
+#recImg{display:block;width:100%;height:auto;min-height:200px;border-radius:18px;box-shadow:0 12px 32px rgba(31,43,49,.22);
+  -webkit-touch-callout:default;user-select:auto;background:rgba(251,247,236,.6)}
+.rec-tip{font-size:clamp(15px,3.9vw,18px);color:var(--ink);background:rgba(247,238,208,.85);padding:4px 14px;border-radius:999px}
+@media (min-width:600px) and (max-aspect-ratio:1/1){ .record{width:min(100%,600px)} .rec-title{font-size:27px} .rec-tip{font-size:19px} }
+@media (min-aspect-ratio:1/1) and (min-width:900px){ .record{width:min(46vw,520px)} }
+/* ═════ 小知的結尾 ═════ */
+.closing{width:min(100%,640px);text-align:center;color:#f7eed0;padding:6px 6px 4px;
+  font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
+  text-shadow:0 0 3px rgba(31,43,49,.85),0 0 3px rgba(31,43,49,.85),0 1px 10px rgba(31,43,49,.7)}
+.closing .who{font-family:"Rounded","PingFang TC","Microsoft JhengHei",sans-serif;letter-spacing:.3em;font-size:clamp(15px,3.8vw,18px);opacity:.85;margin-bottom:6px}
+.closing p{font-size:clamp(18px,4.6vw,22px);line-height:1.85;text-wrap:pretty;line-break:strict}
+.closing p + p{margin-top:10px}
+.closing::before{content:"";display:block;width:72px;height:1px;margin:0 auto 16px;
+  background:linear-gradient(90deg,transparent,#f7eed0 30%,#f7eed0 70%,transparent)}
+
+/* ═════ 平板直放（寬 600px 以上、直式）：整體放大，填滿畫面 ═════ */
+@media (min-width:600px) and (max-aspect-ratio:1/1){
+  .screen{padding-left:40px;padding-right:40px;padding-top:calc(96px + env(safe-area-inset-top));padding-bottom:calc(36px + env(safe-area-inset-bottom))}
+  .corner{width:64px;font-size:28px}
+  .btn{font-size:24px;padding:14px 34px}
+  /* 開場、對話 */
+  #cover{height:min(60dvh,760px)}
+  #coverTalk{height:min(46dvh,560px)}
+  #loadText{font-size:26px;padding:10px 28px}
+  .dialog{width:min(88vw,20em)}
+  #talkPanel{width:min(100%,680px)}
+  #talkPanel .pk h3{font-size:26px}
+  #talkPanel .pk p{font-size:23px;padding:12px 20px}
+  /* 選主題 */
+  #s-theme{gap:32px}
+  .title{font-size:28px;padding:12px 26px}
+  .themes{width:min(100%,600px);gap:18px}
+  .themes .btn{font-size:27px;padding:20px 20px}
+  /* 旋轉盤 */
+  .hint,#sortGuide{font-size:22px}
+  #ring{--cardH:min(50dvh,640px)}
+  .arrow{width:56px;height:56px;font-size:24px}
+  .piles{width:min(100%,680px);gap:14px}
+  .pile{font-size:26px;padding:18px 6px}
+  .pile .count{min-width:32px;height:32px;line-height:32px;font-size:18px;border-radius:16px}
+  #reviewBtn{font-size:20px;padding:10px 22px}
+  /* 選五張 */
+  .grid{width:min(100%,680px);gap:16px}
+  /* 種子 */
+  .seed{width:42px;height:42px}
+  #seedPool{max-width:540px;gap:4px}
+  .seedrow{width:min(100%,680px);gap:22px;padding:14px 20px;margin-bottom:16px}
+  .seedrow .card{width:90px}
+  .seedrow .nm{font-size:25px}
+  .seedrow .sd{min-height:42px;gap:4px}
+  .seedrow .ctrl button{width:54px;height:54px;font-size:30px}
+  .seedrow .num{font-size:24px}
+  /* 計分 Level */
+  #levelWrap{height:min(28dvh,400px);margin-top:16px}
+  .levels{width:min(100%,680px);gap:10px}
+  #s-level .level{font-size:20px;line-height:1.55}
+  #s-level .level .lv-box{padding:8px 18px 9px}
+  /* 樹枝 */
+  .branch{width:min(94%,860px);height:150px}
+  .branch .bar{top:76px;height:18px;border-radius:9px}
+  .branch .leaf{width:28px;height:15px}
+  .branch .tick{top:102px;font-size:19px}
+  #marker{top:30px;width:50px;height:50px;margin-left:-25px}
+  #marker .seed{width:50px;height:50px}
+  #plus{font-size:32px}
+  #scoreText{font-size:32px}
+  #scoreText .big{font-size:84px}
+  /* 結果 */
+  .result,.panel2,.closing{width:min(100%,680px)}
+  .result{padding:30px 34px 26px}
+  .result p{font-size:22px}
+  .result .score{font-size:26px}
+  .result h2{font-size:23px}
+  .res-top .card{width:130px}
+  .res-top .nm{font-size:34px}
+  .res-top .sk{font-size:22px}
+  .res-top .lv{font-size:19px}
+  .res-sec h3{font-size:22px}
+  .res-note,.res-shop p{font-size:20px!important}
+  .panel2 h2{font-size:27px}
+  .panel2 .sub,.panel2 .q{font-size:20px}
+  .closing p{font-size:23px}
+  .closing .who{font-size:19px}
+  .box{width:min(100%,560px);font-size:22px}
+}
+/* 平板橫放：種子列、樹枝也放大 */
+@media (min-aspect-ratio:1/1) and (min-width:900px) and (min-height:620px){
+  .seed{width:36px;height:36px}
+  .seedrow{width:min(100%,760px);gap:18px;padding:12px 18px}
+  .seedrow .card{width:92px}
+  .seedrow .ctrl button{width:50px;height:50px;font-size:28px}
+  .branch{width:min(80%,880px)}
+  .closing{width:min(100%,760px)}
+  .closing p{font-size:21px}
+}
+
+/* ═════ 大螢幕（筆電、桌機）：整體放大 ═════ */
+@media (min-aspect-ratio:1/1) and (min-width:1180px) and (min-height:700px){
+  .corner{width:58px;font-size:26px}
+  .title{font-size:30px;padding:12px 30px}
+  .themes{width:min(100%,620px);gap:16px}
+  .themes .btn{font-size:26px;padding:18px 20px}
+  .hint,#sortGuide{font-size:22px}
+  .btn{font-size:23px;padding:13px 34px}
+  .piles{width:min(100%,760px);gap:14px}
+  .pile{font-size:25px;padding:16px 6px}
+  #reviewBtn{font-size:20px}
+  .grid{width:min(100%,960px);gap:18px}
+  #talkPanel{width:min(100%,900px)}
+  #talkPanel .pk h3{font-size:27px}
+  #talkPanel .pk p{font-size:23px}
+  .seed{width:40px;height:40px}
+  #seedPool{gap:4px}
+  .seedrow{width:min(100%,860px);padding:14px 22px}
+  .seedrow .card{width:100px}
+  .seedrow .nm{font-size:26px}
+  .lvq{font-size:28px;padding:10px 28px}
+  #s-level .level{font-size:20px}
+  .levels{width:min(46vw,680px)}
+  .branch{height:150px}
+  .branch .bar{top:76px;height:18px;border-radius:9px}
+  .branch .tick{top:102px;font-size:19px}
+  #marker{top:30px;width:50px;height:50px;margin-left:-25px}
+  #marker .seed{width:50px;height:50px}
+  #scoreText{font-size:32px}
+  #scoreText .big{font-size:84px}
+  .record{width:min(40vw,560px)}
+  .rec-title{font-size:28px} .rec-tip{font-size:19px}
+  .result,.panel2,.closing{width:min(100%,760px)}
+  .closing p{font-size:22px}
+}
+
+/* ═════ 轉盤：卡片大小跟著中間剩下的空間走，不會蓋到上下的文字 ═════ */
+#s-sort .stage{container-type:size}
+#s-sort #ring{--cardH:min(94cqh,660px)}
+
+/* ═════ A 支線風格：不用圓角色塊，改成光暈文字＋細線（看起來不像按鈕） ═════ */
+:root{--glowL:0 0 4px #fff,0 0 12px rgba(255,255,255,.95),0 0 22px rgba(255,255,255,.7);--inkD:#2f4651;
+  --hairL:linear-gradient(90deg,transparent,rgba(78,116,134,.55) 22%,rgba(78,116,134,.55) 78%,transparent)}
+.title,.hint,.lvq,.rec-title,.rec-tip,#sortGuide,#loadText{background:none!important;border:0!important;box-shadow:none!important;
+  border-radius:0!important;color:var(--inkD)!important;text-shadow:var(--glowL);padding-left:0!important;padding-right:0!important}
+.title,.lvq,.rec-title{position:relative;padding-top:2px!important;padding-bottom:14px!important;letter-spacing:.12em}
+.title::after,.lvq::after,.rec-title::after{content:"";position:absolute;left:50%;bottom:0;width:min(240px,70%);height:1px;transform:translateX(-50%);background:var(--hairL)}
+.hint,#sortGuide,.rec-tip{letter-spacing:.12em}
+#loadText{letter-spacing:.3em}
+/* 三種分類說明：顏色只留在字和細線上 */
+#talkPanel .pk{text-align:center;padding:2px 0 4px}
+#talkPanel .pk.a{--pc:#a85a54} #talkPanel .pk.b{--pc:#6f5d8a} #talkPanel .pk.c{--pc:#3f6577}
+#talkPanel .pk h3{background:none!important;color:var(--pc)!important;border-radius:0!important;padding:0!important;letter-spacing:.24em;
+  text-shadow:var(--glowL);font-weight:500}
+#talkPanel .pk p{background:none!important;border:0!important;box-shadow:none!important;padding:4px 0 0!important;color:var(--inkD);text-shadow:var(--glowL)}
+#talkPanel .pk::after{content:"";display:block;width:min(220px,60%);height:1px;margin:10px auto 0;
+  background:linear-gradient(90deg,transparent,var(--pc),transparent);opacity:.7}
+#talkPanel .pk:last-child::after{display:none}
+/* 種子列：不用底色框，只用細線分隔 */
+.seedrow{background:none!important;border-radius:0!important;box-shadow:none!important;border-bottom:1px solid rgba(78,116,134,.3);margin-bottom:6px!important}
+.seedrow .nm,.seedrow .num{text-shadow:var(--glowL)}
+/* 結果頁的小禮物、購買、回饋：細線分段 */
+.result,.panel2{background:none!important;border-radius:0!important;box-shadow:none!important;border:0!important;
+  border-top:1px solid rgba(78,116,134,.35)!important;padding:20px 4px 6px!important}
+.result p,.panel2 h2,.panel2 .sub,.panel2 .q,.panel2 #fbMsg{text-shadow:var(--glowL)}
+.res-shop{border-top:0!important}
+/* 小知的結尾：深色字＋白色光暈，一個短句一行 */
+.closing{color:var(--inkD)!important;text-shadow:var(--glowL)!important}
+.closing p{line-height:2;text-wrap:balance}
+.closing p + p{margin-top:18px}
+.closing .who{color:#4e7486}
+.closing::before{background:var(--hairL)!important;width:180px!important}
 </style>
+<link rel="stylesheet" href="site-bg.css">
 </head>
 <body>
+<div class="site-bg" aria-hidden="true"></div>
 <div id="app">
 
   <button class="corner show" id="menuBtn" aria-label="選單"><img src="images/btn-menu.png" alt="" onerror="this.parentElement.classList.add('empty')"><span class="mt">☰</span></button>
@@ -422,6 +640,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
     <div class="cover" id="coverTalk"><img class="c1" alt=""><img class="c2" alt=""></div>
     <div id="talkPanel"></div>
     <div class="dialog" id="talkBox">
+      <div class="who">小知</div>
       <div class="text" id="talkText"></div>
       <div class="nav"><button id="talkPrev">◂ 上一句</button><button id="talkNext">下一句 ▸</button></div>
     </div>
@@ -469,10 +688,13 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
   <!-- 計分 -->
   <section class="screen" id="s-level">
     <p class="hint" id="levelHint"></p>
+    <p class="lvq" id="levelQ"></p>
     <div class="levelBody">
-      <div id="levelWrap">
-        <div class="card" id="levelCard"></div>
-        <div id="levelNote"><img alt=""><div class="ph"></div></div>
+      <div class="lv-head">
+        <div id="levelWrap">
+          <div class="card" id="levelCard"></div>
+          <div id="levelNote"><img alt=""><div class="ph"></div></div>
+        </div>
       </div>
       <div class="levels" id="levelBtns"></div>
     </div>
@@ -496,19 +718,21 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 
   <!-- 結果 -->
   <section class="screen" id="s-result">
+    <!-- 花園紀錄卡：用程式畫成一張圖片，手機長按就能儲存 -->
+    <div class="record">
+      <p class="rec-title" id="recTitle"></p>
+      <img id="recImg" alt="">
+      <p class="rec-tip" id="recTip"></p>
+      <button class="btn" id="recSave"></button>
+    </div>
+
     <div class="result" id="resBox">
-      <p class="score" id="resScore"></p>
-      <h2 id="resTopTitle"></h2>
-      <div class="res-top">
-        <div id="resCard"></div>
-        <div><div class="nm" id="resName"></div><div class="sk" id="resSkill"></div><span class="lv" id="resLevel"></span></div>
-      </div>
-      <div class="res-sec"><h3 id="resStateT"></h3><p id="resState"></p></div>
-      <div class="res-sec tip"><h3 id="resTipT"></h3><p id="resTip"></p></div>
-      <p class="res-note" id="resNote"></p>
       <p class="res-gift" id="resGift"></p>
       <div class="res-shop" id="resShop"><p id="shopText"></p><button class="btn" id="shopBtn"></button></div>
     </div>
+
+    <!-- 小知的結尾（與小故事的結尾相同） -->
+    <div class="closing" id="resEnd"></div>
 
     <!-- 回饋＋贊助（同一張卡片） -->
     <div class="panel2">
@@ -582,7 +806,6 @@ const FILES = {
   cover1:  IMG + 'cover1.png',   // 開場知更鳥（直式）
   cover2:  IMG + 'cover2.png',   // 開場知更鳥打光版
   seed:    IMG + 'seed.png',
-  bg:      IMG + 'background1.png',
   music:  'audio/music1.mp3'
 };
 
@@ -603,7 +826,7 @@ const TEXT = {
   sortIntro: [
     '試著回想遺憾發生的那一刻…',
     '是哪些因素，讓當時的你做出了那個選擇呢？',
-    { text:'接下來，請把每張卡分到這三個地方：', panel:true },
+    { text:'接下來，請把每張卡分到這三個地方', panel:true },
     '記得，要用「當時的自己」來判斷，而不是現在的想法喔！'
   ],
   sortIntroEnd: '開始分類',
@@ -613,11 +836,11 @@ const TEXT = {
     { title:'恆久不變的', desc:'當時難以由自己改變，或不論如何都存在的' },
     { title:'沒有關聯的', desc:'當時並沒有影響你做選擇的' }
   ],
-  reviewBtn:  '🗂 查看已分類的卡・分錯可以放回',
+  reviewBtn:  '查看已分類的卡',
   reviewHint: '分錯了也沒關係～按「放回轉盤」就能重新分類；點卡片可以放大看看。',
   reviewTip:  '分錯了嗎？點下方「查看已分類的卡」可以放回重新分類喔',
-  sortHint: '以「當時的自己」判斷・還有 {n} 張',
-  sortGuide: '點選下方的選項，把中間這張卡分類 ↓',
+  sortHint: '還有 {n} 張',
+  sortGuide: '當時的你，會把這張卡放在哪一類？',
 
 
   pickTitle: '可以改變的因素超過 {max} 張囉！<br>請選出對你最重要的 {max} 張',
@@ -633,9 +856,19 @@ const TEXT = {
   seedIntroEnd: '開始分配',
   seedLeft: '還剩 {n} 顆種子',
 
-  levelIntro: ['現在，回頭看看每個因素——現在的你，走到哪一步了呢？'],
+  // 能力評分前的引導（{f} = 第一張卡的因素，{s} = 它對應的能力）
+  levelIntro: [
+    '種子都種下了！剛剛我們一直在看『當時的你』。',
+    '接下來，我們回到『現在』，看看這段時間你有沒有一些不同的成長。',
+    '每一張因素卡背後，都代表著一種『能力』——它是你面對這個因素時，會慢慢成長出來的力量。',
+    '像是『{f}』背後的能力，就是『{s}』。',
+    '我把每張卡的能力寫在紙上，貼在卡片上了。',
+    '請你看看紙上的能力，想想：現在的你，這個能力長到哪裡了？',
+    '一共有三個階段：開始看得見、開始嘗試、自然流暢。沒有對錯，選最接近現在的你就好。'
+  ],
   levelIntroEnd: '開始',
-  levelHint: '第 {i} / {total} 張・這張卡有 {s} 顆種子',
+  levelHint: '第 {i} / {total} 張',
+  levelQ: '現在的你，「{s}」走到哪一步了？',
   levelDone: '確認完成',
   levels: [
     { title:'Level. I',   name:'開始看得見、意識到', desc:'能察覺此因素對自己的影響，但反應模式仍隨過往習慣動搖，尚未採取實際改變行動。' },
@@ -649,15 +882,27 @@ const TEXT = {
   leave: '確定要離開嗎？<br>離開後這次的排卡進度不會保留喔。',
 
   // 結果頁
-  resTop:      '🌱 這次對你影響最深的因素',
-  resSkill:    '對應能力：{s}',
-  resLevel:    '你現在的階段：{l}',
-  resState:    '現在的你能夠做到的',
-  resTip:      '送給你的小練習',
-  resNote:     '分數沒有好壞之分，不論現在在哪個階段，都是給花園帶來不一樣的樣貌。',
+  // 結果頁的「花園紀錄卡」（畫成圖片，可長按儲存）
+  recTitle:  '你的花園紀錄卡',
+  recTip:    '長按圖片即可儲存，留下這次的紀錄',
+  recTipPC:  '按下方按鈕即可下載，留下這次的紀錄',
+  recSave:   '下載紀錄卡',
+  recSkillT: '這次你在心靈花園裡長出的能力',
+  recFrom:   '來自影響你最深的因素',
+  recStateT: '現在的你能夠做到的',
+  recTipT:   '可以繼續練習的方向',
+  recScore:  '花園分數 {n}',
+  recScoreNote: '分數沒有好壞之分，每個階段都是花園不一樣的樣貌',
+  recSign:   '遺落成華｜心靈花園線上體驗',
   resGift:     '🎁 帶著這個畫面去找攤主，就能領取一份神秘小禮物喔！',
   shopText:    '想看每張卡更完整的解讀嗎？<br>《遺落成華》卡牌套組裡，有更多詳細的介紹～',
   shopBtn:     '看看卡牌套組',
+  // 小知的結尾（結果頁下方；和小故事的結尾同一段話）
+  closing: [
+    '無論你現在心裡是否帶著遺憾，都謝謝你今天的到來。',
+    '如果可以，願你能坦然地放下曾經那些「如果」。過去不必被修補得完美無憾，把感受放回現在，此刻正讀著這段話的你，就已經值得被好好肯定。'
+  ],
+  closingFeather: '也歡迎把寫好的羽毛紙掛到我們的花園牆上，一起打卡拍照～',   // 只有從小故事來的人會看到
 
   fbTitle:   '給我們一點回饋吧',
   fbSub:     '你的回饋能夠幫助我們更加完整！歡迎寫下這次的體驗～',
@@ -694,8 +939,8 @@ const FACTORS = {
   C01:{ name:'時間分配', skill:'珍惜',
     state:['看見時間的有限性，感受到時間的價值','會將時間留給值得的人事物','全神貫注地享受當下，感受這一切得來不易'],
     tip:['今天睡前花一分鐘回想：「今天的時間裡，有哪一段讓我覺得很值得？」先從「看見」開始就好。',
-         '試著每週將一件重要的人事物「預留」時間，像約會一樣寫進行事曆，不讓它被雜事掩埋。',
-         '你已經懂得把時間留給重要的人與事。也記得那些願意陪你一起珍惜時間的人吧！'] },
+         '試著每週為一件重要的人事物「預留」時間，像約會一樣寫進行事曆，不讓它被雜事掩埋。',
+         '你已經懂得把時間留給重要的人與事。請記得那些願意陪你一起珍惜時間的人吧！'] },
   C02:{ name:'資訊落差', skill:'查證',
     state:['心態上不盲目全盤接收，在心中先留一個理性的問號','尋找不同的資料、詢問他人的看法，主動描繪事實的輪廓','獨立辨別真偽並洞察事實真相'],
     tip:['下次聽到讓你不太清楚的消息時，先在心裡說聲「等等」，給自己一點時間判斷。',
@@ -723,7 +968,7 @@ const FACTORS = {
          '你已經把目光放在現在與未來。替接下來的路程，寫下一個真正值得投入的小目標吧！'] },
   C07:{ name:'外界期待', skill:'心理獨立',
     state:['分辨自己真實擁有的能力和缺陷','接納外在的聲音，但不再全盤活成他人期待的樣貌','把發言權留給自己，保有前進的底氣'],
-    tip:['拿一張紙分成兩欄：「我真的擅長的」和「我還想加強的」。誠實地認識自己，是獨立的第一步。',
+    tip:['在紙張寫下：「我真的擅長的」和「我還想加強的」。誠實地認識自己，是獨立的第一步。',
          '聽到別人的期待時，可以先說「謝謝你的意見」，再問問自己：「那我自己怎麼想？」',
          '你已經能把發言權留給自己。繼續相信你的步調，這份底氣是你一點一點累積來的。'] },
   C08:{ name:'情緒狀態', skill:'調節情緒',
@@ -735,7 +980,7 @@ const FACTORS = {
     state:['不急躁，整理實際已經累積的努力','大目標拆解為可執行的小任務，專注做好當下','享受當下的狀態，將目標與現實連結、穩健推進'],
     tip:['先別急著看終點，回頭列出你已經做到的三件事，你其實比想像中走得更遠。',
          '把大目標切成「這週就能完成」的小任務，一次只專心做好一件。',
-         '你已經把夢想和現實連在一起了。記得在路上也別忘記幫自己撒花，慶祝每一個值得紀念的里程碑。'] },
+         '你已經把夢想和現實連在一起了。在路上也別忘記幫自己撒花，慶祝每一個值得紀念的里程碑。'] },
   C10:{ name:'個性特質', skill:'自我接納',
     state:['覺察特質帶來的限制與情緒','看見特質的兩面性，用溫柔的語言替代苛責自己','坦然擁抱不完美，踏實與己共處'],
     tip:['當你又在責怪自己的個性時，先注意到這個聲音就好，不用急著改變它，或許它也有好的一面呢？',
@@ -784,7 +1029,7 @@ const FACTORS = {
   P02:{ name:'現實負擔', skill:'自我投資',
     state:['分析現實的重擔與環境限制','學習特定技能、累積個人資本，為未來注入改變的可能','擁有保護自己的實力與底氣，脫離不合適環境與情緒勒索'],
     tip:['把現實的壓力和限制一條一條列出來。看清楚會比模糊的擔心焦慮更好找到方法面對。',
-         '挑一項對未來有幫助的技能，每天向它投資 15 分鐘，時間會累積使你改變的力量。',
+         '挑一項對未來有幫助的技能，每天向它投資 15 分鐘，時間會累積成使你改變的力量。',
          '你已經擁有保護自己的實力。需要的時候，你可以有底氣地離開不適合的環境。'] },
   P03:{ name:'盲從世俗', skill:'思考獨立',
     state:['缺乏自己的判斷而隨波逐流，關注太多不影響自己的消息','保有好奇心，不輕易接受表象也審視自己的思考盲點，避免個人偏見','建立屬於自己的認知框架，只看事實而不被情緒影響'],
@@ -804,7 +1049,7 @@ const FACTORS = {
   M03:{ name:'盲目摸索', skill:'資產規劃',
     state:['缺乏理財規劃的盲目支配中，常為不確定的未來感到焦慮','理清自己的財務現狀，練習分配擁有的資源','游刃有餘面對自己的財務規劃，建立踏實的保障'],
     tip:['先從生活上的記帳開始，不急著批判自己，只是看清楚錢都飛往了哪裡。',
-         '試著把收入分成「生活、存錢、想做的事」三份預算，細項目可以再慢慢調整。',
+         '試著把收入分成「生活、存錢、想做的事」三份預算，細項可以再慢慢調整。',
          '你已經能從容地規劃財務。定期回顧一次目標，讓這份安全感一直陪著你。'] }
 
 };
@@ -818,13 +1063,14 @@ const fill = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k]);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const failed = new Set();
 
-let theme = null, cards = [], music = null, guard = false;
+let theme = null, cards = [], music = null, guard = false, fromStory = false;
 
 /* ---------- 主題（從故事頁帶入：cards.html?theme=F） ---------- */
 (function readTheme(){
   const map = {F:'F',friendship:'F',friend:'F','友情':'F', L:'L',love:'L','愛情':'L',
     P:'P',plan:'P','未來規劃':'P', M:'M',money:'M','財務管理':'M', O:'O',other:'O','其他':'O'};
   const p = new URLSearchParams(location.search).get('theme');
+  fromStory = !!p;                       // 從小故事來的人：結尾多一句羽毛紙的話
   if (p && map[p] !== undefined) theme = map[p];
   else if (p && map[p.toUpperCase()]) theme = map[p.toUpperCase()];
 })();
@@ -889,10 +1135,10 @@ async function preload(){
   music = new Audio(FILES.music); music.loop = true; music.volume = .6; music.preload = 'auto';
 
   // 2. 開始前一定要有的：背景、種子、字型
-  const must = [FILES.bg, FILES.seed];
+  const must = [FILES.seed];
   let n = 0; const total = must.length + 1;
   const step = () => { n++; $('#loadText').textContent = TEXT.loading + ' ' + Math.round(n / total * 100) + '%'; };
-  const font = Promise.race([document.fonts ? Promise.all([document.fonts.load('20px Chalk')]) : 0, sleep(10000)]).catch(()=>{}).then(step);
+  const font = Promise.race([document.fonts ? Promise.all([document.fonts.load('20px Rounded')]) : 0, sleep(10000)]).catch(()=>{}).then(step);
   await Promise.all([...must.map(s => loadImg(s).then(step)), font]);
   if (failed.has(FILES.seed)) document.body.classList.add('noseed');
 
@@ -912,6 +1158,7 @@ $('#musicBtn').onclick = () => {
   if (!music) return;
   if (music.paused){ music.play().catch(()=>{}); $('#musicBtn').classList.remove('off'); }
   else { music.pause(); $('#musicBtn').classList.add('off'); }
+  try { localStorage.setItem('musicOff', music.paused ? '1' : '0'); } catch (e) {}
 };
 $('#leaveText').innerHTML = TEXT.leave;
 $('#menuBtn').onclick = e => { e.stopPropagation(); $('#cmenu').classList.toggle('open'); };
@@ -963,8 +1210,9 @@ function talk(lines, endLabel, onDone){
 /* ---------- 開始 ---------- */
 function start(){
   guard = true;
-  if (music) music.play().catch(()=>{});
-  if (music) $('#musicBtn').classList.add('show');
+  const off = (() => { try { return localStorage.getItem('musicOff') === '1'; } catch (e) { return false; } })();   // 和小故事共用開關
+  if (music && !off) music.play().catch(()=>{});
+  if (music){ $('#musicBtn').classList.add('show'); $('#musicBtn').classList.toggle('off', off); }
   $('#menuBtn').classList.add('show');
   talk(TEXT.prep, TEXT.prepEnd, () => theme ? sortIntro() : chooseTheme());
 }
@@ -1152,7 +1400,10 @@ function renderSeeds(){
     const row = document.createElement('div'); row.className = 'seedrow';
     const ce = cardEl(c.code); ce.onclick = () => zoom(c.code);
     const mid = document.createElement('div'); mid.className = 'mid';
-    for (let i = 0; i < c.seeds; i++) mid.appendChild(seedIcon());
+    const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = FACTORS[c.code] ? FACTORS[c.code].name : c.code;
+    const sd = document.createElement('div'); sd.className = 'sd';
+    for (let i = 0; i < c.seeds; i++) sd.appendChild(seedIcon());
+    mid.append(nm, sd);
     const ctrl = document.createElement('div'); ctrl.className = 'ctrl';
     const plus = document.createElement('button'); plus.textContent = '+'; plus.disabled = left === 0;
     const num = document.createElement('span'); num.className = 'num'; num.textContent = c.seeds;
@@ -1164,14 +1415,19 @@ function renderSeeds(){
   });
   $('#seedOk').disabled = left !== 0;
 }
-$('#seedOk').onclick = () => talk(TEXT.levelIntro, TEXT.levelIntroEnd, () => { lvIdx = 0; renderLevel(); show('s-level'); });
+$('#seedOk').onclick = () => {
+  const f0 = FACTORS[chosen()[0].code] || {name:'', skill:''};
+  talk(TEXT.levelIntro.map(t => fill(t, {f:f0.name, s:f0.skill})), TEXT.levelIntroEnd, () => { lvIdx = 0; renderLevel(); show('s-level'); });
+};
 
 /* ---------- 計分 ---------- */
 let lvIdx = 0;
 const points = c => c.level === 3 ? c.seeds : c.level === 2 ? c.seeds / 2 : 0;
 function renderLevel(){
   const list = chosen(), c = list[lvIdx];
-  $('#levelHint').textContent = fill(TEXT.levelHint, {i:lvIdx + 1, total:list.length, s:c.seeds});
+  const fa = FACTORS[c.code] || {name:c.code, skill:'', state:[]};
+  $('#levelHint').textContent = fill(TEXT.levelHint, {i:lvIdx + 1, total:list.length});
+  $('#levelQ').textContent = fill(TEXT.levelQ, {s:fa.skill});
   const old = $('#levelCard'), el = cardEl(c.code); el.id = 'levelCard';
   el.onclick = () => zoom(c.code); old.replaceWith(el);
   const note = $('#levelNote'), nimg = note.querySelector('img'), nsrc = NOTE + c.code + '.png';
@@ -1186,7 +1442,7 @@ function renderLevel(){
     b.className = 'level' + (c.level === k + 1 ? ' sel' : '');
     b.innerHTML = `<span class="lv-tab">${lv.title}</span><span class="lv-box">`
       + `<span class="lv-name"><span>「${lv.name}」</span><span class="lv-pts">+${pts}</span></span>`
-      + `<span class="lv-desc">${lv.desc}</span></span>`;
+      + `<span class="lv-desc">${fa.state[k] || lv.desc}</span></span>`;   // 說明用這張卡自己的「現在能夠做到的」
     b.onclick = () => {
       c.level = k + 1; renderLevel();
       // 不是最後一張：選完自動到下一張；最後一張：等使用者按「確認完成」
@@ -1256,18 +1512,15 @@ function pickTop(){
 function showResult(){
   const total = chosen().reduce((s, c) => s + points(c), 0);
   const top = pickTop(), f = FACTORS[top.code], lv = Math.max(1, top.level) - 1;
-  $('#resScore').textContent = fill(TEXT.scoreFinal, {n:total});
-  $('#resTopTitle').textContent = TEXT.resTop;
-  const ce = cardEl(top.code); ce.onclick = () => zoom(top.code);
-  $('#resCard').replaceChildren(ce);
-  $('#resName').textContent = f.name;
-  $('#resSkill').textContent = fill(TEXT.resSkill, {s:f.skill});
-  $('#resLevel').textContent = fill(TEXT.resLevel, {l:TEXT.levels[lv].title});
-  $('#resStateT').textContent = TEXT.resState; $('#resState').textContent = f.state[lv];
-  $('#resTipT').textContent = TEXT.resTip;     $('#resTip').textContent = f.tip[lv];
-  $('#resNote').textContent = TEXT.resNote;
+  $('#recTitle').textContent = TEXT.recTitle;
+  $('#recTip').textContent = matchMedia('(hover:hover) and (pointer:fine)').matches ? TEXT.recTipPC : TEXT.recTip;
+  $('#recSave').textContent = TEXT.recSave;
+  $('#recImg').alt = `${TEXT.recSkillT}：${f.skill}。${TEXT.recStateT}：${f.state[lv]}。${TEXT.recTipT}：${f.tip[lv]}`;
+  makeRecord(top, f, lv, total);
   $('#resGift').textContent = TEXT.resGift;
   $('#shopText').innerHTML = TEXT.shopText;
+  const verse = t => t.replace(/。(?!$)/g, '。，').split('，').filter(Boolean).join('<br>');   // 不用逗號，一個短句一行
+  $('#resEnd').innerHTML = '<p class="who">小知</p>' + TEXT.closing.concat(fromStory ? [TEXT.closingFeather] : []).map(t => `<p>${verse(t)}</p>`).join('');
   $('#shopBtn').textContent = FILES.shop ? TEXT.shopBtn : TEXT.soon; $('#shopBtn').disabled = !FILES.shop;
   lastResult = { theme: THEMES[theme] ? THEMES[theme].name : '', score: total,
     card: top.code, factor: f.name, level: lv + 1 };
@@ -1275,6 +1528,133 @@ function showResult(){
   show('s-result'); $('#s-result').scrollTop = 0;
 }
 $('#shopBtn').onclick = () => window.open(FILES.shop, '_blank');
+
+/* ---------- 花園紀錄卡（畫成圖片：手機長按可儲存，電腦按鈕下載；右下角押 logo 水印） ---------- */
+let recBlob = null, recUrl = null;
+const RECORD = { logo: IMG + 'logo-mark.png' };
+function loadImg(src){
+  return new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+}
+function wrapText(ctx, text, maxW){                 // 中文逐字換行，標點不放在行首
+  const lines = []; let line = '';
+  const noStart = '，。、！？；：」』）…～';
+  for (const ch of text){
+    const t = line + ch;
+    if (ctx.measureText(t).width > maxW && line && !noStart.includes(ch)){ lines.push(line); line = ch; }
+    else line = t;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+function rrect(ctx, x, y, w, h, r){ ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+async function makeRecord(top, f, lv, total){
+  let img = $('#recImg');
+  if (img.tagName !== 'IMG'){ const n = document.createElement('img'); n.id = 'recImg'; img.replaceWith(n); img = n; }
+  img.removeAttribute('src'); $('#recSave').disabled = true;
+  await Promise.all(['400 40px FYSong', '400 30px Rounded', '500 30px Rounded'].map(x => document.fonts.load(x).catch(() => {})));
+  const card = await loadImg(CARD + top.code + '.webp') || await loadImg(CARD + top.code + '.png');
+  const logo = await loadImg(RECORD.logo);
+  const W = 1080, M = 64, L = M + 64, TW = W - L * 2;
+  const ink = '#2f4651', blue = '#4e7486', red = '#a85a54', quiet = '#7a8f99';
+  const SONG = 'FYSong, "Noto Serif TC", serif', RND = 'Rounded, "PingFang TC", "Microsoft JhengHei", sans-serif';
+  const cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+  const LOGO_H = 170; let logoBox = { top: 0, h: LOGO_H };
+  // 先量高度，再真的畫
+  const paint = draw => {
+    let y = M + 96;
+    const text = (t, font, color, x, yy, align = 'left', ls = '0px') => {
+      if (!draw) return; ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align;
+      if ('letterSpacing' in ctx) ctx.letterSpacing = ls; ctx.fillText(t, x, yy);
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+    };
+    const para = (t, font, color, x, w, lh) => {
+      ctx.font = font; const ls = wrapText(ctx, t, w);
+      ls.forEach((l, i) => text(l, font, color, x, y + i * lh));
+      y += (ls.length - 1) * lh;
+    };
+    // 主題｜標題
+    text(`${THEMES[theme] ? THEMES[theme].name + '｜' : ''}${TEXT.recSkillT}`, `500 32px ${RND}`, blue, W / 2, y, 'center', '3px');
+    // 能力（最大）
+    y += 132; ctx.font = `400 112px ${SONG}`;
+    text(`「${f.skill}」`, `400 112px ${SONG}`, red, W / 2, y, 'center', '6px');
+    // 分隔線
+    y += 58;
+    if (draw){ ctx.strokeStyle = 'rgba(78,116,134,.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(W / 2 - 120, y); ctx.lineTo(W / 2 + 120, y); ctx.stroke();
+      ctx.fillStyle = blue; ctx.beginPath(); ctx.arc(W / 2, y, 5, 0, Math.PI * 2); ctx.fill(); }
+    // 因素卡＋因素名稱＋階段
+    y += 50;
+    const cw = 200, ch = Math.round(cw * 1642 / 804), cx = L + 10;
+    if (draw && card){ ctx.save(); ctx.shadowColor = 'rgba(47,70,81,.22)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8;
+      rrect(ctx, cx, y, cw, ch, 14); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
+      ctx.save(); rrect(ctx, cx, y, cw, ch, 14); ctx.clip(); ctx.drawImage(card, cx, y, cw, ch); ctx.restore(); }
+    const rx = cx + cw + 56, ry = y + ch / 2;
+    text(TEXT.recFrom, `400 30px ${RND}`, blue, rx, ry - 78, 'left', '2px');
+    text(f.name, `400 64px ${SONG}`, ink, rx, ry + 8, 'left', '3px');
+    const lvText = `${TEXT.levels[lv].title}｜${TEXT.levels[lv].name}`;
+    ctx.font = `500 29px ${RND}`; const pw = ctx.measureText(lvText).width + 48;
+    if (draw){ rrect(ctx, rx, ry + 44, pw, 56, 28); ctx.fillStyle = 'rgba(78,116,134,.12)'; ctx.fill(); }
+    text(lvText, `500 29px ${RND}`, blue, rx + 24, ry + 82);
+    y += ch + 92;
+    // 現在的你能夠做到的
+    text(TEXT.recStateT, `500 32px ${RND}`, blue, L, y, 'left', '2px');
+    y += 64; para(f.state[lv], `400 40px ${SONG}`, ink, L, TW, 66);
+    // 可以繼續練習的方向（底色框）
+    y += 70;
+    const boxTop = y - 4, bp = 40;
+    ctx.font = `400 40px ${SONG}`; const tl = wrapText(ctx, f.tip[lv], TW - bp * 2);
+    const boxH = bp + 40 + 64 + (tl.length - 1) * 66 + bp + 6;
+    if (draw){ rrect(ctx, L - 8, boxTop, TW + 16, boxH, 24); ctx.fillStyle = 'rgba(168,90,84,.08)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(168,90,84,.25)'; ctx.lineWidth = 2; ctx.stroke(); }
+    y = boxTop + bp + 32;
+    text(TEXT.recTipT, `500 32px ${RND}`, red, L + bp - 8, y, 'left', '2px');
+    y += 64; para(f.tip[lv], `400 40px ${SONG}`, ink, L + bp - 8, TW - bp * 2, 66);
+    // 最下面一區：左邊分數、日期與署名；右邊 logo 水印（跟上面的框保持距離）
+    const footTop = boxTop + boxH + 56;
+    y = footTop + 30;
+    text(fill(TEXT.recScore, {n:total}), `500 26px ${RND}`, quiet, L, y);
+    y += 42; para(TEXT.recScoreNote, `400 26px ${RND}`, quiet, L, TW - 170, 42);
+    y += 48;
+    const d = new Date(), date = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+    text(`${date}　${TEXT.recSign}`, `400 26px ${RND}`, quiet, L, y);
+    logoBox = { top: footTop, h: LOGO_H };
+    return Math.max(y + 40, footTop + LOGO_H) + 40 + M;
+  };
+  const H = Math.max(1350, Math.ceil(paint(false)));
+  cv.width = W; cv.height = H;
+  // 背景：跟網站一樣的霧藍＋上下波點
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#dce6eb'); g.addColorStop(1, '#c4d3da');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(255,255,255,.7)';
+  for (let yy = 8; yy < H; yy += 18){
+    const k = Math.max(0, 1 - Math.min(yy, H - yy) / 150); if (!k) continue;
+    for (let xx = (yy / 18 % 2) * 9; xx < W; xx += 18){ ctx.beginPath(); ctx.arc(xx, yy, 1 + 3 * k, 0, Math.PI * 2); ctx.fill(); }
+  }
+  // 紙卡
+  ctx.save(); ctx.shadowColor = 'rgba(47,70,81,.18)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 12;
+  rrect(ctx, M, M, W - M * 2, H - M * 2, 36); ctx.fillStyle = '#fbf7ec'; ctx.fill(); ctx.restore();
+  rrect(ctx, M + 14, M + 14, W - M * 2 - 28, H - M * 2 - 28, 26); ctx.strokeStyle = 'rgba(78,116,134,.22)'; ctx.lineWidth = 2; ctx.stroke();
+  paint(true);
+  // logo 水印：右下角
+  if (logo){ const lh = LOGO_H, lw = lh * logo.width / logo.height;
+    ctx.globalAlpha = .6; ctx.drawImage(logo, W - L - lw + 8, logoBox.top, lw, lh); ctx.globalAlpha = 1; }
+  try {
+    recBlob = await new Promise(r => cv.toBlob(r, 'image/png'));
+    if (recUrl) URL.revokeObjectURL(recUrl);
+    recUrl = URL.createObjectURL(recBlob); img.src = recUrl; $('#recSave').disabled = false;
+  } catch (e){                                   // 用電腦直接開檔案時瀏覽器不允許輸出圖片，改成直接顯示
+    cv.id = 'recImg'; img.replaceWith(cv);
+  }
+}
+$('#recSave').onclick = async () => {
+  if (!recBlob) return;
+  const name = '遺落成華_花園紀錄卡.png', file = new File([recBlob], name, { type:'image/png' });
+  const phone = matchMedia('(hover:none) and (pointer:coarse)').matches;
+  if (phone && navigator.canShare && navigator.canShare({ files:[file] })){
+    try { await navigator.share({ files:[file] }); return; } catch (e){ if (e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a'); a.href = recUrl; a.download = name; document.body.append(a); a.click(); a.remove();
+};
+
 
 /* 回饋 */
 function setupFeedback(){
