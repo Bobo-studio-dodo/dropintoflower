@@ -12,7 +12,7 @@
   story.html                  ← 支線 A：小故事
   cards.html                  ← 支線 B：開始排卡(陣)
   shop.html                   ← 支線 C：購買卡牌
-  fonts/GenSenRounded-R-site.woff2、-M-site.woff2（全站共用的源泉圓體）
+  fonts/GenSenRounded-R.woff2、-M.woff2、FengYaSong.woff2（全站共用字型，常用字版）
   site-bg.css                 ← 背景（全站共用：霧藍底＋上下波點，不用圖片）
   images/logo-vertical.png    ← 專案 logo（1283×1283，透明背景）
   images/btn-story.png        ← 支線 A：整張圖就是按鈕（長方形約 3.2:1，建議 1200×375，透明背景）
@@ -25,11 +25,11 @@
 <style>
   html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
 
-  @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R-site.woff2") format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M-site.woff2") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
+  @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
   @font-face {
     font-family: "FYSong";          /* 猫啃网风雅宋（已加寬 10% 的網站版） */
-    src: url("fonts/FengYaSong-site.woff2") format("woff2");
+    src: url("fonts/FengYaSong.woff2?v=1118b") format("woff2");
     font-display: swap;
   }
 
