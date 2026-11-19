@@ -1,4 +1,13 @@
 /* ═══════════════════════════════════════════════
+   全站字型（每頁共用；改了字型檔就把 ?v= 後面的版本號改一下）
+   Rounded：源泉圓體 GenSenRounded2（SIL OFL 授權），內文
+   FYSong ：猫啃网风雅宋（已加寬 16% 的網站版），標題
+   ═══════════════════════════════════════════════ */
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}
+@font-face{font-family:"FYSong";src:url("fonts/FengYaSong.woff2?v=1119b") format("woff2");font-display:swap}
+
+/* ═══════════════════════════════════════════════
    《遺落成華》全站共用背景：雲裡霧裡的天空
    天空漸層＋右上一點暖光＋中間一層薄霧（不動）
    ＋上方慢慢飄的雲絲（::before）＋下方慢慢流動的雲海（::after）

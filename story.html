@@ -13,12 +13,12 @@
   第三段｜寫在羽毛上：在羽毛紙寫下遺憾 → 羽毛飄落到選的花上→ 寫好了：實體體驗卡牌／線上體驗卡牌；先跳過：直接到結尾
   結尾：感謝＋神秘小禮物＋花園牆，下方回饋表單
 
-  素材（images/；網頁先讀 .webp，讀不到才用同名 .png）
+  素材（images/）
   信箱      mailbox2（有信）、mailbox（取出信後的空信箱）
   信封      letter-close、letter-open（1000×1000；小知從信封開口探出頭）
   小知      keeper1
   花園背景  garden-night（電腦，2400×1350）、garden-night-m（手機，1080×1920）
-  花苞      bud1-down 洋甘菊、bud2-down 桔梗花、bud3-down 繡球花、bud4-down 櫻花、bud-seed 種子（400×600）
+  花苞      bud1-down 洋甘菊、bud2-down 桔梗花、bud3-down 繡球花、bud4-down 櫻花、bud-seed 種子（高 520）
             「看過」「微亮」不用另外畫，用程式調整亮度與光暈
   介紹卡圖  flower1～flower4（正方形，網頁版 1000×1000）
   羽毛      feather（300×600）
@@ -29,17 +29,13 @@
 
 <script>
 function imgOk(i){ i.parentElement.classList.remove('empty'); }
-function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；png 也沒有才顯示佔位框
+function imgMiss(i){                 // 圖片讀不到：顯示佔位框
   const f = i.getAttribute('src') || '';
-  if (f.endsWith('.webp')) { i.src = f.replace(/\.webp$/, '.png'); return; }
   i.parentElement.classList.add('empty'); i.parentElement.dataset.file = f;
   console.warn('找不到圖片：' + f);
 }
 </script>
 <style>
-  @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
-  @font-face{font-family:"FYSong";src:url("fonts/FengYaSong.woff2?v=1119b") format("woff2");font-display:swap}  /* 猫啃网风雅宋（加寬 16%） */
   :root{
     --blue:#789baa; --deep:#4e7486; --rose:#e1beb9; --cream:#f7eed0; --blush:#f1e0e4; --lav:#ede2ef;
     --ink:#3d535d; --night:#1f2b31; --paper:#f8f5ee;
@@ -91,8 +87,6 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
   @keyframes cuebob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,6px)}}
   .glow{filter:drop-shadow(0 0 14px rgba(255,255,255,.85));animation:pulse 1.8s ease-in-out infinite}
   @keyframes pulse{50%{scale:1.04}}
-  .shake{animation:shake .35s}
-  @keyframes shake{25%{translate:-6px 0}75%{translate:6px 0}}
   .popin{animation:popin .6s cubic-bezier(.2,.9,.3,1.2)}
   @keyframes popin{from{scale:.6;opacity:0}to{scale:1;opacity:1}}
 
@@ -169,11 +163,10 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
   /* ───── 對話框 ───── */
   #talk{position:fixed;z-index:30;left:50%;transform:translateX(-50%);bottom:var(--gap);
     font-size:var(--em);line-height:1.7;line-break:strict;text-wrap:pretty;
-    width:min(92vw,20em);padding:.5em 1em .4em;border-radius:26px;display:flex;flex-direction:column;gap:4px;
-    border:3px solid var(--blue);background:var(--tb);cursor:pointer;box-shadow:0 6px 0 rgba(120,155,170,.35)}
+    width:min(92vw,20em);padding:.5em 1em .4em;display:flex;flex-direction:column;gap:4px;cursor:pointer}
   #talk[data-w="1"]{--tb:var(--cream)}
   #talk[data-w="2"]{--tb:var(--cream)}
-  #talk-name{font-size:.62em;letter-spacing:.2em;color:var(--deep);margin-bottom:-4px}
+  #talk-name{margin-bottom:-4px}
   #talk-text{position:relative}
   #choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
   #choices button{flex:1 1 45%;font-size:calc(var(--em) * .8);padding:8px 14px;border-radius:999px;border:0;
@@ -206,8 +199,7 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
   /* ───── 彈出視窗 ───── */
   .ov{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:16px;
     background:rgba(31,43,49,.5);backdrop-filter:blur(3px)}
-  .mbox,.cbox{width:min(92vw,calc(var(--em) * 22),720px);padding:26px 24px;border-radius:24px;background:var(--cream);border:2px solid var(--paper);text-align:center;
-    box-shadow:0 10px 30px rgba(31,43,49,.3)}
+  .mbox,.cbox{width:min(92vw,calc(var(--em) * 22),720px);padding:26px 24px;border-radius:24px;text-align:center}
   .cbox{max-height:92svh;overflow:auto}
   @media (max-width:380px){ .cbox{padding:22px 14px} }
   .cbox h3,.cbox p,.mbox h3,.mbox p{word-break:normal;overflow-wrap:anywhere;text-wrap:pretty;line-break:strict}
@@ -217,19 +209,19 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
   .mbox input{width:100%;font:inherit;font-size:22px;text-align:center;padding:10px;border-radius:14px;
     border:2px solid var(--blue);background:#fff;color:var(--ink);user-select:text}
   .mbox input:focus{outline:3px solid var(--blue)}
-  #err{min-height:30px;margin:8px 0;font-size:18px;color:#a0524a}
+  #err{min-height:30px;margin:8px 0;font-size:18px}
   .big{display:block;width:100%;margin:10px 0 12px;font-size:max(18px,calc(var(--em) * .82));padding:11px 18px;
     border-radius:999px;border:0;letter-spacing:.06em;box-shadow:0 3px 0 rgba(61,83,93,.2);transition:transform .15s;background:var(--deep);color:#fff}
   .big:active{transform:translateY(2px)}
   .big.light{background:var(--blue)}
-  .link{border:0;background:none;color:var(--deep);text-decoration:underline;text-underline-offset:4px;font-size:clamp(17px,.4vw + 14px,20px);padding:6px}
+  .link{border:0;background:none;text-decoration:underline;text-underline-offset:4px;font-size:clamp(17px,.4vw + 14px,20px);padding:6px}
   .big:focus-visible,.link:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 
   /* 介紹卡：花圖＋花名｜主題＋一句話＋花語＋介紹 */
   #intro .cbox{text-align:left;padding-top:18px}
   #in-pic{position:relative;height:min(30svh,440px);margin:0 auto 6px;display:flex;justify-content:center}
   #in-pic img{height:100%;width:auto;object-fit:contain;display:block}
-  #intro h3{margin:4px 0 2px;text-align:center;font-weight:normal;font-size:max(24px,calc(var(--em) * 1.1));color:var(--deep);letter-spacing:.06em}
+  #intro h3{margin:4px 0 2px;text-align:center;font-size:max(24px,calc(var(--em) * 1.1));color:var(--deep)}
   #in-one{text-align:center;margin:0 0 10px;font-size:max(16px,calc(var(--em) * .74))!important;color:var(--ink)}
   #in-lang{text-align:center;margin:0 0 12px;padding:8px 0;border-top:1px solid rgba(78,116,134,.25);border-bottom:1px solid rgba(78,116,134,.25);
     font-size:max(15px,calc(var(--em) * .66))!important;color:var(--deep)}
@@ -264,7 +256,7 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
   #cv-ph small{display:block;font-size:.4em;opacity:.8;margin-top:8px}
 
   @media (prefers-reduced-motion:reduce){
-    .glow,.shake,.cue,.popin,.bud.lit img{animation:none} .ch.on,#curtain,.bud,.bud img,#peek img,#mailbox{transition:none}
+    .glow,.cue,.popin,.bud.lit img{animation:none} .ch.on,#curtain,.bud,.bud img,#peek img,#mailbox{transition:none}
   }
   /* ═════ 精緻版外觀：不用方框，文字帶光暈（同「點一朵花」那句），背景整片半霧透明 ═════ */
   :root{--glow:0 0 3px rgba(31,43,49,.85),0 0 3px rgba(31,43,49,.85),0 1px 10px rgba(31,43,49,.7);
@@ -304,7 +296,7 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
     #onsite img.ill{max-width:min(60%,380px)}
   }
 </style>
-<link rel="stylesheet" href="site-bg.css?v=1119b">
+<link rel="stylesheet" href="site-bg.css?v=1119c">
 </head>
 
 <body>
@@ -595,10 +587,6 @@ function guide(el, text) {
   if (!el) return;
   el.querySelector('.cue-t').textContent = text;
   el.classList.add('hinted', 'glow');
-}
-function nudge(el) {
-  el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
-  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
 }
 function popIn(el) { el.classList.remove('popin'); void el.offsetWidth; el.classList.add('popin'); }
 function preload(list) { list.forEach(n => { const i = new Image(); i.src = 'images/' + n; }); }
@@ -930,6 +918,6 @@ function setupStaff(menuEl, groups, btnPos, panelPos, onOpen){
 store.reset();
 guide(mailbox, '取出信件');
 </script>
-<script src="site-fx.js?v=1119"></script>
+<script src="site-fx.js?v=1119b"></script>
 </body>
 </html>

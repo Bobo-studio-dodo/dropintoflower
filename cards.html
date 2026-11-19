@@ -36,13 +36,6 @@
 }
 
 /* =================================================== */
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
-@font-face{
-  font-family:"FYSong";             /* 猫啃网风雅宋（已加寬 16% 的網站版） */
-  src:url("fonts/FengYaSong.woff2?v=1119b") format("woff2");
-  font-display:swap;
-}
 .dialog .text,#talkPanel .pk p,.level,#s-result,.box p,.rv .tip,#toast{text-wrap:pretty;line-break:strict}
 .result,.level,#talkPanel .pk p{font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -99,7 +92,7 @@ img{-webkit-user-drag:none;user-select:none}
 .cover.noimg img{display:none}
 #cover{height:min(64dvh,680px)}
 #coverTalk{height:min(40dvh,440px);flex:0 1 auto;min-height:110px}
-#loadText{font-size:clamp(19px,4.8vw,24px);letter-spacing:.1em;
+#loadText{font-size:clamp(19px,4.8vw,24px);
   background:rgba(247,238,208,.85);padding:8px 22px;border-radius:999px}
 #loadText.ready{animation:breathe 2.2s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:1}50%{opacity:.45}}
@@ -108,16 +101,15 @@ img{-webkit-user-drag:none;user-select:none}
 #s-talk{justify-content:center;gap:18px}
 /* 對話框：與故事線（A）相同的樣式與字級 */
 .dialog{--em:clamp(22px,3.6vmin,38px);font-size:var(--em);
-  width:min(92vw,19em);background:#f7eed0;color:#3d535d;border-radius:26px;
-  border:3px solid #789baa;padding:12px 1em 10px;box-shadow:0 6px 0 rgba(120,155,170,.35);flex:none}
+  width:min(92vw,19em);padding:12px 1em 10px;flex:none}
 .dialog .text{font-size:1em;line-height:1.7;line-break:strict;min-height:1.7em}
 .dialog .text ul{list-style:none;margin-top:4px}
 .dialog .text li{margin:6px 0;font-size:.9em;line-height:1.45}
-.dialog .text b{color:#a85a54;font-weight:normal}
+.dialog .text b{font-weight:normal}
 .dialog .nav{display:flex;justify-content:space-between;margin-top:2px}
-.dialog .nav button{color:inherit;font-size:clamp(16px,.6vw + 12px,20px);padding:4px 2px;opacity:.7;letter-spacing:.12em;transition:opacity .2s}
+.dialog .nav button{font-size:clamp(16px,.6vw + 12px,20px);padding:4px 2px;opacity:.7;letter-spacing:.12em;transition:opacity .2s}
 .dialog .nav button:hover{opacity:1}
-#talkNext.end{background:#4e7486;color:#fff;padding:6px 20px;border-radius:999px;opacity:1}
+#talkNext.end{padding:6px 20px;border-radius:999px;opacity:1}
 
 /* 三種分類的說明區塊（顏色對應分類按鈕） */
 #talkPanel{display:none;flex-direction:column;gap:12px;width:min(100%,620px);flex:0 1 auto;min-height:0;overflow-y:auto}
@@ -127,11 +119,9 @@ img{-webkit-user-drag:none;user-select:none}
 #talkPanel .pk:nth-child(2){animation-delay:.25s}
 #talkPanel .pk:nth-child(3){animation-delay:.5s}
 /* 標題：獨立的色塊標籤，貼在說明框上方 */
-#talkPanel .pk h3{display:inline-block;font-weight:normal;font-size:clamp(21px,5.4vw,26px);color:#fff;
-  padding:4px 18px 2px;border-radius:12px 12px 0 0;margin-left:12px}
+#talkPanel .pk h3{display:inline-block;font-size:clamp(21px,5.4vw,26px);margin-left:12px}
 /* 說明：淺色框、深色字 */
-#talkPanel .pk p{font-size:clamp(18px,4.6vw,22px);line-height:1.6;color:var(--ink);background:rgba(250,244,228,.97);
-  border:2.5px solid;border-radius:14px;padding:10px 16px;box-shadow:0 3px 0 rgba(60,45,40,.18)}
+#talkPanel .pk p{font-size:clamp(18px,4.6vw,22px);line-height:1.6;border-radius:14px}
 #talkPanel .pk.a h3{background:#a85a54}  #talkPanel .pk.a p{border-color:#a85a54}
 #talkPanel .pk.b h3{background:#7a6694}  #talkPanel .pk.b p{border-color:#7a6694}
 #talkPanel .pk.c h3{background:#4e7486}  #talkPanel .pk.c p{border-color:#4e7486}
@@ -211,11 +201,10 @@ body.noseed .seed{background:none}
 body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12% auto;border-radius:50%;background:var(--branch)}
 .seed.ghost{opacity:.22}
 #s-seed{gap:10px}
-#seedPool{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:360px}
-.seedrow{display:flex;align-items:center;gap:12px;width:min(100%,560px);margin:0 auto 12px;
-  background:rgba(247,238,208,.88);border-radius:16px;padding:10px}
+#seedPool{display:flex;justify-content:center;gap:2px}
+.seedrow{display:flex;align-items:center;gap:12px;width:min(100%,560px);margin:0 auto 12px;padding:10px}
 .seedrow .card{width:68px;flex:none;cursor:zoom-in}
-.seedrow .mid{flex:1;display:flex;flex-wrap:wrap;gap:2px;align-items:center;min-width:0}
+.seedrow .mid{flex:1;display:flex;min-width:0}
 .seedrow .ctrl{display:flex;flex-direction:column;align-items:center;gap:4px}
 .seedrow .ctrl button{width:42px;height:42px;border-radius:50%;background:var(--blue);color:#fff;font-size:24px;line-height:1}
 .seedrow .ctrl button:disabled{opacity:.3}
@@ -291,7 +280,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .result p{font-size:clamp(18px,4.6vw,22px);line-height:1.75}
 
 .res-gift{margin-top:10px;color:#a85a54}
-.res-shop{margin-top:16px;padding-top:14px;border-top:1px solid var(--hair);text-align:center}
+.res-shop{margin-top:16px;padding-top:14px;text-align:center}
 .res-shop p{font-size:clamp(16px,4.2vw,19px)!important;margin-bottom:10px}
 .panel2{width:min(100%,640px);background:rgba(250,244,228,.97);border-radius:20px;padding:20px 20px;
   border:2px solid var(--frame);box-shadow:0 4px 14px rgba(90,74,66,.16);text-align:center}
@@ -433,14 +422,11 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 @media (min-width:600px) and (max-aspect-ratio:1/1){ .record{width:min(100%,600px)} .rec-title{font-size:27px} .rec-tip{font-size:19px} }
 @media (min-aspect-ratio:1/1) and (min-width:900px){ .record{width:min(46vw,520px)} }
 /* ═════ 小知的結尾 ═════ */
-.closing{width:min(100%,640px);text-align:center;color:#f7eed0;padding:6px 6px 4px;
-  font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
-  text-shadow:0 0 3px rgba(31,43,49,.85),0 0 3px rgba(31,43,49,.85),0 1px 10px rgba(31,43,49,.7)}
+.closing{width:min(100%,640px);text-align:center;padding:6px 6px 4px;
+  font-family:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif}
 .closing .who{font-family:"Rounded","PingFang TC","Microsoft JhengHei",sans-serif;letter-spacing:.3em;font-size:clamp(15px,3.8vw,18px);opacity:.85;margin-bottom:6px}
-.closing p{font-size:clamp(18px,4.6vw,22px);line-height:1.85;text-wrap:pretty;line-break:strict}
-.closing p + p{margin-top:10px}
-.closing::before{content:"";display:block;width:72px;height:1px;margin:0 auto 16px;
-  background:linear-gradient(90deg,transparent,#f7eed0 30%,#f7eed0 70%,transparent)}
+.closing p{font-size:clamp(18px,4.6vw,22px);line-break:strict}
+.closing::before{content:"";display:block;height:1px;margin:0 auto 16px}
 
 /* ═════ 平板直放（寬 600px 以上、直式）：整體放大，填滿畫面 ═════ */
 @media (min-width:600px) and (max-aspect-ratio:1/1){
@@ -596,7 +582,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .closing .who{color:#4e7486}
 .closing::before{background:var(--hairL)!important;width:180px!important}
 </style>
-<link rel="stylesheet" href="site-bg.css?v=1119b">
+<link rel="stylesheet" href="site-bg.css?v=1119c">
 </head>
 <body>
 <div class="site-bg" aria-hidden="true"></div>
@@ -775,8 +761,8 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
    ✏️ 文字與檔案設定：只要修改引號「' '」裡面的文字即可
    ========================================================= */
 const IMG  = 'images/';                  // 共用圖片資料夾
-const CARD = 'images/cards/card/';       // 卡牌圖（C01.png、F01.png…）
-const NOTE = 'images/cards/ability/';    // 能力便條紙圖（檔名與卡牌相同：C01.png、F01.png…）
+const CARD = 'images/cards/card/';       // 卡牌圖（C01.webp、F01.webp…）
+const NOTE = 'images/cards/ability/';    // 能力便條紙圖（檔名與卡牌相同：C01.webp、F01.webp…）
 const FILES = {
   home:   'index.html',     // 回到首頁
   shop:     'shop.html',          // 購買卡牌頁（首頁 C 支線）
@@ -1073,9 +1059,8 @@ function cardEl(code, opt = {}){
   d.className = 'card'; d.dataset.code = code;
   const img = document.createElement('img');
   img.alt = code; img.decoding = 'async'; img.src = CARD + code + '.webp';
-  if (failed.has(CARD + code + '.webp')) img.src = CARD + code + '.png';
-  img.onerror = () => {             // webp 讀不到時改用 png，再不行就顯示編號
-    if (img.src.endsWith('.webp')) img.src = CARD + code + '.png'; else d.classList.add('noimg'); };
+  if (failed.has(CARD + code + '.webp')) d.classList.add('noimg');
+  img.onerror = () => d.classList.add('noimg');   // 讀不到就顯示編號
   const ph = document.createElement('div'); ph.className = 'ph'; ph.textContent = code;
   d.append(img, ph);
   return d;
@@ -1124,7 +1109,7 @@ async function preload(){
   const first = [...COMMON, ...(theme ? THEMES[theme].cards : [])];
   const rest = Object.values(THEMES).flatMap(t => t.cards).filter(c => !first.includes(c));
   const later = [...[...first, ...rest].map(c => CARD + c + '.webp'), FILES.flowerOn, FILES.flowerOff,
-    ...[...first, ...rest].map(c => NOTE + c + '.png')];
+    ...[...first, ...rest].map(c => NOTE + c + '.webp')];
   (async () => { for (let i = 0; i < later.length; i += 4) await Promise.all(later.slice(i, i + 4).map(s => loadImg(s, 20000))); })();
 
   const lt = $('#loadText'); lt.textContent = TEXT.ready; lt.classList.add('ready');
@@ -1407,7 +1392,7 @@ function renderLevel(){
   $('#levelQ').textContent = fill(TEXT.levelQ, {s:fa.skill});
   const old = $('#levelCard'), el = cardEl(c.code); el.id = 'levelCard';
   el.onclick = () => zoom(c.code); old.replaceWith(el);
-  const note = $('#levelNote'), nimg = note.querySelector('img'), nsrc = NOTE + c.code + '.png';
+  const note = $('#levelNote'), nimg = note.querySelector('img'), nsrc = NOTE + c.code + '.webp';
   note.querySelector('.ph').innerHTML = '能力便條紙<br>' + c.code;
   note.classList.toggle('noimg', failed.has(nsrc));
   nimg.onerror = () => note.classList.add('noimg');
@@ -1529,7 +1514,7 @@ async function makeRecord(top, f, lv, total){
   if (img.tagName !== 'IMG'){ const n = document.createElement('img'); n.id = 'recImg'; img.replaceWith(n); img = n; }
   img.removeAttribute('src'); $('#recSave').disabled = true;
   await Promise.all(['400 40px FYSong', '400 30px Rounded', '500 30px Rounded'].map(x => document.fonts.load(x).catch(() => {})));
-  const card = await loadImg(CARD + top.code + '.webp') || await loadImg(CARD + top.code + '.png');
+  const card = await loadImg(CARD + top.code + '.webp');
   const logo = await loadImg(RECORD.logo);
   const W = 1080, M = 64, L = M + 64, TW = W - L * 2;
   const ink = '#2f4651', blue = '#4e7486', red = '#a85a54', quiet = '#7a8f99';
@@ -1790,6 +1775,6 @@ function setupStaff(menuEl, groups, btnPos, panelPos, onOpen){
 window.addEventListener('resize', () => { if ($('#s-sort').classList.contains('show')) renderRing(); });
 preload();
 </script>
-<script src="site-fx.js?v=1119"></script>
+<script src="site-fx.js?v=1119b"></script>
 </body>
 </html>

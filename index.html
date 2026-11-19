@@ -103,7 +103,7 @@ const TEXT = {
       text: '有些遺憾，是想過得更好卻踩進了盲目的泥淖，或是衝動購物來粉飾焦慮；我們用錯了經營生活的方式，直到自由被現實套牢，才懂得代價有多沉重。' }
   ],
   keeperTag: '知更鳥｜小知',
-  keeperCap: '花園的管理員',                         // 頁首小知旁邊的小字
+  keeperRole: '花園的管理員',                        // 寫在「知更鳥｜小知」上面的小字
   keeper: '我會陪你回到那時候，放下那些沒發生的想像與糾結，把遺憾這片壞天氣趕出花園。',
 
   // 結尾邀請
@@ -141,9 +141,6 @@ const TEXT = {
 <style>
   html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
 
-  @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
-  @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
-  @font-face{font-family:"FYSong";src:url("fonts/FengYaSong.woff2?v=1119b") format("woff2");font-display:swap}  /* 猫啃网风雅宋（加寬 16%） */
 
   :root{
     --main:#3f6577;      /* 深藍：標題、主要按鈕 */
@@ -173,7 +170,7 @@ const TEXT = {
 
   /* 區塊：風雅宋標題＋細線分區（不用卡片框） */
   .sec{width:100%;padding:clamp(56px,9vw,110px) max(22px,6vw);text-align:center;position:relative}
-  .sec + .sec::before{content:"";position:absolute;top:0;left:50%;width:min(320px,60%);height:1px;transform:translateX(-50%);background:var(--hair)}
+  .sec + .sec::before{content:"";position:absolute;top:0;left:50%;width:min(320px,60%);height:1px;background:var(--hair)}
   .sec h2{margin:0 0 clamp(18px,2.4vw,28px);font-family:var(--serif);font-weight:400;color:var(--main);
     font-size:clamp(25px,1.3vw + 19px,38px);letter-spacing:.14em;line-height:1.5;text-shadow:var(--glow);text-wrap:balance}
   .sec h2::after{content:"";display:block;width:56px;height:1px;margin:16px auto 0;background:var(--hair)}
@@ -240,10 +237,7 @@ const TEXT = {
   .fl img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
   .fl .bud{opacity:0;filter:saturate(.35) brightness(.92)}
   .keeper{width:100%;height:auto;align-self:end}
-  /* 頁首小知旁的小字「花園的管理員」：手機放在小知頭上 */
-  .garden .keeper{grid-column:5;grid-row:1}
-  .keeper-cap{grid-column:5;grid-row:1;align-self:start;justify-self:center;transform:translateY(-110%);white-space:nowrap;
-    font-family:var(--serif);font-size:clamp(12px,.3vw + 11px,15px);letter-spacing:.14em;color:var(--main);text-shadow:var(--glow);pointer-events:none}
+
   .down{position:relative;z-index:3;margin-top:clamp(6px,1.4svh,14px);color:var(--main);text-decoration:none;font-size:clamp(15px,.4vw + 13px,18px);
     letter-spacing:.14em;text-shadow:var(--glow);padding:6px 10px;animation:bob 2.2s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
@@ -271,7 +265,6 @@ const TEXT = {
     .hero-btns a{width:min(24vw,360px)}
     .garden{grid-column:2;grid-row:1;width:100%;max-width:640px;justify-self:center;grid-template-columns:repeat(4,1fr);grid-template-areas:"k k k k" "a b c d";margin:0}
     .garden .keeper{grid-area:k;width:46%;justify-self:center;margin-bottom:-4%}
-    .keeper-cap{grid-area:k;align-self:center;justify-self:start;margin-left:15%;transform:none;font-size:clamp(15px,.4vw + 12px,18px)}
     .down{grid-column:1 / -1;grid-row:2;justify-self:center}
   }
 
@@ -315,7 +308,6 @@ const TEXT = {
   @keyframes budOut{from{opacity:.6;transform:rotate(0)}to{opacity:0;transform:translateY(-6%) rotate(-6deg)}}
   @keyframes bloomIn{from{opacity:0;transform:translateY(12%) scale(.7)}to{opacity:1;transform:none}}
   .hero.play .keeper{animation:keeperIn .8s ease 5.2s both}
-  .hero.play .keeper-cap{animation:fadeUp .7s ease 5.8s both}
   @keyframes keeperIn{from{opacity:0;transform:translateX(30%)}to{opacity:1;transform:none}}
   .hero.play .mark{animation:fadeIn .6s ease 5.6s both}
   .hero.play .down{animation:fadeIn .6s ease 6.4s both}
@@ -437,6 +429,7 @@ const TEXT = {
   .keeper-say img{width:clamp(130px,22vw,220px);height:auto}
   .keeper-say .words{display:flex;flex-direction:column;gap:10px;align-items:center}
   .keeper-say .tag{font-size:clamp(15px,.3vw + 14px,18px);letter-spacing:.24em;color:var(--main);text-shadow:var(--glow);padding-bottom:8px;position:relative}
+  .keeper-say .role{font-size:clamp(13px,.25vw + 12px,15px);letter-spacing:.3em;color:var(--main);opacity:.8;text-shadow:var(--glow);margin-bottom:-6px}
   .keeper-say .tag::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--hair)}
   .keeper-say blockquote{margin:0;font-family:var(--serif);font-size:clamp(19px,.6vw + 16px,24px);line-height:1.9;color:var(--text);text-shadow:var(--glow);max-width:22em;text-wrap:pretty}
   @media (min-width:900px){ .keeper-say{flex-direction:row;text-align:left;gap:32px} .keeper-say .words{align-items:flex-start} }
@@ -479,7 +472,7 @@ const TEXT = {
     .reply-ov,.reply-card{animation:none}
   }
 </style>
-<link rel="stylesheet" href="site-bg.css?v=1119b">
+<link rel="stylesheet" href="site-bg.css?v=1119c">
 </head>
 
 <body data-fx-petals="back">
@@ -513,7 +506,6 @@ const TEXT = {
       <div class="fl"><img class="bud" src="images/bud3-down.webp" alt="" width="357" height="520"><img class="bloom" src="images/flower3.webp" alt="" width="1000" height="1000"></div>
       <div class="fl"><img class="bud" src="images/bud4-down.webp" alt="" width="520" height="268"><img class="bloom" src="images/flower4.webp" alt="" width="1000" height="1000"></div>
       <img class="keeper" src="images/keeper1.webp" alt="" width="899" height="900">
-      <span class="keeper-cap" data-t="keeperCap"></span>
     </div>
 
     <a class="down" href="#entries" data-t="down"></a>
@@ -541,6 +533,7 @@ const TEXT = {
       <div class="keeper-say reveal">
         <img src="images/keeper1.webp" alt="" width="899" height="900" loading="lazy">
         <div class="words">
+          <span class="role" data-t="keeperRole"></span>
           <span class="tag" data-t="keeperTag"></span>
           <blockquote data-t="keeper"></blockquote>
         </div>
@@ -648,12 +641,6 @@ $('#siteMenu').innerHTML = TEXT.menuGroups.map((g, gi) => {
   const links = TEXT.menu.slice(mi, mi += g.n).map(m => `<a href="${m.href}">${m.t}</a>`).join('');
   return `<p class="mh">${g.t}</p>` + (gi ? `<div class="mgrid">${links}</div>` : links);
 }).join('');
-(() => {
-  const b = document.querySelector('.menu-ico'), m = $('#siteMenu');
-  const set = o => { m.classList.toggle('open', o); b.setAttribute('aria-expanded', o); };
-  b.addEventListener('click', e => { e.stopPropagation(); set(!m.classList.contains('open')); });
-  document.addEventListener('click', () => set(false));
-})();
 
 /* 三個步驟 */
 $('#stepList').innerHTML = TEXT.steps.map(s => `<li class="reveal"><h3>${s.t}</h3><p>${s.d}</p></li>`).join('');
@@ -854,6 +841,6 @@ const boardReady = new Promise(done => {
   hero.addEventListener('click', e => { if (hero.classList.contains('play')){ e.preventDefault(); e.stopPropagation(); finish(); } }, true);
 })();
 </script>
-<script src="site-fx.js?v=1119"></script>
+<script src="site-fx.js?v=1119b"></script>
 </body>
 </html>
