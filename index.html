@@ -23,7 +23,7 @@
   images/flower1~4.webp               開花（開場、心靈花園）
   images/keeper1.webp                 小知
   images/feather.webp                 霧散時飄過的羽毛
-  images/btn-story/cards/shop.png     頁首兩個按鈕、購買卡牌按鈕
+  images/btn-story/cards/shop.webp     頁首兩個按鈕、購買卡牌按鈕
   images/frames/thumb1~4.webp         打卡相框小圖
 
   開場動畫：每個分頁只播一次（sessionStorage），點畫面或「跳過」立刻到最後畫面；
@@ -55,8 +55,8 @@ const TEXT = {
   def: '陪你回到遺憾發生的那一刻，看清當時綁住你的因素，也看見一路走來的成長。',
   // 頁首的兩個圖片按鈕（label 是給讀螢幕軟體的名稱，畫面上不顯示）
   heroBtns: [
-    { href: 'story.html', img: 'images/btn-story.png', label: '進入故事' },
-    { href: 'cards.html', img: 'images/btn-cards.png', label: '線上體驗卡牌' }
+    { href: 'story.html', img: 'images/btn-story.webp', label: '進入故事' },
+    { href: 'cards.html', img: 'images/btn-cards.webp', label: '線上體驗卡牌' }
   ],
   down: '↓ 認識《遺落成華》',
   skip: '跳過',
@@ -74,23 +74,23 @@ const TEXT = {
   menuGroups: [ { t: '開始體驗', n: 2 }, { t: '更多', n: 4 } ],
 
   // 購買卡牌（頁尾資訊欄前面）
-  shop: { href: 'shop.html', img: 'images/btn-shop.png', name: '購買卡牌', note: '把整套卡牌帶回家' },
+  shop: { href: 'shop.html', img: 'images/btn-shop.webp', name: '購買卡牌', note: '把整套卡牌帶回家' },
 
   // 為什麼是遺憾
   whyTitle: '我們常聽見的那些「如果」',
-  why: '常聽身邊的朋友說起遺憾：做過的選擇、不如意的結果。說著說著，對一件事的懊悔，慢慢變成「我是不是很沒用。」的自責。<br>不過，向身邊人傾訴能得到的幫助或許有限，又或是沒有一個合適的對象可以紓發心情。<br>因此我們製作了這套兼具理性和情緒支持卡牌，期望創造一個可以讓人好好面對遺憾的空間。',
+  why: '常聽身邊的朋友說起遺憾：做過的選擇、不如意的結果。說著說著，對一件事的懊悔，慢慢變成「我是不是很沒用。」的自責。朋友傾訴能得到的幫助有限，有時候或許會因此更難過，所以我們製作了這套卡牌，帶給遺憾一個可以好好面對的空間。',
 
   // 卡牌怎麼陪你
-  howTitle: '如何陪伴你走過遺憾？',
+  howTitle: '情緒價值與理性分析並存',
   steps: [
-    { t: '思緒回到那時',     d: '寫下遺憾，它屬於哪一種花。' },
-    { t: '看清當時的困境', d: '一張一張閱讀因素卡，分辨出哪些是可以改變的、恆久不變的，又或是沒有關聯的。' },
-    { t: '看見一路的成長', d: '思緒回到此刻，現在的你已經走多遠了，又獲得些什麼不同呢？' }
+    { t: '回到那一刻',     d: '寫下遺憾，選出它屬於哪一種花。' },
+    { t: '看清當時的困境', d: '一張一張看過因素卡，分出可以改變的、恆久不變的、沒有關聯的。' },
+    { t: '看見一路的成長', d: '回到此刻，現在的你已經走多遠了。' }
   ],
 
   // 心靈花園（調查人數確定後，可以把「大學生最常見的四種遺憾」改成「我們調查 N 位大學生後整理出的四種遺憾」）
   gardenTitle: '每個人心裡，都有一座花園',
-  garden: '花園裡有著四種花，對應大學生常見的四種遺憾。<br>當遺憾徘徊於此，它會奪走花園的養分、遮住溫暖的陽光。<br>花將無法勇敢勝放。',
+  garden: '花園裡種著四種花，對應大學生最常見的四種遺憾。<br>當遺憾徘徊不去，它會奪走土壤的養分、遮住陽光，花就開不了。',
   flipHint: '點一朵花，翻面看看它的故事',
   flowers: [
     { img: 'images/flower1.webp', name: '洋甘菊', theme: '友情',     one: '和朋友之間的交集',
