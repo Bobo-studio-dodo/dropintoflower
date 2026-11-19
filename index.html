@@ -3,273 +3,597 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#cbd7dd">
-<title>遺落成華</title>
+<meta name="theme-color" content="#cfdbe1">
+<title>遺落成華｜把「如果」，慢慢變成「原來」</title>
+<meta name="description" content="《遺落成華》：以遺憾為主題的自我探索卡牌。陪你回到遺憾發生的那一刻，看清當時綁住你的因素，也看見一路走來的成長。">
 
 <!--
-  ═══════════════ 檔案結構（請依此放置素材）═══════════════
-  index.html                  ← 本頁（首頁）
-  story.html                  ← 支線 A：小故事
-  cards.html                  ← 支線 B：開始排卡(陣)
-  shop.html                   ← 支線 C：購買卡牌
-  fonts/GenSenRounded-R.woff2、-M.woff2、FengYaSong.woff2（全站共用字型，常用字版）
-  site-bg.css                 ← 背景（全站共用：霧藍底＋上下波點，不用圖片）
-  images/logo-vertical.png    ← 專案 logo（1283×1283，透明背景）
-  images/btn-story.png        ← 支線 A：整張圖就是按鈕（長方形約 3.2:1，建議 1200×375，透明背景）
-  images/btn-cards.png        ← 支線 B：同上
-  images/btn-shop.png         ← 支線 C：同上
-  按鈕圖寬度由頁面控制、高度跟著圖走；手機一屏版面以約 3.2:1 計算（3:1～4:1 都可）。
-  圖還沒放時，頁面會顯示色票佔位卡片，不會破圖。
+  ═══════════════ 首頁 index.html（依「遺落成華_首頁改版規劃書」）═══════════════
+  由上到下：開場動畫＋頁首（兩個圖片按鈕）→ 為什麼是遺憾 → 卡牌怎麼陪你 → 心靈花園 → 留言板 → 結尾邀請 → 打卡拍照 → 購買卡牌 → 關於我們
+  左上「選單」：進入故事、線上體驗卡牌、留言板、打卡拍照、購買卡牌、聯絡資訊
+  留言板：存在 Google 試算表「留言板」工作表（後台程式見「回饋後台_GoogleAppsScript.txt」），送出後馬上顯示；
+         不想顯示的留言，把試算表裡那一列的「顯示」改成「否」
+
+  用到的檔案
+  site-bg.css                         全站共用背景（霧藍底＋上下波點）
+  fonts/GenSenRounded-R/M.woff2       源泉圓體（內文、按鈕）
+  fonts/FengYaSong.woff2              風雅宋（標題、「如果」句）
+  images/logo-mark.png                左上角小 logo
+  images/bud1~4-down.webp             垂頭花苞（開場）
+  images/flower1~4.webp               開花（開場、心靈花園）
+  images/keeper1.webp                 小知
+  images/feather.webp                 霧散時飄過的羽毛
+  images/btn-story/cards/shop.png     頁首兩個按鈕、購買卡牌按鈕
+  images/frames/thumb1~4.webp         打卡相框小圖
+
+  開場動畫：每個分頁只播一次（sessionStorage），點畫面或「跳過」立刻到最後畫面；
+           系統設定「減少動態」的人直接看到最後畫面。
 -->
+
+<script>
+/* ═══════════════════════════════════════════════
+   ✏️ 首頁所有文字都在這裡，只要改引號裡的字就好
+   （<br> 是換行；「」等標點照常打）
+   ═══════════════════════════════════════════════ */
+const TEXT = {
+  // 開場的「如果」：每次從這三句＋留言板的留言裡隨機挑 3 句
+  ifs: [
+    '如果那時候，選了另一間學校……',
+    '如果那天晚上，沒有按下結帳……',
+    '如果考前，再認真一點點……'
+  ],
+  // 標題（分兩行）：第二行的兩個字會先出現「如果」，再變成紅色的「此刻」
+  titleA: '把「如果」放下，',
+  titleMid: '看見「',
+  titleFrom: '如果',
+  titleTo: '此刻',
+  titleB: '」',
+  sub: '《遺落成華》｜以遺憾為主題的自我探索卡牌',
+  // 卡牌副標題（獻詞），放在頁首副標下面；<br> 是換行
+  dedi: '致——被遺憾困住，<br>但不曾停止成長的你',
+  lead: '遺憾會跨越時間，縈繞不散，直到你直面攤開這個故事。',
+  def: '陪你回到遺憾發生的那一刻，看清當時綁住你的因素，也看見一路走來的成長。',
+  // 頁首的兩個圖片按鈕（label 是給讀螢幕軟體的名稱，畫面上不顯示）
+  heroBtns: [
+    { href: 'story.html', img: 'images/btn-story.png', label: '進入故事' },
+    { href: 'cards.html', img: 'images/btn-cards.png', label: '線上體驗卡牌' }
+  ],
+  down: '↓ 認識《遺落成華》',
+  skip: '跳過',
+
+  // 左上「選單」
+  menu: [
+    { href: 'story.html', t: '進入故事' },
+    { href: 'cards.html', t: '線上體驗卡牌' },
+    { href: '#board',     t: '留言板' },
+    { href: '#photo',     t: '打卡拍照' },
+    { href: 'shop.html',  t: '購買卡牌' },
+    { href: '#about',     t: '聯絡資訊' }
+  ],
+  // 選單分組：t 是小標，n 是這一組包含上面幾個項目（照順序）
+  menuGroups: [ { t: '開始體驗', n: 2 }, { t: '更多', n: 4 } ],
+
+  // 購買卡牌（頁尾資訊欄前面）
+  shop: { href: 'shop.html', img: 'images/btn-shop.png', name: '購買卡牌', note: '把整套卡牌帶回家' },
+
+  // 為什麼是遺憾
+  whyTitle: '我們常聽見的那些「如果」',
+  why: '常聽身邊的朋友說起遺憾：做過的選擇、不如意的結果。說著說著，對一件事的懊悔，慢慢變成「我是不是很沒用。」的自責。<br>不過，向身邊人傾訴能得到的幫助或許有限，又或是沒有一個合適的對象可以紓發心情。<br>因此我們製作了這套兼具理性和情緒支持卡牌，期望創造一個可以讓人好好面對遺憾的空間。',
+
+  // 卡牌怎麼陪你
+  howTitle: '如何陪伴你走過遺憾？',
+  steps: [
+    { t: '思緒回到那時',     d: '寫下遺憾，它屬於哪一種花。' },
+    { t: '看清當時的困境', d: '一張一張閱讀因素卡，分辨出哪些是可以改變的、恆久不變的，又或是沒有關聯的。' },
+    { t: '看見一路的成長', d: '思緒回到此刻，現在的你已經走多遠了，又獲得些什麼不同呢？' }
+  ],
+
+  // 心靈花園（調查人數確定後，可以把「大學生最常見的四種遺憾」改成「我們調查 N 位大學生後整理出的四種遺憾」）
+  gardenTitle: '每個人心裡，都有一座花園',
+  garden: '花園裡有著四種花，對應大學生常見的四種遺憾。<br>當遺憾徘徊於此，它會奪走花園的養分、遮住溫暖的陽光。<br>花將無法勇敢勝放。',
+  flipHint: '點一朵花，翻面看看它的故事',
+  flowers: [
+    { img: 'images/flower1.webp', name: '洋甘菊', theme: '友情',     one: '和朋友之間的交集',
+      text: '有些遺憾，是不知如何好好說話的爭執，或用錯了力道的討好；我們在倔強與沉默裡漸行漸遠，把想珍惜的夥伴，過成了再也回不去的曾經。' },
+    { img: 'images/flower2.webp', name: '桔梗花', theme: '愛情',     one: '對一個人的真心',
+      text: '有些遺憾，是錯把執念當成深愛，或太用力把愛變成了束縛；在不懂愛的歲月裡互相消磨，等到終於學會廣闊的溫柔，那個最想牽的手，早已走散在時光裡。' },
+    { img: 'images/flower3.webp', name: '繡球花', theme: '未來規劃', one: '那時對未來工作和課業的規劃',
+      text: '有些遺憾，是因害怕犯錯而不敢啟程，或是順應了所有人的期待卻唯獨忘記了自己；在不斷的妥協與猶豫裡，發現最痛的，是悄悄的弄丟了心中念想的遠方。' },
+    { img: 'images/flower4.webp', name: '櫻花',   theme: '財務管理', one: '對金錢的取捨',
+      text: '有些遺憾，是想過得更好卻踩進了盲目的泥淖，或是衝動購物來粉飾焦慮；我們用錯了經營生活的方式，直到自由被現實套牢，才懂得代價有多沉重。' }
+  ],
+  keeperTag: '知更鳥｜小知',
+  keeperCap: '花園的管理員',                         // 頁首小知旁邊的小字
+  keeper: '我會陪你回到那時候，放下那些沒發生的想像與糾結，把遺憾這片壞天氣趕出花園。',
+
+  // 結尾邀請
+  invite: '不需要告訴我們故事的細節。<br>這是屬於你自己與自己對話的時刻<br>準備好了，就從小故事開始吧。',
+  inviteBtn: '點此探索故事',
+
+  // 留言板（送出後馬上出現在下面的跑馬燈，也會隨機出現在首頁開場）
+  boardTitle: '寫下你的「如果」',
+  board: '匿名留下一句你的遺憾，想讓你知道，你不是一個人面對。',
+  boardStart: '如果',                                   // 輸入框一開始的字
+  boardPlace: '如果那時候……',
+  boardNote: '請不要寫出別人的名字、聯絡方式或個人資料',
+  boardBtn: '送出',
+  boardOk: '收到了，謝謝你願意寫下來。',
+  boardShort: '再多寫幾個字吧～',
+  boardBad: '這句話好像有網址或電話號碼，請拿掉再送出。',
+  boardWait: '剛剛已經送出囉，過一分鐘再寫下一句吧。',
+  boardFail: '網路好像不太穩，請再試一次。',
+  boardMax: 40,                                         // 最多幾個字
+  // 回應別人的「如果」：點跑馬燈上的一句，跳出小卡，選一句溫柔的回應送給他（可以改字、增減句子）
+  mqHint: '點跑馬燈上的任何一句，送一句溫柔的話給寫下它的人',
+  replies: ['我也有過', '抱抱那時候的你', '你已經走很遠了'],
+  replyHint: '點一句你想說的，把祝福送給他',
+  replyDone: '送出了，謝謝你的溫柔',
+  replyFail: '網路好像不太穩，請再試一次',
+
+  // 打卡拍照（沿用原本的文字）
+  photoTitle: '來拍一張吧！',
+  photoText: '選一個喜歡的濾鏡，<br>來到我們左側打卡區，即可拍照！',
+  photoBtn: '開始拍照',
+  frames: ['洋甘菊', '桔梗花', '繡球花', '櫻花']
+};
+</script>
 
 <style>
   html,*{touch-action:manipulation}   /* 快速連點不會放大；雙指縮放仍可使用 */
 
   @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
-  @font-face {
-    font-family: "FYSong";          /* 猫啃网风雅宋（已加寬 10% 的網站版） */
-    src: url("fonts/FengYaSong.woff2?v=1118b") format("woff2");
-    font-display: swap;
+  @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
+  @font-face{font-family:"FYSong";src:url("fonts/FengYaSong.woff2?v=1119b") format("woff2");font-display:swap}  /* 猫啃网风雅宋（加寬 16%） */
+
+  :root{
+    --main:#3f6577;      /* 深藍：標題、主要按鈕 */
+    --text:#3d5568;      /* 藍：內文 */
+    --accent:#a85a54;    /* 紅：只用在「原來」等重點字 */
+    --line:rgba(63,101,119,.24);
+    --glow:0 0 4px #fff,0 0 12px rgba(255,255,255,.95),0 0 22px rgba(255,255,255,.7);
+    --hair:linear-gradient(90deg,transparent,rgba(63,101,119,.55) 22%,rgba(63,101,119,.55) 78%,transparent);
+    --sans:"Rounded","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    --serif:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{max-width:100%;overflow-x:clip;scroll-behavior:smooth}
+  body{margin:0;font-family:var(--sans);color:var(--text);background:#cfdbe1;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+  img{max-width:100%}
+  a{color:inherit}
+  .missing{visibility:hidden}            /* 圖片讀不到時不顯示破圖 */
+
+  /* ───────── 共用：主要按鈕（深藍膠囊）與次要連結 ───────── */
+  .btn-main{display:inline-flex;align-items:baseline;justify-content:center;gap:.5em;padding:.78em 2.1em;border-radius:999px;
+    background:var(--main);color:#fff;text-decoration:none;font-weight:500;letter-spacing:.14em;
+    font-size:clamp(18px,.5vw + 16px,22px);box-shadow:0 6px 18px rgba(31,43,49,.22);transition:transform .18s,filter .18s}
+  .btn-main small{font-weight:400;font-size:.74em;letter-spacing:.06em;opacity:.85}
+  .btn-main:hover{filter:brightness(1.1);transform:translateY(-2px)}
+  .btn-main:active{transform:scale(.98)}
+  .btn-main:focus-visible,.entry a:focus-visible,.flip:focus-visible,.down:focus-visible{outline:3px solid var(--main);outline-offset:4px}
+
+  /* 區塊：風雅宋標題＋細線分區（不用卡片框） */
+  .sec{width:100%;padding:clamp(56px,9vw,110px) max(22px,6vw);text-align:center;position:relative}
+  .sec + .sec::before{content:"";position:absolute;top:0;left:50%;width:min(320px,60%);height:1px;transform:translateX(-50%);background:var(--hair)}
+  .sec h2{margin:0 0 clamp(18px,2.4vw,28px);font-family:var(--serif);font-weight:400;color:var(--main);
+    font-size:clamp(25px,1.3vw + 19px,38px);letter-spacing:.14em;line-height:1.5;text-shadow:var(--glow);text-wrap:balance}
+  .sec h2::after{content:"";display:block;width:56px;height:1px;margin:16px auto 0;background:var(--hair)}
+  .sec p{margin:0 auto;max-width:32em;font-size:clamp(18px,.45vw + 15.5px,22px);line-height:1.95;text-shadow:var(--glow);
+    text-wrap:pretty;line-break:strict;overflow-wrap:anywhere}
+  .band-soft{background:rgba(255,255,255,.32)}   /* 滿版淡色帶 */
+
+  /* 滑入淡入（只改透明度與位移，版面不會跳） */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .9s ease,transform .9s ease,filter .9s ease}
+  .reveal:not(.in){filter:blur(5px)}             /* 從朦朧慢慢變清楚 */
+  .reveal.in{opacity:1;transform:none}
+  /* 細線：滑到該區塊時，從中間往兩邊慢慢畫出來 */
+  .sec + .sec::before{transform:translateX(-50%) scaleX(0);transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
+  .sec + .sec.seen::before{transform:translateX(-50%) scaleX(1)}
+  .sec h2::after,.steps h3::after,.keeper-say .tag::after{transform:scaleX(0);transition:transform 1.2s cubic-bezier(.2,.7,.2,1) .35s}
+  .sec.seen h2::after,.sec.seen .steps h3::after,.sec.seen .keeper-say .tag::after{transform:scaleX(1)}
+  .sec.seen .steps li:nth-child(2) h3::after{transition-delay:.55s} .sec.seen .steps li:nth-child(3) h3::after{transition-delay:.75s}
+  .steps .reveal:nth-child(2),.entries .reveal:nth-child(2),.flips .reveal:nth-child(2){transition-delay:.12s}
+  .steps .reveal:nth-child(3),.entries .reveal:nth-child(3),.flips .reveal:nth-child(3){transition-delay:.24s}
+  .flips .reveal:nth-child(4){transition-delay:.36s}
+
+  /* ═══════════════ 1–2. 開場動畫＋頁首 ═══════════════ */
+  .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;overflow:hidden;
+    padding:max(18px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
+  .mark{position:absolute;z-index:4;top:max(14px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));
+    height:clamp(58px,11svh,124px);width:auto;opacity:.9}
+  .hero-text{position:relative;z-index:3;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:0;max-width:34em;padding-top:clamp(56px,8svh,90px)}
+  /* 頁首文字層級：小標 → 大標題 → 獻詞 ／ 細線 ／ 導言 → 說明 → 按鈕 */
+  .title{margin:0;font-family:var(--serif);font-weight:400;color:var(--main);line-height:1.45;letter-spacing:.06em;
+    font-size:clamp(28px,3.4vw + 14px,56px);text-shadow:var(--glow);text-wrap:balance}
+  .title .nw{white-space:nowrap}
+  .swap{display:inline-grid}
+  .swap > span{grid-area:1/1}
+  .swap .from{opacity:0}
+  .swap .to{color:var(--accent)}
+  .sub{margin:0 0 clamp(8px,1.4svh,14px);line-height:1.7;font-size:clamp(13.5px,.4vw + 11.5px,17px);letter-spacing:.2em;color:var(--main);opacity:.85;text-shadow:var(--glow);text-wrap:balance}
+  .dedi{margin:clamp(10px,1.6svh,16px) 0 0;font-family:var(--serif);font-size:clamp(16px,.5vw + 13px,20px);line-height:1.75;letter-spacing:.16em;color:var(--main);
+    text-shadow:var(--glow)}
+  .lead{margin:clamp(18px,3svh,30px) 0 0;padding-top:clamp(16px,2.6svh,26px);position:relative;font-family:var(--serif);font-size:clamp(17px,.6vw + 13px,22px);
+    line-height:1.8;color:var(--main);letter-spacing:.06em;text-shadow:var(--glow);text-wrap:balance;line-break:strict}
+  .sub .nw{white-space:nowrap}
+  @media (max-width:599px){ .sub .bar{display:none} .sub .nw{display:block} }   /* 手機：在「｜」處分兩行，避開右上角的 logo */
+  .lead::before{content:"";position:absolute;top:0;left:50%;width:48px;height:1px;margin-left:-24px;background:var(--hair)}
+  .def{margin:clamp(6px,1svh,10px) 0 0;font-size:clamp(15.5px,.5vw + 12.5px,19px);line-height:1.85;opacity:.92;text-shadow:var(--glow);text-wrap:pretty;line-break:strict;max-width:22em}
+  /* 頁首兩個圖片按鈕 */
+  .hero-btns{display:flex;flex-direction:column;align-items:center;gap:clamp(4px,1svh,12px);margin-top:clamp(14px,2.4svh,26px)}
+  .hero-btns a{display:block;width:min(70vw,30svh * 3.2,300px);border-radius:18px;transition:transform .18s,filter .18s}
+  .hero-btns a:hover{transform:translateY(-3px);filter:drop-shadow(0 8px 10px rgba(61,83,93,.24))}
+  .hero-btns a:active{transform:scale(.98)}
+  .hero-btns a:focus-visible{outline:3px solid var(--main);outline-offset:4px}
+  .hero-btns img{display:block;width:100%;height:auto}
+  .hero-btns .fallback{display:none}
+  .hero-btns a.is-empty img{display:none}
+  .hero-btns a.is-empty .fallback{display:flex;aspect-ratio:16/5;align-items:center;justify-content:center;font-family:var(--serif);font-size:22px;
+    color:var(--main);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  /* 開場時先藏起選單 */
+  body.intro .menu-ico{opacity:0;pointer-events:none}
+
+  /* 花園：四朵花＋小知（手機：一排在底部，小知站在最右邊那朵花旁） */
+  .garden{position:relative;z-index:1;width:min(100%,560px);display:grid;grid-template-columns:repeat(4,1fr) 1.15fr;align-items:end;gap:2px;
+    margin-top:clamp(8px,2svh,20px)}
+  .fl{position:relative;aspect-ratio:1}
+  .fl img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
+  .fl .bud{opacity:0;filter:saturate(.35) brightness(.92)}
+  .keeper{width:100%;height:auto;align-self:end}
+  /* 頁首小知旁的小字「花園的管理員」：手機放在小知頭上 */
+  .garden .keeper{grid-column:5;grid-row:1}
+  .keeper-cap{grid-column:5;grid-row:1;align-self:start;justify-self:center;transform:translateY(-110%);white-space:nowrap;
+    font-family:var(--serif);font-size:clamp(12px,.3vw + 11px,15px);letter-spacing:.14em;color:var(--main);text-shadow:var(--glow);pointer-events:none}
+  .down{position:relative;z-index:3;margin-top:clamp(6px,1.4svh,14px);color:var(--main);text-decoration:none;font-size:clamp(15px,.4vw + 13px,18px);
+    letter-spacing:.14em;text-shadow:var(--glow);padding:6px 10px;animation:bob 2.2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+  /* 開場時才出現的東西（播完就不顯示） */
+  .ifs,.mist,.feather,#skip{display:none}
+
+  /* 平板直放：字與花放大 */
+  @media (orientation:portrait) and (min-width:600px){
+    .title{font-size:clamp(44px,6.4vw,64px)}
+    .sub{font-size:18px} .dedi{font-size:22px} .lead{font-size:24px} .def{font-size:21px;max-width:20em}
+    .hero-btns a{width:min(46vw,360px)}
+    .garden{width:min(100%,720px)}
+    .down{font-size:20px}
+    .sec p{font-size:23px} .entry p{font-size:21px} .entry{width:min(80vw,520px)}
+    .board-form textarea{font-size:22px}
+  }
+  /* 電腦、平板橫放：左半文字、右半花與小知 */
+  @media (orientation:landscape) and (min-width:900px){
+    .hero{display:grid;grid-template-columns:1.05fr 1fr;grid-template-rows:1fr auto;align-items:center;column-gap:4vw;
+      padding-left:max(6vw,env(safe-area-inset-left));padding-right:6vw}
+    .hero-text{grid-column:1;grid-row:1;align-items:flex-start;text-align:left;padding-top:0}
+    .lead::before{left:0;margin-left:0}
+    .hero-btns{flex-direction:row;align-items:flex-start}
+    .hero-btns a{width:min(24vw,360px)}
+    .garden{grid-column:2;grid-row:1;width:100%;max-width:640px;justify-self:center;grid-template-columns:repeat(4,1fr);grid-template-areas:"k k k k" "a b c d";margin:0}
+    .garden .keeper{grid-area:k;width:46%;justify-self:center;margin-bottom:-4%}
+    .keeper-cap{grid-area:k;align-self:center;justify-self:start;margin-left:15%;transform:none;font-size:clamp(15px,.4vw + 12px,18px)}
+    .down{grid-column:1 / -1;grid-row:2;justify-self:center}
   }
 
-  :root {
-    --blue:     #789baa;
-    --rose:     #e1beb9;
-    --cream:    #f7eed0;
-    --blush:    #f1e0e4;
-    --lavender: #ede2ef;
-    --ink:      #3d535d;   /* 由 789baa 加深，供淺色底上的文字使用 */
-    --font: "Rounded", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-    --main: #3f6577;   /* 主色：深藍 */
-    --text: #3d5568;   /* 一般文字：藍 */
-    --accent: #a85a54; /* 重點：紅 */
-    --sky:    #cbd7dd; /* 淺藍：背景圖的底色 */
-    --sky2:   #e4ebee; /* 更淺的藍：打卡區 */
-    --line:   rgba(63, 101, 119, .22);   /* 細線（與購買頁相同） */
-    --paper:  #f8f5ee; /* 購買頁底色 */
+  /* ───── 開場動畫（只在 .hero.play 時播放；跳過＝拿掉 play，直接是最後畫面） ───── */
+  .hero.play .ifs{display:flex;position:absolute;inset:0;z-index:3;flex-direction:column;align-items:center;justify-content:center;gap:.35em;
+    pointer-events:none;padding:0 4vw;font-family:var(--serif);color:var(--text);font-size:clamp(20px,2.2vw + 12px,40px);letter-spacing:.06em;text-shadow:var(--glow)}
+  .hero.play .ifs p{margin:0;opacity:0;max-width:min(92vw,24em);text-align:center;text-wrap:balance;line-break:strict}
+  .hero.play .ifs p:nth-child(1){animation:if1 4.8s linear both}
+  .hero.play .ifs p:nth-child(2){animation:if2 4.8s linear both}
+  .hero.play .ifs p:nth-child(3){animation:if3 4.8s linear both}
+  /* 0.3–1.6 秒第一句、1.6–2.9 秒第二句、2.9–4.2 秒第三句，前面的句子往上飄、變淡；4.2–4.8 秒一起飄散 */
+  @keyframes if1{0%,6%{opacity:0;translate:-5% 0}19%,33%{opacity:1;translate:-5% 0}46%,60%{opacity:.5;translate:-5% -1.5em}72%,87.5%{opacity:.32;translate:-5% -2.6em}100%{opacity:0;translate:-5% -5em}}
+  @keyframes if2{0%,33%{opacity:0;translate:4% .4em}46%,60%{opacity:1;translate:4% 0}72%,87.5%{opacity:.5;translate:4% -1.3em}100%{opacity:0;translate:4% -4.6em}}
+  @keyframes if3{0%,60%{opacity:0;translate:-2% .4em}72%,87.5%{opacity:1;translate:-2% 0}100%{opacity:0;translate:-2% -4.2em}}
 
-    /* 按鈕顯示寬度（手機直式 / 橫式各自設定，要調大小改這裡） */
-    --btn-w: min(88vw, 40svh, 440px);   /* 長條按鈕（約 3.2:1），手機一屏放得下 */
-  }
+  .hero.play .mist{display:block;position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse 80% 70% at 50% 42%,rgba(255,255,255,.95),rgba(246,249,250,.86) 70%,rgba(236,242,245,.8));
+    -webkit-mask-image:linear-gradient(#000 62%,rgba(0,0,0,.42));mask-image:linear-gradient(#000 62%,rgba(0,0,0,.42));
+    animation:mist 6s ease both}
+  @keyframes mist{0%,83%{opacity:1}100%{opacity:0}}
 
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body { min-height: 100%; margin: 0; }
+  .hero.play .hero-text > *{animation:fadeUp .7s ease 6s both}
+  .hero.play .hero-text .title{animation:fadeUp .6s ease 4.8s both}
+  .hero.play .hero-text .def{animation-delay:6.1s}
+  .hero.play .hero-text .lead{animation-delay:6.05s}
+  .hero.play .hero-text .hero-btns{animation-delay:6.2s}
+  .hero.play .hero-text .dedi{animation-delay:6s}
+  .hero.play .swap .from{animation:swapOut .5s ease 5.15s both}
+  .hero.play .swap .to{animation:swapIn .5s ease 5.15s both}
+  @keyframes swapOut{from{opacity:1}to{opacity:0}}
+  @keyframes swapIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-  body {
-    font-family: var(--font);
-    color: var(--ink);
-    background: #cfdbe1;
-    -webkit-tap-highlight-color: transparent;
-    overflow-x: hidden;
-  }
-  html { max-width: 100%; overflow-x: clip; }   /* 手機不會左右滑動 */
+  /* 花苞依序抬頭、換成開花（間隔 0.15 秒） */
+  .hero.play .fl .bud{animation:budOut .6s ease both}
+  .hero.play .fl .bloom{animation:bloomIn .7s cubic-bezier(.2,.8,.3,1.15) both}
+  .hero.play .fl:nth-child(1) .bud{animation-delay:5s}    .hero.play .fl:nth-child(1) .bloom{animation-delay:5.05s}
+  .hero.play .fl:nth-child(2) .bud{animation-delay:5.15s} .hero.play .fl:nth-child(2) .bloom{animation-delay:5.2s}
+  .hero.play .fl:nth-child(3) .bud{animation-delay:5.3s}  .hero.play .fl:nth-child(3) .bloom{animation-delay:5.35s}
+  .hero.play .fl:nth-child(4) .bud{animation-delay:5.45s} .hero.play .fl:nth-child(4) .bloom{animation-delay:5.5s}
+  @keyframes budOut{from{opacity:.6;transform:rotate(0)}to{opacity:0;transform:translateY(-6%) rotate(-6deg)}}
+  @keyframes bloomIn{from{opacity:0;transform:translateY(12%) scale(.7)}to{opacity:1;transform:none}}
+  .hero.play .keeper{animation:keeperIn .8s ease 5.2s both}
+  .hero.play .keeper-cap{animation:fadeUp .7s ease 5.8s both}
+  @keyframes keeperIn{from{opacity:0;transform:translateX(30%)}to{opacity:1;transform:none}}
+  .hero.play .mark{animation:fadeIn .6s ease 5.6s both}
+  .hero.play .down{animation:fadeIn .6s ease 6.4s both}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-  /* ───────── 背景：全站共用（site-bg.css） ───────── */
+  .hero.play .feather{display:block;position:absolute;z-index:2;top:24%;left:-10%;width:clamp(34px,5vw,64px);height:auto;opacity:0;
+    pointer-events:none;filter:drop-shadow(0 0 6px #fff);animation:feather 2.2s ease-in-out 4.9s both}
+  @keyframes feather{0%{opacity:0;transform:translate(0,0) rotate(-30deg)}15%{opacity:.9}50%{transform:translate(55vw,10vh) rotate(18deg)}
+    85%{opacity:.8}100%{opacity:0;transform:translate(115vw,4vh) rotate(-12deg)}}
 
-  /* ───────── 版面 ───────── */
-  .page {
-    min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(16px, 3.5svh, 40px);
-    padding:
-      max(20px, env(safe-area-inset-top))
-      max(20px, env(safe-area-inset-right))
-      max(28px, env(safe-area-inset-bottom))
-      max(20px, env(safe-area-inset-left));
-  }
+  .hero.play #skip{display:block;position:absolute;z-index:5;bottom:max(18px,env(safe-area-inset-bottom));right:max(18px,env(safe-area-inset-right));
+    background:none;border:0;border-bottom:1px solid var(--line);padding:6px 4px;font:inherit;font-size:clamp(16px,.4vw + 14px,19px);
+    letter-spacing:.2em;color:var(--main);text-shadow:var(--glow);cursor:pointer}
 
-  /* ───────── Logo（1283×1283，置中）───────── */
-  .logo {
-    width: clamp(120px, min(78vw, 36svh), 440px);
-    aspect-ratio: 1;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: float 6s ease-in-out infinite;
-  }
-  .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
-  .logo.is-empty img { display: none; }
-  .logo-fallback { display: none; }
-  .logo.is-empty .logo-fallback {
-    display: block;
-    writing-mode: vertical-rl;
-    font-size: clamp(44px, 9svh, 84px);
-    letter-spacing: 0.3em;
-    color: var(--blue);
-    padding: 0.4em 0.5em;
-    border-left: 3px solid var(--rose);
-    border-right: 3px solid var(--rose);
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-8px); }
-  }
+  /* ═══════════════ 購買卡牌（頁尾資訊欄前面） ═══════════════ */
+  .entry{width:min(88vw,420px);display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 auto}
+  .entry a{display:block;width:100%;border-radius:22px;transition:transform .18s,filter .18s}
+  .entry a:hover{transform:translateY(-4px);filter:drop-shadow(0 8px 10px rgba(61,83,93,.24))}
+  .entry a:active{transform:scale(.98)}
+  .entry img{display:block;width:100%;height:auto}
+  .entry .fallback{display:none}
+  .entry a.is-empty img{display:none}
+  .entry a.is-empty .fallback{display:flex;aspect-ratio:16/5;align-items:center;justify-content:center;font-family:var(--serif);font-size:24px;
+    color:var(--main);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .entry p{margin:0;font-size:clamp(16px,.4vw + 14px,19px);line-height:1.7;text-shadow:var(--glow);text-wrap:balance}
+  @media (min-width:900px){ .entry{width:min(31vw,440px)} }
 
-  /* ───────── 三個按鈕：整張圖就是按鈕 ───────── */
-  .branches {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;     /* 手機直式：直排，一屏看完 */
-    align-items: center;
-    gap: clamp(8px, 1.6svh, 16px);
-  }
+  /* ═══════════════ 留言板 ═══════════════ */
+  .board-form{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:560px;margin:clamp(22px,3vw,34px) auto 0}
+  .board-form textarea{width:100%;min-height:5.2em;resize:none;padding:14px 16px;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.55);font-family:var(--serif);font-size:clamp(18px,.5vw + 16px,22px);line-height:1.7;color:var(--text);border-radius:0}
+  .board-form textarea:focus{outline:2px solid var(--main);outline-offset:2px}
+  .board-form .meta{width:100%;display:flex;justify-content:space-between;gap:12px;font-size:clamp(14px,.3vw + 13px,16px);color:var(--main);opacity:.85;text-align:left}
+  .board-form .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+  .board-form .msg{min-height:1.6em;margin:0;font-size:clamp(15px,.3vw + 14px,18px);color:var(--accent);text-shadow:var(--glow)}
+  .board-form .btn-main{border:0;cursor:pointer;font-family:inherit}
+  .board-form .btn-main:disabled{opacity:.5;cursor:default}
+  /* 跑馬燈上的每一句都可以點 */
+  .marquee .mq-i{cursor:pointer;transition:color .2s}
+  .marquee .mq-i:hover{color:var(--accent)}
+  .marquee .mq-i:focus-visible{outline:2px solid var(--main);outline-offset:4px}
+  .marquee.paused .row{animation-play-state:paused}
+  .mq-hint{margin-top:clamp(18px,2.4vw,26px)!important}
+  /* 回應小卡：霧面淺色卡，上下細線，不用框 */
+  .reply-ov{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;
+    background:rgba(214,226,232,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:rIn .35s ease}
+  .reply-ov[hidden]{display:none}
+  @keyframes rIn{from{opacity:0}}
+  .reply-card{position:relative;width:min(92vw,460px);max-height:86svh;overflow:auto;text-align:center;
+    padding:clamp(34px,5vw,48px) clamp(22px,4vw,40px) clamp(24px,3.6vw,34px);
+    background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(250,247,238,.8));
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:0 18px 50px rgba(31,43,49,.18);animation:rUp .45s cubic-bezier(.2,.7,.2,1)}
+  @keyframes rUp{from{opacity:0;transform:translateY(16px)}}
+  .reply-x{position:absolute;top:6px;right:8px;width:44px;height:44px;border:0;background:none;font-size:26px;line-height:1;color:var(--main);cursor:pointer;opacity:.7}
+  .reply-q{margin:0 auto;font-family:var(--serif);font-size:clamp(21px,.8vw + 17px,27px);line-height:1.75;color:var(--main);letter-spacing:.06em;text-shadow:var(--glow);text-wrap:balance}
+  .reply-q::after{content:"";display:block;width:56px;height:1px;margin:18px auto 6px;background:var(--hair)}
+  .reply-opts{display:flex;flex-direction:column;margin-top:4px}
+  .reply-opts button{display:flex;align-items:baseline;gap:10px;width:100%;padding:14px 4px;border:0;border-bottom:1px solid var(--line);background:none;
+    font-family:var(--serif);font-size:clamp(18px,.5vw + 16px,22px);color:var(--text);letter-spacing:.06em;cursor:pointer;text-align:left;transition:color .2s}
+  .reply-opts button .dots{flex:1;border-bottom:1px dotted rgba(63,101,119,.45);transform:translateY(-.3em)}
+  .reply-opts button .n{font-family:var(--sans);font-size:.82em;color:var(--main);min-width:1.5em;text-align:right}
+  .reply-opts button:hover:not(:disabled),.reply-opts button.on{color:var(--accent)}
+  .reply-opts button.on .n{color:var(--accent)}
+  .reply-opts button:disabled{cursor:default}
+  .reply-opts button:disabled:not(.on){opacity:.55}
+  .reply-card:focus{outline:none} .reply-x:focus{outline:none} .reply-x:focus-visible{outline:2px solid var(--main);outline-offset:-6px}
+  @media (min-width:600px){ .reply-card{width:min(84vw,560px)} .reply-q{font-size:clamp(26px,1vw + 20px,31px)} .reply-opts button{font-size:clamp(21px,.5vw + 18px,24px);padding:18px 4px} .reply-hint{font-size:18px} }
+  .reply-hint{margin:16px 0 0;min-height:1.6em;font-size:clamp(15px,.3vw + 14px,17px);color:var(--main);letter-spacing:.12em}
+  /* 跑馬燈：兩排往不同方向慢慢移動 */
+  .marquee{margin:clamp(30px,4vw,48px) calc(-1 * max(22px,6vw)) 0;overflow:hidden;display:flex;flex-direction:column;gap:clamp(18px,2.4vw,26px);padding:6px 0;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .marquee .row{display:flex;width:max-content;gap:0;animation:slide 60s linear infinite}
+  .marquee .row.r2{animation-direction:reverse;animation-duration:72s}
+  .marquee .row.r3{animation-duration:84s}
+  .marquee:hover .row{animation-play-state:paused}
+  .marquee span{white-space:nowrap;padding:0 1.8em;font-family:var(--serif);font-size:clamp(19px,.6vw + 16px,24px);line-height:1.6;color:var(--text);text-shadow:var(--glow);position:relative}
+  .marquee span::after{content:"";position:absolute;right:-3px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--accent);opacity:.45}
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-  .branch {
-    display: block;
-    width: var(--btn-w);
-    color: var(--ink);
-    text-decoration: none;
-    border-radius: 24px;
-    transition: transform 0.18s ease, filter 0.18s ease;
-  }
-  .branch img { display: block; width: 100%; height: auto; }
-  .branch:hover  { transform: translateY(-4px) scale(1.02); filter: drop-shadow(0 8px 10px rgba(61, 83, 93, 0.28)); }
-  .branch:active { transform: scale(0.98); filter: none; }
-  .branch:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+  /* ═══════════════ 5. 卡牌怎麼陪你 ═══════════════ */
+  .steps{list-style:none;margin:0 auto;padding:0;display:grid;gap:clamp(26px,4vw,48px);max-width:1080px;counter-reset:s}
+  .steps li{counter-increment:s;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .steps li::before{content:"0" counter(s);font-family:var(--serif);font-size:clamp(34px,2vw + 24px,52px);line-height:1;color:var(--accent);opacity:.85;text-shadow:var(--glow)}
+  .steps h3{margin:0;font-family:var(--serif);font-weight:400;font-size:clamp(21px,.7vw + 18px,27px);color:var(--main);letter-spacing:.12em;text-shadow:var(--glow)}
+  .steps h3::after{content:"";display:block;width:40px;height:1px;margin:10px auto 0;background:var(--hair)}
+  .steps p{max-width:17em}
+  @media (min-width:900px){ .steps{grid-template-columns:repeat(3,1fr)} }
 
-  /* 圖還沒放時的佔位卡片 */
-  .fallback { display: none; }
-  .branch.is-empty img { display: none; }
-  .branch.is-empty .fallback {
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: center;
-    align-content: center;
-    gap: 14px;
-    aspect-ratio: 16 / 5;
-    text-align: center;
-    background: var(--blush);
-    border: 3px solid var(--blue);
-    border-radius: 24px;
-  }
-  .fallback { padding: 0 14px; }
-  .fallback b { font-weight: normal; font-size: 1.35rem; }
-  .fallback small { font-size: 1rem; color: var(--blue); }
+  /* ═══════════════ 6. 心靈花園（四朵花可以翻面） ═══════════════ */
+  .flips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2.4vw,26px);max-width:1080px;margin:clamp(22px,3.4vw,40px) auto 0}
+  @media (min-width:900px){ .flips{grid-template-columns:repeat(4,minmax(0,1fr))} }
+  .sec .hint{margin-top:14px;font-size:clamp(15px,.3vw + 14px,17px);color:var(--main);letter-spacing:.12em;opacity:.85}
+  .flip{position:relative;display:block;width:100%;aspect-ratio:3/4.4;padding:0;border:0;background:none;cursor:pointer;perspective:1000px;font:inherit;color:inherit;text-align:center}
+  .flip .in{position:absolute;inset:0;transition:transform .7s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
+  .flip[aria-pressed="true"] .in{transform:rotateY(180deg)}
+  /* 翻完之後改成平面顯示，平板上背面的字才不會糊（3D 翻轉中的畫面會被瀏覽器降解析度） */
+  .flip.flat .in{transition:none;transform:none}
+  .flip.flat .face.front{visibility:hidden}
+  .flip.flat .face.back{transform:none}
+  .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 12px;
+    -webkit-backface-visibility:hidden;backface-visibility:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.16))}
+  .face.front img{width:82%;aspect-ratio:1;object-fit:contain}
+  .face .nm{font-family:var(--serif);font-size:clamp(20px,.8vw + 16px,26px);color:var(--main);letter-spacing:.14em;text-shadow:var(--glow)}
+  .face .th{font-size:clamp(14px,.3vw + 13px,17px);letter-spacing:.2em;color:var(--accent)}
+  .face.back{transform:rotateY(180deg);justify-content:flex-start;padding:clamp(14px,1.8vw,22px) clamp(10px,1.4vw,16px);background:rgba(250,247,238,.88)}
+  .face.back .th{font-family:var(--serif);font-size:clamp(19px,.6vw + 16px,24px)}
+  .face.back .one{font-size:clamp(15.5px,.3vw + 14.5px,18.5px);color:var(--main);line-height:1.55;padding-bottom:8px;border-bottom:1px solid var(--line);width:100%}
+  /* 背面內文：字放大，放不下時可以在卡片裡上下滑動（下緣漸淡提示還有字） */
+  .face.back .tx{font-family:var(--serif);font-size:clamp(16px,.4vw + 14.5px,19px);line-height:1.8;color:var(--text);text-align:left;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:2px 2px 18px;
+    -webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent);
+    text-wrap:pretty;line-break:strict;min-height:0;flex:1}
+  .face.back .tx::-webkit-scrollbar{width:3px} .face.back .tx::-webkit-scrollbar-thumb{background:rgba(63,101,119,.35);border-radius:3px}
+  @media (max-width:599px){ .flip{aspect-ratio:3/5.2} .face.back{padding:12px 9px} }
+  @media (orientation:portrait) and (min-width:600px){ .face.back .th{font-size:25px} .face.back .one{font-size:19.5px} .face.back .tx{font-size:21px} }
 
-  /* ───────── 橫式（電腦 / 平板 / 手機橫放）：按鈕排成一列 ───────── */
-  @media (orientation: landscape) and (min-width: 640px) {
-    :root { --btn-w: min(29vw, 400px); }
-    .page { gap: clamp(10px, 2.5svh, 30px); }
-    .logo { width: clamp(150px, min(50svh, 44vw), 460px); }
-    .branches { flex-direction: row; align-items: flex-start; gap: clamp(8px, 2vw, 28px); }
-  }
+  .keeper-say{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:760px;margin:clamp(36px,5vw,60px) auto 0}
+  .keeper-say img{width:clamp(130px,22vw,220px);height:auto}
+  .keeper-say .words{display:flex;flex-direction:column;gap:10px;align-items:center}
+  .keeper-say .tag{font-size:clamp(15px,.3vw + 14px,18px);letter-spacing:.24em;color:var(--main);text-shadow:var(--glow);padding-bottom:8px;position:relative}
+  .keeper-say .tag::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--hair)}
+  .keeper-say blockquote{margin:0;font-family:var(--serif);font-size:clamp(19px,.6vw + 16px,24px);line-height:1.9;color:var(--text);text-shadow:var(--glow);max-width:22em;text-wrap:pretty}
+  @media (min-width:900px){ .keeper-say{flex-direction:row;text-align:left;gap:32px} .keeper-say .words{align-items:flex-start} }
 
-  /* ───────── 往下滑提示 ───────── */
-  .page { position: relative; }
-  .more { position: absolute; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%);
-    font-size: clamp(17px, .5vw + 14px, 21px); color: var(--main); background: rgba(248, 245, 238, .85);
-    border: 1px solid var(--line); padding: .25em 1.2em; border-radius: 999px; text-decoration: none; letter-spacing: .1em; white-space: nowrap;
-    animation: bob 2s ease-in-out infinite; }
-  @keyframes bob { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
+  /* ═══════════════ 7. 結尾邀請 ═══════════════ */
+  .invite p{font-family:var(--serif);font-size:clamp(21px,.8vw + 17px,28px);color:var(--main);line-height:1.9;margin-bottom:clamp(22px,3vw,34px)}
 
-  /* ───────── 下半部：整條色塊 ───────── */
-  .band { width: 100%; padding: clamp(44px, 7vw, 90px) max(22px, 6vw); text-align: center; }
-  .band h2 { margin: 0 0 14px; font-weight: normal; font-size: clamp(25px, .9vw + 20px, 34px); letter-spacing: .12em; }
-  .band p { margin: 0 auto; max-width: 30em; font-size: clamp(18px, .5vw + 15px, 22px); line-height: 1.8;
-    word-break: keep-all; overflow-wrap: anywhere; text-wrap: pretty; }
+  /* ═══════════════ 8. 打卡拍照（內容與功能保留） ═══════════════ */
+  .photo .frames{display:flex;justify-content:center;gap:clamp(8px,2vw,26px);margin:clamp(24px,3vw,40px) auto;padding:clamp(18px,2.4vw,28px) 0;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);max-width:900px}
+  .photo .frames a{display:block;padding:clamp(5px,.8vw,8px) clamp(5px,.8vw,8px) 0;background:#fff;border-radius:3px;text-decoration:none;
+    box-shadow:0 3px 10px rgba(61,83,93,.16);transition:transform .18s}
+  .photo .frames a:nth-child(odd){transform:rotate(-2deg)}
+  .photo .frames a:nth-child(even){transform:rotate(2deg)}
+  .photo .frames a:hover{transform:translateY(-4px) rotate(0)}
+  .photo .frames a:active{transform:scale(.97)}
+  .photo .frames img{display:block;width:clamp(58px,15vw,150px);height:auto;aspect-ratio:9/16;object-fit:cover;background:#cbd7dd}
+  .photo .frames span{display:block;padding:.35em 0 .45em;font-size:clamp(13px,.4vw + 11px,17px);color:var(--main);letter-spacing:.08em}
 
-  /* 打卡拍照：淺藍色塊＋細線區隔（與購買頁一致） */
-  .photo { background: var(--sky2); color: var(--text); border-top: 1px solid var(--line); }
-  .photo h2 { color: var(--main); }
-  .photo h2::after { content: ""; display: block; width: 44px; height: 1px; margin: 14px auto 0; background: var(--main); opacity: .45; }
-  .photo .frames { display: flex; justify-content: center; gap: clamp(8px, 2vw, 26px); margin: clamp(24px, 3vw, 40px) auto;
-    padding: clamp(18px, 2.4vw, 28px) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); max-width: 900px; }
-  /* 拍立得小卡 */
-  .photo .frames a { display: block; padding: clamp(5px, .8vw, 8px) clamp(5px, .8vw, 8px) 0; background: #fff; border-radius: 3px; text-decoration: none;
-    box-shadow: 0 3px 10px rgba(61, 83, 93, .16); transition: transform .18s; }
-  .photo .frames a:nth-child(odd)  { transform: rotate(-2deg); }
-  .photo .frames a:nth-child(even) { transform: rotate(2deg); }
-  .photo .frames a:hover { transform: translateY(-4px) rotate(0); }
-  .photo .frames a:active { transform: scale(.97); }
-  .photo .frames img { display: block; width: clamp(58px, 15vw, 150px); aspect-ratio: 9 / 16; object-fit: cover; background: var(--sky); }
-  .photo .frames img.empty { content: url("data:image/gif;base64,R0lGODlhAQABAAAAACw="); }
-  .photo .frames span { display: block; padding: .35em 0 .45em; font-size: clamp(13px, .4vw + 11px, 17px); color: var(--main); letter-spacing: .08em; }
-  .photo .go { display: inline-block; padding: .6em 2.4em; border-radius: 6px; background: var(--main); color: #fff;
-    text-decoration: none; font-size: clamp(18px, .4vw + 16px, 22px); letter-spacing: .12em; }
-  .photo .go:hover { filter: brightness(1.1); }
+  /* ═══════════════ 9. 關於我們（內容保留） ═══════════════ */
+  .foot{background:var(--main);color:#fff;text-align:left;padding:clamp(44px,7vw,90px) max(22px,6vw) max(36px,env(safe-area-inset-bottom));font-family:var(--serif)}
+  .foot .cols{display:grid;gap:34px;max-width:1100px;margin:0 auto}
+  .foot h3{margin:0 0 10px;font-weight:normal;font-size:clamp(22px,.6vw + 18px,28px);letter-spacing:.08em;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.35)}
+  .foot p{margin:0;font-size:clamp(18px,.5vw + 15px,22px);line-height:1.9}
+  .foot a{color:#fff;text-underline-offset:4px}
+  .foot .copy{max-width:1100px;margin:36px auto 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.35);font-size:clamp(15px,.3vw + 13px,18px);
+    line-height:1.8;opacity:.9;word-break:keep-all;overflow-wrap:anywhere;text-wrap:pretty}
+  @media (min-width:760px){ .foot .cols{grid-template-columns:1fr 1fr} }
 
-  /* 頁尾：深藍色塊、白字 */
-  .foot { background: var(--main); color: #fff; text-align: left; padding-bottom: max(36px, env(safe-area-inset-bottom));
-    font-family: "FYSong", "Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif; }
-  .foot .cols { display: grid; gap: 34px; max-width: 1100px; margin: 0 auto; }
-  .foot h3 { margin: 0 0 10px; font-weight: normal; font-size: clamp(22px, .6vw + 18px, 28px); letter-spacing: .08em;
-    padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.35); }
-  .foot p { margin: 0; max-width: none; font-size: clamp(18px, .5vw + 15px, 22px); line-height: 1.9; }
-  .foot a { color: #fff; text-underline-offset: 4px; }
-  .foot .copy { max-width: 1100px; margin: 36px auto 0; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.35);
-    font-size: clamp(15px, .3vw + 13px, 18px); line-height: 1.8; opacity: .9; word-break: keep-all; overflow-wrap: anywhere; text-wrap: pretty; }
-  @media (min-width: 760px) { .foot .cols { grid-template-columns: 1fr 1fr; } }
-
-  @media (prefers-reduced-motion: reduce) {
-    .more { animation: none; }
-    .logo { animation: none; }
-    .branch { transition: none; }
+  /* 減少動態：沒有動畫 */
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .down{animation:none}
+    .reveal{opacity:1;transform:none;transition:none} .reveal:not(.in){filter:none}
+    .sec + .sec::before{transform:translateX(-50%)} .sec h2::after,.steps h3::after,.keeper-say .tag::after{transform:none;transition:none}
+    .flip .in{transition:none}
+    .btn-main,.entry a,.photo .frames a,.hero-btns a{transition:none}
+    .marquee .row{animation:none;flex-wrap:wrap;width:auto;justify-content:center;row-gap:10px}
+    .marquee .row.r2,.marquee .row.r3{display:none}
+    .reply-ov,.reply-card{animation:none}
   }
 </style>
-<link rel="stylesheet" href="site-bg.css">
+<link rel="stylesheet" href="site-bg.css?v=1119b">
 </head>
 
-<body>
+<body data-fx-petals="back">
   <div class="site-bg" aria-hidden="true"></div>
 
-  <main class="page">
+  <!-- 左上「選單」：和其他頁面同一張圖 -->
+  <button class="menu-ico" type="button" aria-label="選單" aria-expanded="false"><span class="mi" aria-hidden="true"></span><span class="ml">選單</span></button>
+  <nav class="site-menu" id="siteMenu"></nav>
 
-    <h1 class="logo">
-      <img src="images/logo-vertical.png" alt="遺落成華"
-           onerror="this.parentElement.classList.add('is-empty')">
-      <span class="logo-fallback">遺落成華</span>
-    </h1>
+  <!-- ═════ 1–2. 開場動畫＋頁首 ═════ -->
+  <header class="hero" id="hero">
+    <img class="mark" src="images/logo-mark.png" alt="遺落成華" width="117" height="360">
 
-    <ul class="branches">
-      <li>
-        <a class="branch" href="story.html" aria-label="小故事：前言故事">
-          <img src="images/btn-story.png" alt=""
-               onerror="this.parentElement.classList.add('is-empty')">
-          <span class="fallback"><b>小故事</b><small>前言故事</small></span>
-        </a>
-      </li>
-      <li>
-        <a class="branch" href="cards.html" aria-label="開始排卡：線上卡牌互動">
-          <img src="images/btn-cards.png" alt=""
-               onerror="this.parentElement.classList.add('is-empty')">
-          <span class="fallback"><b>開始排卡</b><small>線上卡牌互動</small></span>
-        </a>
-      </li>
-      <li>
-        <a class="branch" href="shop.html" aria-label="購買卡牌：卡牌套組">
-          <img src="images/btn-shop.png" alt=""
-               onerror="this.parentElement.classList.add('is-empty')">
-          <span class="fallback"><b>購買卡牌</b><small>卡牌套組</small></span>
-        </a>
-      </li>
-    </ul>
+    <div class="ifs" aria-hidden="true"><p data-t="ifs.0"></p><p data-t="ifs.1"></p><p data-t="ifs.2"></p></div>
+    <div class="mist" aria-hidden="true"></div>
+    <img class="feather" src="images/feather.webp" alt="" width="237" height="520" aria-hidden="true">
+    <button id="skip" type="button" data-t="skip"></button>
 
-    <a class="more" href="#photo">打卡拍照 ↓</a>
+    <div class="hero-text">
+      <p class="sub" data-t="sub"></p>
+      <h1 class="title"><span class="nw" data-t="titleA"></span><br><span class="nw"><span data-t="titleMid"></span><span class="swap"><span class="from" data-t="titleFrom"></span><span class="to" data-t="titleTo"></span></span><span data-t="titleB"></span></span></h1>
+      <p class="dedi" data-t="dedi"></p>
+      <p class="lead" data-t="lead"></p>
+      <p class="def" data-t="def"></p>
+      <div class="hero-btns" id="heroBtns"></div>
+    </div>
+
+    <div class="garden" aria-hidden="true">
+      <div class="fl"><img class="bud" src="images/bud1-down.webp" alt="" width="357" height="520"><img class="bloom" src="images/flower1.webp" alt="" width="1000" height="1000"></div>
+      <div class="fl"><img class="bud" src="images/bud2-down.webp" alt="" width="357" height="520"><img class="bloom" src="images/flower2.webp" alt="" width="1000" height="1000"></div>
+      <div class="fl"><img class="bud" src="images/bud3-down.webp" alt="" width="357" height="520"><img class="bloom" src="images/flower3.webp" alt="" width="1000" height="1000"></div>
+      <div class="fl"><img class="bud" src="images/bud4-down.webp" alt="" width="520" height="268"><img class="bloom" src="images/flower4.webp" alt="" width="1000" height="1000"></div>
+      <img class="keeper" src="images/keeper1.webp" alt="" width="899" height="900">
+      <span class="keeper-cap" data-t="keeperCap"></span>
+    </div>
+
+    <a class="down" href="#entries" data-t="down"></a>
+  </header>
+
+  <main>
+    <!-- ═════ 為什麼是遺憾 ═════ -->
+    <section class="sec band-soft" id="entries">
+      <h2 class="reveal" data-t="whyTitle"></h2>
+      <p class="reveal" data-t="why"></p>
+    </section>
+
+    <!-- ═════ 卡牌怎麼陪你 ═════ -->
+    <section class="sec">
+      <h2 class="reveal" data-t="howTitle"></h2>
+      <ol class="steps" id="stepList"></ol>
+    </section>
+
+    <!-- ═════ 心靈花園 ═════ -->
+    <section class="sec band-soft" id="garden">
+      <h2 class="reveal" data-t="gardenTitle"></h2>
+      <p class="reveal" data-t="garden"></p>
+      <p class="reveal hint" data-t="flipHint"></p>
+      <div class="flips" id="flipList"></div>
+      <div class="keeper-say reveal">
+        <img src="images/keeper1.webp" alt="" width="899" height="900" loading="lazy">
+        <div class="words">
+          <span class="tag" data-t="keeperTag"></span>
+          <blockquote data-t="keeper"></blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════ 留言板 ═════ -->
+    <section class="sec" id="board">
+      <h2 class="reveal" data-t="boardTitle"></h2>
+      <p class="reveal" data-t="board"></p>
+      <form class="board-form reveal" id="boardForm" autocomplete="off">
+        <label class="hp" aria-hidden="true">請勿填寫<input type="text" name="hp" tabindex="-1"></label>
+        <textarea id="boardText" rows="3" aria-label="寫下你的如果"></textarea>
+        <div class="meta"><span data-t="boardNote"></span><span id="boardCount"></span></div>
+        <button class="btn-main" type="submit" data-t="boardBtn"></button>
+        <p class="msg" id="boardMsg" role="status"></p>
+      </form>
+      <div class="marquee" id="marquee" aria-label="大家寫下的如果"><div class="row" id="mq1"></div><div class="row r2" id="mq2"></div><div class="row r3" id="mq3"></div></div>
+      <p class="hint mq-hint" data-t="mqHint"></p>
+    </section>
+
+    <!-- 回應小卡：點跑馬燈上的一句時出現 -->
+    <div class="reply-ov" id="replyOv" hidden>
+      <div class="reply-card" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="replyQ">
+        <button class="reply-x" type="button" aria-label="關閉">×</button>
+        <p class="reply-q" id="replyQ"></p>
+        <div class="reply-opts" id="replyOpts"></div>
+        <p class="reply-hint" id="replyHint" role="status"></p>
+      </div>
+    </div>
+
+    <!-- ═════ 結尾邀請 ═════ -->
+    <section class="sec band-soft invite">
+      <p class="reveal" data-t="invite"></p>
+      <a class="btn-main reveal" href="story.html" data-t="inviteBtn"></a>
+    </section>
+
+    <!-- ═════ 打卡拍照（保留） ═════ -->
+    <section class="sec photo" id="photo">
+      <h2 data-t="photoTitle"></h2>
+      <p data-t="photoText"></p>
+      <div class="frames" id="frameList"></div>
+      <a class="btn-main" href="photo.html" data-t="photoBtn"></a>
+    </section>
+
+    <!-- ═════ 購買卡牌 ═════ -->
+    <section class="sec band-soft" id="buy" aria-label="購買卡牌">
+      <div class="entry reveal" id="shopEntry"></div>
+    </section>
   </main>
 
-  <!-- ═════ 打卡拍照 ═════ -->
-  <section class="band photo" id="photo">
-    <h2>來拍一張吧！</h2>
-    <p>選一個喜歡的濾鏡，<br>來到我們左側打卡區，即可拍照！</p>
-    <div class="frames">
-      <a href="photo.html?f=1" aria-label="用洋甘菊相框拍照"><img src="images/frames/thumb1.webp" alt="" onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame1.png';else this.classList.add('empty')"><span>洋甘菊</span></a>
-      <a href="photo.html?f=2" aria-label="用桔梗花相框拍照"><img src="images/frames/thumb2.webp" alt="" onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame2.png';else this.classList.add('empty')"><span>桔梗花</span></a>
-      <a href="photo.html?f=3" aria-label="用繡球花相框拍照"><img src="images/frames/thumb3.webp" alt="" onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame3.png';else this.classList.add('empty')"><span>繡球花</span></a>
-      <a href="photo.html?f=4" aria-label="用櫻花相框拍照"><img src="images/frames/thumb4.webp" alt="" onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame4.png';else this.classList.add('empty')"><span>櫻花</span></a>
-    </div>
-    <a class="go" href="photo.html">開始拍照</a>
-  </section>
-
-  <!-- ═════ 頁尾（文字可以直接改） ═════ -->
-  <footer class="band foot" id="about">
+  <!-- ═════ 9. 關於我們（保留；文字可以直接改） ═════ -->
+  <footer class="foot" id="about">
     <div class="cols">
       <div>
         <h3>關於我們</h3>
@@ -287,5 +611,249 @@
       本網站與《遺落成華》卡牌中的插畫、圖像、文字與設計，著作權皆屬花森什麼鳥事團隊所有。
       未經同意，請勿轉載、重製、改作或作商業使用；如需引用，請先來信聯繫。</p>
   </footer>
+
+<script>
+/* =========================================================
+   以下為程式（文字請改上面的 ✏️ TEXT）
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const get = path => path.split('.').reduce((o, k) => o == null ? o : o[k], TEXT);
+const hide = im => im.classList.add('missing');      // 圖片讀不到：留白，不破圖
+
+/* 把 ✏️ 區的文字放進畫面 */
+document.querySelectorAll('[data-t]').forEach(el => { const v = get(el.dataset.t); if (v != null) el.innerHTML = v; });
+// 頁首小標：以「｜」分段，手機上分成兩行
+document.querySelector('.hero .sub').innerHTML = TEXT.sub.split('｜').map(p => `<span class="nw">${p}</span>`).join('<span class="bar">｜</span>');
+
+/* 頁首兩個圖片按鈕 */
+$('#heroBtns').innerHTML = TEXT.heroBtns.map(b => `
+  <a href="${b.href}" aria-label="${b.label}">
+    <img src="${b.img}" alt="" width="1200" height="375" onerror="this.parentElement.classList.add('is-empty')">
+    <span class="fallback">${b.label}</span>
+  </a>`).join('');
+
+/* 購買卡牌 */
+const sh = TEXT.shop;
+$('#shopEntry').innerHTML = `
+  <a href="${sh.href}" aria-label="${sh.name}">
+    <img src="${sh.img}" alt="" width="1200" height="375" loading="lazy" onerror="this.parentElement.classList.add('is-empty')">
+    <span class="fallback">${sh.name}</span>
+  </a>
+  <p>${sh.note}</p>`;
+
+/* 左上選單 */
+// 分組顯示：第一組一行一個，第二組排成兩欄
+let mi = 0;
+$('#siteMenu').innerHTML = TEXT.menuGroups.map((g, gi) => {
+  const links = TEXT.menu.slice(mi, mi += g.n).map(m => `<a href="${m.href}">${m.t}</a>`).join('');
+  return `<p class="mh">${g.t}</p>` + (gi ? `<div class="mgrid">${links}</div>` : links);
+}).join('');
+(() => {
+  const b = document.querySelector('.menu-ico'), m = $('#siteMenu');
+  const set = o => { m.classList.toggle('open', o); b.setAttribute('aria-expanded', o); };
+  b.addEventListener('click', e => { e.stopPropagation(); set(!m.classList.contains('open')); });
+  document.addEventListener('click', () => set(false));
+})();
+
+/* 三個步驟 */
+$('#stepList').innerHTML = TEXT.steps.map(s => `<li class="reveal"><h3>${s.t}</h3><p>${s.d}</p></li>`).join('');
+
+/* 四朵花：點一下翻面，再點一次翻回來（鍵盤也可以用） */
+$('#flipList').innerHTML = TEXT.flowers.map(f => `
+  <button class="flip reveal" type="button" aria-pressed="false" aria-label="${f.name}｜${f.theme}，點一下看主題介紹">
+    <span class="in">
+      <span class="face front">
+        <img src="${f.img}" alt="" width="1000" height="1000" loading="lazy">
+        <span class="nm">${f.name}</span><span class="th">${f.theme}</span>
+      </span>
+      <span class="face back">
+        <span class="th">${f.name}｜${f.theme}</span>
+        <span class="one">${f.one}</span>
+        <span class="tx">${f.text}</span>
+      </span>
+    </span>
+  </button>`).join('');
+document.querySelectorAll('.flip').forEach(b => {
+  const inner = b.querySelector('.in');
+  b.addEventListener('click', () => {
+    const on = b.getAttribute('aria-pressed') !== 'true';
+    if (!on && b.classList.contains('flat')){       // 先無動畫地回到 3D 背面，再翻回正面
+      inner.style.transition = 'none'; b.classList.remove('flat'); void inner.offsetWidth; inner.style.transition = '';
+    }
+    b.setAttribute('aria-pressed', on);
+    if (on && matchMedia('(prefers-reduced-motion: reduce)').matches) b.classList.add('flat');
+  });
+  inner.addEventListener('transitionend', e => {
+    if (e.target === inner && e.propertyName === 'transform' && b.getAttribute('aria-pressed') === 'true') b.classList.add('flat');
+  });
+});
+
+/* 打卡相框 */
+$('#frameList').innerHTML = TEXT.frames.map((n, i) => `
+  <a href="photo.html?f=${i + 1}" aria-label="用${n}相框拍照"><img src="images/frames/thumb${i + 1}.webp" alt="" width="270" height="480" loading="lazy"
+     onerror="if(this.src.indexOf('thumb')>-1)this.src='images/frames/frame${i + 1}.webp';else this.classList.add('missing')"><span>${n}</span></a>`).join('');
+
+/* 其他圖片讀不到時留白 */
+document.querySelectorAll('.hero img, .flip img, .keeper-say img').forEach(im => {
+  im.addEventListener('error', () => hide(im));
+  if (im.complete && im.naturalWidth === 0 && im.src) hide(im);
+});
+
+/* 往下的區塊：滑到時淡入 */
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const items = document.querySelectorAll('.reveal');
+const secs = document.querySelectorAll('.sec');
+if (reduce || !('IntersectionObserver' in window)) { items.forEach(el => el.classList.add('in')); secs.forEach(el => el.classList.add('seen')); }
+else {
+  const io2 = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('seen'); io2.unobserve(e.target); } }),
+                                       { rootMargin: '0px 0px -12% 0px', threshold: 0 });
+  secs.forEach(el => io2.observe(el));
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }),
+                                      { rootMargin: '0px 0px -8% 0px', threshold: .12 });
+  items.forEach(el => io.observe(el));
+}
+
+
+/* ---------- 留言板（存在 Google 試算表「留言板」工作表；送出後馬上顯示） ---------- */
+const BOARD_URL = 'https://script.google.com/macros/s/AKfycby0IrQq5lZt7b8Wv2QHy5VXmNtBHDzhBPWE1OdNWUV9PsJRWaI9b_J_NycdWC3zqk2d_w/exec';
+const clean = t => String(t || '').replace(/\s+/g, ' ').trim();
+const esc = t => clean(t).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const badText = t => /(https?:|www\.|\.com|09\d{2}[-\s]?\d{3}[-\s]?\d{3})/i.test(t);
+let boardList = [];
+try { boardList = JSON.parse(localStorage.getItem('boardCache') || '[]').filter(x => typeof x === 'string'); } catch (e) {}
+
+function drawMarquee(){
+  const list = boardList.length ? boardList : TEXT.ifs;
+  // 分成三排；留言太少時各排換個順序重複使用
+  const parts = [[], [], []]; list.forEach((t, i) => parts[i % 3].push(t));
+  const a = parts[0], b = parts[1].length ? parts[1] : list.slice().reverse(), c = parts[2].length ? parts[2] : list.slice(1).concat(list.slice(0, 1));
+  // 每一句都可以點（回應）；後半段是為了無縫循環複製的，讀螢幕軟體略過
+  const row = arr => { let r = arr.slice(); while (r.length < 6) r = r.concat(arr);
+    return r.map(t => `<span class="mq-i" role="button" tabindex="0">${esc(t)}</span>`).join('') + r.map(t => `<span class="mq-i" aria-hidden="true">${esc(t)}</span>`).join(''); };
+  $('#mq1').innerHTML = row(a); $('#mq2').innerHTML = row(b); $('#mq3').innerHTML = row(c);
+}
+drawMarquee();
+
+// 讀最新的留言（最多等 1.2 秒，開場不會因此變慢）
+let boardCounts = {};                 // 每一句收到的回應次數：{ 留言: { 回應: 次數 } }
+const boardReady = new Promise(done => {
+  const tm = setTimeout(done, 1200);  // 開場最多等 1.2 秒；之後讀到的回應次數照樣會更新
+  fetch(BOARD_URL + '?action=board')
+    .then(r => r.json())
+    .then(j => {
+      const items = (j && j.items || []).map(clean).filter(t => t && t.length <= 60 && !badText(t));
+      if (j && j.counts && typeof j.counts === 'object') boardCounts = j.counts;
+      if (items.length){ boardList = items; try { localStorage.setItem('boardCache', JSON.stringify(items.slice(0, 60))); } catch (e) {} drawMarquee(); }
+    })
+    .catch(() => {})
+    .finally(() => { clearTimeout(tm); done(); });
+});
+
+(() => {
+  const f = $('#boardForm'), ta = $('#boardText'), cnt = $('#boardCount'), msg = $('#boardMsg'), btn = f.querySelector('button');
+  const max = TEXT.boardMax;
+  ta.value = TEXT.boardStart; ta.placeholder = TEXT.boardPlace; ta.maxLength = max;
+  const upd = () => { cnt.textContent = `${[...ta.value].length} / ${max}`; };
+  ta.addEventListener('input', upd); upd();
+  f.addEventListener('submit', async e => {
+    e.preventDefault();
+    const t = clean(ta.value);
+    if (f.hp.value) return;
+    if ([...t].length < 5 || t === clean(TEXT.boardStart)){ msg.textContent = TEXT.boardShort; return; }
+    if (badText(t)){ msg.textContent = TEXT.boardBad; return; }
+    let last = 0; try { last = +localStorage.getItem('boardLast') || 0; } catch (e2) {}
+    if (Date.now() - last < 60000){ msg.textContent = TEXT.boardWait; return; }
+    btn.disabled = true; msg.textContent = '';
+    try {
+      const ctrl = new AbortController(), tm = setTimeout(() => ctrl.abort(), 8000);
+      await fetch(BOARD_URL, { method:'POST', mode:'no-cors', signal: ctrl.signal,
+        headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ type:'board', text: t, hp: f.hp.value }) });
+      clearTimeout(tm);
+      try { localStorage.setItem('boardLast', Date.now()); } catch (e2) {}
+      boardList = [t].concat(boardList.filter(x => x !== t));          // 馬上出現在跑馬燈
+      try { localStorage.setItem('boardCache', JSON.stringify(boardList.slice(0, 60))); } catch (e2) {}
+      drawMarquee();
+      ta.value = TEXT.boardStart; upd(); msg.textContent = TEXT.boardOk;
+    } catch (err) { msg.textContent = TEXT.boardFail; }
+    btn.disabled = false;
+  });
+})();
+
+/* ---------- 回應別人的「如果」 ---------- */
+(() => {
+  const mq = $('#marquee'), ov = $('#replyOv'), q = $('#replyQ'), opts = $('#replyOpts'), hint = $('#replyHint');
+  let mine = {}; try { mine = JSON.parse(localStorage.getItem('replyMine') || '{}') || {}; } catch (e) {}
+  let cur = '', lastFocus = null;
+  const count = (t, r) => ((boardCounts[t] || {})[r] || 0);
+  function draw(){
+    const chosen = mine[cur];
+    opts.innerHTML = TEXT.replies.map(r => `<button type="button" data-r="${esc(r)}"${chosen ? ' disabled' : ''} class="${chosen === r ? 'on' : ''}">`
+      + `<span>${esc(r)}</span><span class="dots"></span><span class="n">${count(cur, r) || ''}</span></button>`).join('');
+    hint.textContent = chosen ? TEXT.replyDone : TEXT.replyHint;
+  }
+  function open(t){
+    cur = clean(t); if (!cur) return;
+    lastFocus = document.activeElement; q.textContent = cur; draw();
+    ov.hidden = false; mq.classList.add('paused'); ov.querySelector('.reply-card').focus({ preventScroll: true });
+  }
+  function close(){ ov.hidden = true; mq.classList.remove('paused'); lastFocus && lastFocus.focus && lastFocus.focus({ preventScroll: true }); }
+  mq.addEventListener('click', e => { const s = e.target.closest('.mq-i'); if (s) open(s.textContent); });
+  mq.addEventListener('keydown', e => { const s = e.target.closest('.mq-i'); if (s && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); open(s.textContent); } });
+  ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('.reply-x')) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) close(); });
+  opts.addEventListener('click', async e => {
+    const b = e.target.closest('button'); if (!b || b.disabled || mine[cur]) return;
+    const r = b.dataset.r, t = cur;
+    mine[t] = r; (boardCounts[t] = boardCounts[t] || {})[r] = count(t, r) + 1;
+    try { localStorage.setItem('replyMine', JSON.stringify(mine)); } catch (e2) {}
+    draw();
+    try {
+      const ctrl = new AbortController(), tm = setTimeout(() => ctrl.abort(), 8000);
+      await fetch(BOARD_URL, { method:'POST', mode:'no-cors', signal: ctrl.signal,
+        headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ type:'reply', text: t, reply: r }) });
+      clearTimeout(tm);
+    } catch (err) {                       // 沒送出去：還原，讓他可以再按一次
+      delete mine[t]; boardCounts[t][r]--;
+      try { localStorage.setItem('replyMine', JSON.stringify(mine)); } catch (e2) {}
+      if (cur === t){ draw(); hint.textContent = TEXT.replyFail; }
+    }
+  });
+})();
+
+/* ---------- 開場動畫：每個分頁只播一次 ---------- */
+(() => {
+  const hero = $('#hero');
+  let played = false;
+  try { played = sessionStorage.getItem('introPlayed') === '1'; } catch (e) {}
+  if (played || reduce) return;                 // 看過了、或「減少動態」：直接是最後畫面
+  try { sessionStorage.setItem('introPlayed', '1'); } catch (e) {}
+  document.body.classList.add('intro');
+
+  // 開場的三句「如果」：從預設的三句＋留言板隨機挑
+  const pickIfs = () => {
+    const pool = [...new Set(TEXT.ifs.concat(boardList.map(clean)))];
+    for (let i = pool.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    hero.querySelectorAll('.ifs p').forEach((p, i) => { p.textContent = pool[i % pool.length]; });
+  };
+  pickIfs();
+
+  let end = 0;
+  const finish = () => { clearTimeout(end); hero.classList.remove('play'); hero.style.visibility = ''; document.body.classList.remove('intro'); };
+  // 先把開場的圖讀好，避免開花時閃一下（最多等 1.2 秒）
+  const imgs = [...hero.querySelectorAll('.fl img, .keeper, .feather')];
+  const ready = Promise.all(imgs.map(im => im.complete ? 0 : new Promise(r => im.addEventListener('load', r) || im.addEventListener('error', r))));
+  hero.classList.add('play'); hero.style.visibility = 'hidden';
+  Promise.race([Promise.all([ready, boardReady]), new Promise(r => setTimeout(r, 1200))]).then(() => {
+    if (!hero.classList.contains('play')) return;
+    pickIfs();                                  // 讀到新留言的話，重新挑一次
+    hero.style.visibility = '';
+    document.getAnimations && document.getAnimations().forEach(a => { if (hero.contains(a.effect && a.effect.target)) a.currentTime = 0; });
+    end = setTimeout(finish, 7100);             // 播完回到一般狀態（畫面和最後一格一樣，不會跳）
+  });
+  $('#skip').addEventListener('click', e => { e.stopPropagation(); finish(); });
+  hero.addEventListener('click', e => { if (hero.classList.contains('play')){ e.preventDefault(); e.stopPropagation(); finish(); } }, true);
+})();
+</script>
+<script src="site-fx.js?v=1119"></script>
 </body>
 </html>

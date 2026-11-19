@@ -8,14 +8,15 @@
 <!--
   打卡拍照（濾鏡框）
   - 點相框圖片就會直接開啟相機；拍完或選完照片，同一頁出現「下載圖片」「複製打卡文字」
-  - 濾鏡框：images/frames/frame1.png ～ frame4.png（1080×1920，中間挖空、背景透明）
+  - 濾鏡框：images/frames/frame1.webp ～ frame4.webp（1080×1920，中間挖空、背景透明）
   - 濾鏡名稱、打卡文字都在下方 <script> 最上面的 ✏️ 設定區
   - 相機需要 https 網址（放上 GitHub Pages 後就可以用；本機直接開檔案可能不能用相機）
   - 首頁相框連過來會帶 ?f=1~4，自動選框並開啟相機
 -->
 <style>
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R-site.woff2") format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M-site.woff2") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
+@font-face{font-family:"FYSong";src:url("fonts/FengYaSong.woff2?v=1119b") format("woff2");font-display:swap}  /* 選單用風雅宋 */
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
 :root{--main:#3f6577;--text:#3d5568;--accent:#a85a54;--line:rgba(63,101,119,.22);--paper:#f8f5ee}
 *{box-sizing:border-box;margin:0;padding:0}
 html,*{touch-action:manipulation}
@@ -78,7 +79,7 @@ h1{font-weight:normal;color:var(--main);font-size:clamp(25px,.9vw + 21px,32px);l
   background:var(--main);color:#fff;border:2px solid var(--main);letter-spacing:.08em}
 .btn:hover{filter:brightness(1.08)}
 .btn.line{background:transparent;color:var(--main)}
-.btn.wide{flex-basis:100%}
+
 .camrow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;width:min(100%,360px)}
 .camrow .icon{justify-self:center}
 .shutter{width:76px;height:76px;flex:none;border-radius:50%;background:#fff;border:7px solid var(--main);box-shadow:0 4px 10px rgba(0,0,0,.2)}
@@ -100,11 +101,11 @@ h1{font-weight:normal;color:var(--main);font-size:clamp(25px,.9vw + 21px,32px);l
 .ok{min-height:1.5em;font-size:.88em;color:#fff;margin-top:8px}
 #file{display:none}
 </style>
-<link rel="stylesheet" href="site-bg.css">
+<link rel="stylesheet" href="site-bg.css?v=1119b">
 </head>
 <body>
 <div class="site-bg" aria-hidden="true"></div>
-  <header class="top"><button class="site-menu-btn" type="button" aria-label="選單" aria-expanded="false"><img src="images/btn-menu.png" alt="" onerror="this.parentElement.classList.add('empty')"><span class="t">選單</span></button><nav class="site-menu"><a href="index.html">回到首頁</a><a href="shop.html">購買卡牌</a></nav></header>
+  <header class="top"><button class="menu-ico" type="button" aria-label="選單" aria-expanded="false"><span class="mi" aria-hidden="true"></span><span class="ml">選單</span></button><nav class="site-menu"><a href="index.html">回到首頁</a><a href="shop.html">購買卡牌</a></nav></header>
   <main>
   <h1>打卡拍照</h1>
 
@@ -161,10 +162,10 @@ h1{font-weight:normal;color:var(--main);font-size:clamp(25px,.9vw + 21px,32px);l
    ✏️ 設定區
    ========================================================= */
 const FRAMES = [                       // 濾鏡框：檔名放在 images/frames/
-  { file: 'frame1.png', name: '洋甘菊' },
-  { file: 'frame2.png', name: '桔梗花' },
-  { file: 'frame3.png', name: '繡球花' },
-  { file: 'frame4.png', name: '櫻花' }
+  { file: 'frame1.webp', name: '洋甘菊' },
+  { file: 'frame2.webp', name: '桔梗花' },
+  { file: 'frame3.webp', name: '繡球花' },
+  { file: 'frame4.webp', name: '櫻花' }
 ];
 const TAG_TEXT = '我在 #遺落成華 #花森什麼鳥事 @below.regret';   // 打卡文字
 const W = 1080, H = 1920;                                           // 輸出照片大小（9:16）
@@ -324,11 +325,12 @@ window.addEventListener('pagehide', stopCam);
 <script>
 /* 左上「選單」：和小故事、線上排卡一樣 */
 (() => {
-  const b = document.querySelector('.site-menu-btn'), m = document.querySelector('.site-menu');
+  const b = document.querySelector('.menu-ico'), m = document.querySelector('.site-menu');
   const set = o => { m.classList.toggle('open', o); b.setAttribute('aria-expanded', o); };
   b.addEventListener('click', e => { e.stopPropagation(); set(!m.classList.contains('open')); });
   document.addEventListener('click', () => set(false));
 })();
 </script>
+<script src="site-fx.js?v=1119"></script>
 </body>
 </html>

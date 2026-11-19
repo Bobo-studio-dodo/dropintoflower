@@ -14,9 +14,9 @@
   - 顏色只用三種：深藍（主色、按鈕）、藍（一般文字）、紅（重點）；深藍底上用白字
 -->
 <style>
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R-site.woff2") format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M-site.woff2") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
-@font-face{font-family:"FYSong";src:url("fonts/FengYaSong-site.woff2") format("woff2");font-display:swap}  /* 猫啃网风雅宋（加寬10%網站版） */
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
+@font-face{font-family:"FYSong";src:url("fonts/FengYaSong.woff2?v=1119b") format("woff2");font-display:swap}  /* 猫啃网风雅宋（加寬 16% 網站版） */
 :root{
   --main:#3f6577;     /* 主色：深藍（按鈕、標題、色塊） */
   --text:#3d5568;     /* 一般文字：藍 */
@@ -112,9 +112,6 @@ h1{font-size:clamp(28px,1.2vw + 22px,40px);line-height:1.4;margin:4px 0 10px}
 .ok{min-height:1.6em;text-align:center;font-size:.9em}
 .band.dark .ok{color:#fff}
 
-.foot{text-align:center;padding:28px 16px calc(32px + env(safe-area-inset-bottom))}
-.foot a{color:var(--main);font-size:clamp(19px,.4vw + 17px,22px);letter-spacing:.1em}
-
 /* ───── 彈出視窗 ───── */
 .modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(30,45,55,.55)}
 .modal.show{display:flex}
@@ -188,12 +185,12 @@ h1{font-size:clamp(28px,1.2vw + 22px,40px);line-height:1.4;margin:4px 0 10px}
   .gallery{position:static}
 }
 </style>
-<link rel="stylesheet" href="site-bg.css">
+<link rel="stylesheet" href="site-bg.css?v=1119b">
 </head>
 <body>
 <div class="site-bg" aria-hidden="true"></div>
   <header class="top">
-    <button class="site-menu-btn" type="button" aria-label="選單" aria-expanded="false"><img src="images/btn-menu.png" alt="" onerror="this.parentElement.classList.add('empty')"><span class="t">選單</span></button>
+    <button class="menu-ico" type="button" aria-label="選單" aria-expanded="false"><span class="mi" aria-hidden="true"></span><span class="ml">選單</span></button>
     <nav class="site-menu"><a href="index.html">回到首頁</a><a href="#sponsor">支持我們</a></nav>
   </header>
 
@@ -399,7 +396,7 @@ function mark(){ [...thumbs.children].forEach((t, i) => t.classList.toggle('on',
 track.addEventListener('scroll', () => requestAnimationFrame(mark));
 $('#prevPh').onclick = () => go(cur() - 1);
 $('#nextPh').onclick = () => go(cur() + 1);
-setTimeout(() => { if (!shown.length){ track.innerHTML = '<div class="ph">商品照片<br>images/shop/photo1.png～photo6.png</div>';
+setTimeout(() => { if (!shown.length){ track.innerHTML = '<div class="ph">商品照片<br>images/shop/photo1～photo6.webp</div>';
   $('#prevPh').classList.add('hid'); $('#nextPh').classList.add('hid'); } }, 2500);
 $('#zoom').onclick = () => $('#zoom').classList.remove('show');
 
@@ -445,11 +442,12 @@ $('#preForm').addEventListener('submit', async e => {
 <script>
 /* 左上「選單」：和小故事、線上排卡一樣 */
 (() => {
-  const b = document.querySelector('.site-menu-btn'), m = document.querySelector('.site-menu');
+  const b = document.querySelector('.menu-ico'), m = document.querySelector('.site-menu');
   const set = o => { m.classList.toggle('open', o); b.setAttribute('aria-expanded', o); };
   b.addEventListener('click', e => { e.stopPropagation(); set(!m.classList.contains('open')); });
   document.addEventListener('click', () => set(false));
 })();
 </script>
+<script src="site-fx.js?v=1119"></script>
 </body>
 </html>

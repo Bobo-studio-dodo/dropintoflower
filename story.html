@@ -10,7 +10,7 @@
   ═════ 小故事（改版：三段、11 句）═════
   第一段｜寄給你的信：點信箱取出信 → 簽名收下 → 信打開、小知探出頭（第 1–3 句）
   第二段｜不開的那一朵：夜晚花園，點花苞看介紹 →「就是這朵」選主題（第 4–6 句）
-  第三段｜寫在羽毛上：在羽毛紙寫下遺憾 → 羽毛飄落到選的花上→ 寫好了：跟攤主排卡／線上體驗排卡；先跳過：直接到結尾
+  第三段｜寫在羽毛上：在羽毛紙寫下遺憾 → 羽毛飄落到選的花上→ 寫好了：實體體驗卡牌／線上體驗卡牌；先跳過：直接到結尾
   結尾：感謝＋神秘小禮物＋花園牆，下方回饋表單
 
   素材（images/；網頁先讀 .webp，讀不到才用同名 .png）
@@ -37,16 +37,13 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
 }
 </script>
 <style>
-  @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R-site.woff2") format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M-site.woff2") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
-  /* 使用者輸入的名字如果有網站沒用到的字，才會下載常用字版本 */
-  @font-face{font-family:"RoundedFull";src:url("fonts/GenSenRounded-R-common.woff2") format("woff2");font-display:swap;
-    unicode-range:U+3400-4DBF,U+4E00-9FFF}
-  @font-face{font-family:"FYSong";src:url("fonts/FengYaSong-site.woff2") format("woff2");font-display:swap}  /* 猫啃网风雅宋（加寬 10%） */
+  @font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-R.woff2?v=1118b") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Rounded";src:url("fonts/GenSenRounded-M.woff2?v=1118b") format("woff2");font-weight:500 700;font-display:swap}  /* 源泉圓體 GenSenRounded2（SIL OFL 授權） */
+  @font-face{font-family:"FYSong";src:url("fonts/FengYaSong.woff2?v=1119b") format("woff2");font-display:swap}  /* 猫啃网风雅宋（加寬 16%） */
   :root{
     --blue:#789baa; --deep:#4e7486; --rose:#e1beb9; --cream:#f7eed0; --blush:#f1e0e4; --lav:#ede2ef;
     --ink:#3d535d; --night:#1f2b31; --paper:#f8f5ee;
-    --font:"Rounded","RoundedFull","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    --font:"Rounded","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
     --serif:"FYSong","Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
     --top:64px;
     --em:clamp(22px,3.6vmin,38px);                     /* 對話框文字大小：手機約 22px、平板約 28–36px */
@@ -154,19 +151,8 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
     box-shadow:0 0 18px rgba(255,240,190,.7)}
 
   /* ───── 選單、跳過 ───── */
-  #menu-btn{position:fixed;top:calc(env(safe-area-inset-top) + 10px);left:calc(env(safe-area-inset-left) + 10px);z-index:50;
-    width:clamp(44px,7vmin,60px);aspect-ratio:1;padding:0;border:2.5px solid var(--blue);border-radius:50%;
-    background:rgba(247,238,208,.95);display:grid;place-items:center;overflow:hidden}
-  #menu-btn img{width:100%;height:100%;object-fit:cover;display:block}
-  #menu-btn .t{display:none;font-size:14px}
-  #menu-btn.empty img{display:none} #menu-btn.empty .t{display:block}
-  #menu{position:fixed;z-index:50;top:calc(env(safe-area-inset-top) + 74px);left:calc(env(safe-area-inset-left) + 10px);
-    display:flex;flex-direction:column;min-width:10em;padding:6px 0;border-radius:12px;
-    background:rgba(250,246,234,.97);border:1px solid rgba(78,116,134,.28);box-shadow:0 10px 28px rgba(31,43,49,.22)}
-  #menu a,#menu button{display:block;text-align:center;text-decoration:none;font-family:var(--serif);font-size:18px;letter-spacing:.24em;
-    padding:12px 26px 12px calc(26px + .24em);border:0;border-radius:0;background:none;color:#3d535d;transition:background .2s,color .2s}
-  #menu a + a,#menu a + button,#menu button + a,#menu button + button{border-top:1px solid rgba(78,116,134,.16)}
-  #menu a:hover,#menu button:hover{background:rgba(120,155,170,.12);color:var(--deep)}
+  /* 選單按鈕與清單的樣式在 site-bg.css（全站共用） */
+  #menu{display:flex}
   /* 背景音樂開關（右上角，和排卡頁一樣） */
   #music-btn{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:calc(env(safe-area-inset-right) + 10px);z-index:50;
     width:clamp(44px,7vmin,60px);aspect-ratio:1;padding:0;border:2.5px solid var(--blue);border-radius:50%;
@@ -318,7 +304,7 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
     #onsite img.ill{max-width:min(60%,380px)}
   }
 </style>
-<link rel="stylesheet" href="site-bg.css">
+<link rel="stylesheet" href="site-bg.css?v=1119b">
 </head>
 
 <body>
@@ -354,10 +340,7 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
 <div id="curtain"></div>
 
 <button id="music-btn" type="button" aria-label="背景音樂開關">♪</button>
-<button id="menu-btn" type="button" aria-label="選單" aria-expanded="false">
-  <img src="images/btn-menu.png" alt="" onerror="this.parentElement.classList.add('empty')">
-  <span class="t">選單</span>
-</button>
+<button id="menu-btn" class="menu-ico" type="button" aria-label="選單" aria-expanded="false"><span class="mi" aria-hidden="true"></span><span class="ml">選單</span></button>
 <nav id="menu" class="hid">
   <a href="index.html">回到首頁</a>
   <button type="button" id="reset">重新開始</button>
@@ -401,14 +384,14 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
   </div>
 </div>
 
-<!-- 跟攤主一起排卡 -->
+<!-- 實體體驗卡牌（跟攤主一起） -->
 <div id="onsite" class="ov hid" role="dialog" aria-modal="true">
   <div class="cbox">
     <img class="ill" src="images/onsite.png" alt="" onerror="this.classList.add('hid')">
     <p>請帶著這個畫面和你的羽毛，<br>找現場的攤主，<br>我們會陪著你一起使用卡牌。</p>
     <p class="small">過程中不需要告訴我們事情的細節，<br>只要跟著卡牌，慢慢整理自己的感受就好。</p>
     <button type="button" id="o-end" class="big">結束旅行</button>
-    <button type="button" id="o-online" class="big light">改成線上體驗排卡</button>
+    <button type="button" id="o-online" class="big light">改成線上體驗卡牌</button>
   </div>
   <div class="staff">
     <button type="button" id="o-card">查看主題卡</button>
@@ -417,7 +400,7 @@ function imgMiss(i){                 // .webp 讀不到 → 改讀同名 .png；
 </div>
 
 <!-- 結尾 -->
-<div id="endbox" class="ov hid" role="dialog" aria-modal="true">
+<div id="endbox" class="ov hid" data-fx-petals="front" role="dialog" aria-modal="true">
   <div class="cbox">
     <!-- 小知的結尾：不用逗號，一個短句一行 -->
     <p class="verse">無論你現在心裡是否帶著遺憾<br>都謝謝你今天的到來。</p>
@@ -470,7 +453,7 @@ const LINES_SKIP = [                               // 選「我想先跳過」�
   '沒關係，不用急著把它寫下來。',
   '羽毛先好好收著，你想多了解我們的卡牌嗎？可以到攤位前面參觀~'
 ];
-const BTN_ONSITE = '跟攤主一起排卡', BTN_ONLINE = '線上體驗排卡';
+const BTN_ONSITE = '實體體驗卡牌', BTN_ONLINE = '線上體驗卡牌';
 /* 結尾第三段：寫了羽毛的人／選「我想先跳過」的人看到的不一樣 */
 const END_GIFT      = '我們在現場準備了一份神秘小禮物，出示這個畫面就能向攤主領取。也歡迎把寫好的羽毛紙掛到我們的花園牆上，一起打卡拍照～';
 const END_GIFT_SKIP = '我們在現場準備了一份神秘小禮物，出示這個畫面就能向攤主領取。羽毛紙可以先帶回家，等你準備好的時候再寫下來；也歡迎到我們的花園牆前，一起打卡拍照～';
@@ -525,10 +508,10 @@ const fill = t => t.replace(/\{name\}/g, uname()).replace(/^，/, '');
 /* ───── 對話框：打字機效果＋上一句 / 下一句 ───── */
 const talk = $('#talk'), tt = $('#talk-text'), prev = $('#prev'), next = $('#next');
 const chEl = $('#choices'), ccEl = $('#cchoices');
-let Q = [], qi = 0, done = null, typing = false, tm = null, chars = [];
+let Q = [], qi = 0, done = null, typing = false, tm = null, chars = [], talkAt = 0;
 function say(list, d) {
   Q = list.map(x => typeof x === 'string' ? { t: x } : { ...x });
-  qi = 0; done = d || null; show(talk); line(false); next.focus({ preventScroll: true });
+  qi = 0; done = d || null; show(talk); talkAt = performance.now(); line(false); next.focus({ preventScroll: true });
 }
 function render(text) {
   tt.textContent = ''; chars = [];
@@ -586,7 +569,18 @@ function go(d) {
   if (++qi < Q.length) line(false);
   else { show(talk, false); const f = done; done = null; if (f) f(); }
 }
-talk.addEventListener('click', () => go(1));
+talk.addEventListener('click', e => { e.stopPropagation(); go(1); });
+// 對話框出現時，點畫面任何地方都是「下一句」（上一句只有點那幾個字才會倒回）
+document.addEventListener('click', e => {
+  if (talk.classList.contains('hid') || talk.classList.contains('menu')) return;
+  if (performance.now() - talkAt < 400) return;                       // 剛打開對話框的那一下不算
+  if (document.querySelector('.ov:not(.hid)') || !cv.classList.contains('hid')) return;
+  const sp = document.getElementById('stf-panel');
+  if (!$('#menu').classList.contains('hid') || (sp && sp.classList.contains('open'))) return;   // 選單開著時只關選單
+  // 這些按鈕在對話中也有自己的功能，點到時不算下一句；畫面上的信箱、花苞等在對話時本來就不能按，所以點到也是下一句
+  if (e.target.closest('#prev,#choices,#cchoices,#menu,#menu-btn,#music-btn,#skip,#stf-panel,#stf-btn,#stf-lock,a,input,textarea,select')) return;
+  go(1);
+});
 prev.addEventListener('click', e => { e.stopPropagation(); go(-1); });
 next.addEventListener('click', e => { e.stopPropagation(); go(1); });
 document.addEventListener('keydown', e => {
@@ -757,7 +751,8 @@ function askCards() {               // 最後一句結束後：兩個大按鈕
   });
   show(ccEl); ccEl.querySelector('button').focus({ preventScroll: true });
 }
-const toOnline = () => { location.href = 'cards.html?theme=' + encodeURIComponent(store.get('selected_theme') || ''); };
+const nav = url => window.SiteFX ? SiteFX.go(url) : (location.href = url);   // 換頁時淡出（site-fx.js）
+const toOnline = () => { nav('cards.html?theme=' + encodeURIComponent(store.get('selected_theme') || '')); };
 
 /* ═════ 彈出視窗、結尾 ═════ */
 const openBox = id => { document.querySelectorAll('.ov').forEach(e => show(e, false)); show($(id)); };
@@ -768,8 +763,8 @@ function openEnd() {
 }
 $('#o-end').addEventListener('click', openEnd);
 $('#o-online').addEventListener('click', toOnline);
-$('#end-shop').addEventListener('click', () => { location.href = 'shop.html'; });
-$('#end-home').addEventListener('click', () => { location.href = 'index.html'; });
+$('#end-shop').addEventListener('click', () => nav('shop.html'));
+$('#end-home').addEventListener('click', () => nav('index.html'));
 
 /* 工作人員用：依照使用者選的主題，滿版顯示對應的主題卡 */
 const CARD = { '友情': 'card-friend', '愛情': 'card-love', '未來規劃': 'card-future', '財務管理': 'card-money', '其他': 'card-other' };
@@ -779,9 +774,9 @@ cvImg.onerror = () => { cvImg.classList.add('hid'); show(cvPh); };
 function showCard() {
   const t = store.get('selected_theme') || '（尚未選擇主題）', f = CARD[t];
   cvPh.textContent = t;
-  const sm = document.createElement('small'); sm.textContent = f ? f + '.png' : '沒有對應的卡牌圖'; cvPh.append(sm);
+  const sm = document.createElement('small'); sm.textContent = f ? f + '.webp' : '沒有對應的卡牌圖'; cvPh.append(sm);
   show(cvPh, !f); cvImg.classList.toggle('hid', !f);
-  if (f) cvImg.src = `images/${f}.png`;
+  if (f) cvImg.src = `images/${f}.webp`;
   show(cv);
 }
 cv.addEventListener('click', () => show(cv, false));
@@ -925,7 +920,7 @@ function setupStaff(menuEl, groups, btnPos, panelPos, onOpen){
       ['羽毛飄落', inGarden(1, () => featherFall(() => say([LINE_THANKS, ...LINES_END], askCards)))],
       ['最後選擇', inGarden(1, () => { $('#b1').classList.add('lit'); askCards(); })] ]],
     ['結尾', [
-      ['現場排卡', () => { resetAll(); openBox('#onsite'); }],
+      ['實體體驗卡牌', () => { resetAll(); openBox('#onsite'); }],
       ['結束畫面', () => { resetAll(); openEnd(); }] ]],
     ['主題卡', [['友情', card('友情')], ['愛情', card('愛情')], ['未來規劃', card('未來規劃')], ['財務管理', card('財務管理')], ['其他', card('其他')]]]
   ], 'right:10px;top:calc(82px + env(safe-area-inset-top))', 'right:10px;top:calc(134px + env(safe-area-inset-top))', () => toggleMenu(false));
@@ -935,5 +930,6 @@ function setupStaff(menuEl, groups, btnPos, panelPos, onOpen){
 store.reset();
 guide(mailbox, '取出信件');
 </script>
+<script src="site-fx.js?v=1119"></script>
 </body>
 </html>
