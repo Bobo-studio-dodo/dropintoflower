@@ -279,7 +279,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .result h2{font-weight:normal;font-size:clamp(18px,4.6vw,22px);color:#4e7486;margin:4px 0 12px}
 .result p{font-size:clamp(18px,4.6vw,22px);line-height:1.75}
 
-.res-gift{margin-top:10px;color:#a85a54}
+.res-gift{margin-top:10px;color:#a85a54;text-align:center;text-wrap:balance}
 .res-shop{margin-top:16px;padding-top:14px;text-align:center}
 .res-shop p{font-size:clamp(16px,4.2vw,19px)!important;margin-bottom:10px}
 .panel2{width:min(100%,640px);background:rgba(250,244,228,.97);border-radius:20px;padding:20px 20px;
@@ -416,7 +416,8 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 /* ═════ 花園紀錄卡 ═════ */
 .record{width:min(100%,560px);display:flex;flex-direction:column;align-items:center;gap:12px}
 .rec-title{font-size:clamp(20px,5.2vw,26px);letter-spacing:.2em;color:var(--ink);background:rgba(247,238,208,.9);padding:6px 22px;border-radius:999px}
-#recImg{display:block;width:100%;height:auto;min-height:200px;border-radius:18px;box-shadow:0 12px 32px rgba(31,43,49,.22);
+/* 紀錄卡一次看得到整張：寬、高都不超過畫面（高度預留上方標題的空間），圖片依原比例縮小 */
+#recImg{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100svh - 190px);border-radius:18px;box-shadow:0 12px 32px rgba(31,43,49,.22);
   -webkit-touch-callout:default;user-select:auto;background:rgba(251,247,236,.6)}
 .rec-tip{font-size:clamp(15px,3.9vw,18px);color:var(--ink);background:rgba(247,238,208,.85);padding:4px 14px;border-radius:999px}
 @media (min-width:600px) and (max-aspect-ratio:1/1){ .record{width:min(100%,600px)} .rec-title{font-size:27px} .rec-tip{font-size:19px} }
@@ -579,7 +580,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
 .closing{color:var(--inkD)!important;text-shadow:var(--glowL)!important}
 .closing p{line-height:2;text-wrap:balance}
 .closing p + p{margin-top:18px}
-.closing .who{color:#4e7486}
+.closing .who{color:#4e7486;text-align:right;margin:22px 4% 0 0!important}
 .closing::before{background:var(--hairL)!important;width:180px!important}
 </style>
 <link rel="stylesheet" href="site-bg.css?v=1119c">
@@ -853,7 +854,7 @@ const TEXT = {
   recTip:    '長按圖片即可儲存，留下這次的紀錄',
   recTipPC:  '按下方按鈕即可下載，留下這次的紀錄',
   recSave:   '下載紀錄卡',
-  recSkillT: '這次你在心靈花園裡收穫的能力',
+  recSkillT: '此次遺憾你收穫的能力是',
   recFrom:   '來自影響你最深的因素',
   recStateT: '現在的你能夠做到的',
   recTipT:   '可以繼續練習的方向',
@@ -883,7 +884,7 @@ const TEXT = {
   fbWait:    '剛剛已經收到你的回饋囉，稍等一分鐘再送吧～',
 
   spTitle: '支持我們',
-  spText:  '歡迎支持我們！可以私訊 IG 贊助，或到現場購買周邊 🌷',
+  spText:  '歡迎私訊我們或是現場購買相關周邊~',
   spBtn:   '看看支持方式',
   soon:    '即將開放'
 };
@@ -1477,12 +1478,13 @@ function showResult(){
   $('#recTitle').textContent = TEXT.recTitle;
   $('#recTip').textContent = matchMedia('(hover:hover) and (pointer:fine)').matches ? TEXT.recTipPC : TEXT.recTip;
   $('#recSave').textContent = TEXT.recSave;
-  $('#recImg').alt = `${TEXT.recSkillT}：${f.skill}。${TEXT.recStateT}：${f.state[lv]}。${TEXT.recTipT}：${f.tip[lv]}`;
+  $('#recImg').alt = `${TEXT.recSkillT}${f.skill}。${TEXT.recStateT}：${f.state[lv]}。${TEXT.recTipT}：${f.tip[lv]}`;
   makeRecord(top, f, lv, total);
   $('#resGift').textContent = TEXT.resGift;
   $('#shopText').innerHTML = TEXT.shopText;
   const verse = t => t.replace(/。(?!$)/g, '。，').split('，').filter(Boolean).join('<br>');   // 不用逗號，一個短句一行
-  $('#resEnd').innerHTML = '<p class="who">小知</p>' + TEXT.closing.concat(fromStory ? [TEXT.closingFeather] : []).map(t => `<p>${verse(t)}</p>`).join('');
+  // 小知的署名放在最後，像信尾的落款
+  $('#resEnd').innerHTML = TEXT.closing.concat(fromStory ? [TEXT.closingFeather] : []).map(t => `<p>${verse(t)}</p>`).join('') + '<p class="who">—— 小知</p>';
   $('#shopBtn').textContent = FILES.shop ? TEXT.shopBtn : TEXT.soon; $('#shopBtn').disabled = !FILES.shop;
   lastResult = { theme: THEMES[theme] ? THEMES[theme].name : '', score: total,
     card: top.code, factor: f.name, level: lv + 1 };
