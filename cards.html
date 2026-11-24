@@ -95,6 +95,14 @@ img{-webkit-user-drag:none;user-select:none}
 #loadText{font-size:clamp(19px,4.8vw,24px);
   background:rgba(247,238,208,.85);padding:8px 22px;border-radius:999px}
 #loadText.ready{animation:breathe 2.2s ease-in-out infinite}
+/* 開始之前：一行小字＋了解更多 */
+#notice{margin:0;max-width:min(92vw,520px);text-align:center;font-size:clamp(13.5px,3.4vw,16px);line-height:1.7;color:#4c6470;text-shadow:var(--glowL);text-wrap:balance}
+#noticeMore{margin-left:.4em;padding:6px 2px;border:0;background:none;font:inherit;color:#3f6577;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.notice-box{text-align:left}
+.notice-box h3{margin:0 0 10px;text-align:center;font-family:"FYSong","Noto Serif TC",serif;font-weight:normal;font-size:clamp(21px,5vw,25px);letter-spacing:.12em;color:#3f6577}
+.notice-box p{font-size:clamp(16px,4vw,19px);line-height:1.8;margin-bottom:12px}
+.notice-box .sign{text-align:right;color:#4e7486;margin:4px 0 14px}
+.notice-box .btn{display:block;margin:0 auto}
 @keyframes breathe{0%,100%{opacity:1}50%{opacity:.45}}
 
 /* ---------- 對話 ---------- */
@@ -601,6 +609,7 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
   <section class="screen show" id="s-load">
     <div class="cover" id="cover"><img class="c1" alt=""><img class="c2" alt=""></div>
     <p id="loadText">花園準備中…</p>
+    <p id="notice"><span id="noticeLine"></span><button type="button" id="noticeMore"></button></p>
   </section>
 
   <!-- 知更鳥對話 -->
@@ -752,6 +761,13 @@ body.noseed .seed::after{content:"";display:block;width:60%;height:75%;margin:12
   <button class="btn" id="reviewClose" style="margin-top:10px">關閉</button>
 </div></div>
 
+<!-- 開始之前（點「了解更多」才出現） -->
+<div class="modal" id="noticeModal" role="dialog" aria-modal="true" aria-labelledby="noticeTitle"><div class="box notice-box">
+  <h3 id="noticeTitle"></h3>
+  <div id="noticeBody"></div>
+  <button class="btn" id="noticeClose"></button>
+</div></div>
+
 <!-- 放大看卡 -->
 <div class="modal" id="zoomModal"><div id="zoomBody"></div></div>
 
@@ -780,6 +796,17 @@ const FILES = {
 const TEXT = {
   loading: '花園準備中…',
   ready:   '輕觸畫面，開始探索',
+  // 開始之前：開場畫面下方的一行小字＋「了解更多」，點開才看到全文
+  noticeLine:  '這是一段陪你整理自己的體驗，不是占卜。',
+  noticeMore:  '了解更多',
+  noticeTitle: '在開始之前',
+  noticeText: [
+    '《遺落成華》是一套陪你回頭看看遺憾、整理自己的卡牌，不是占卜，也不是心理諮商或診斷。卡牌給出的能力與方向，只是一個讓你停下來想一想的起點，沒有對錯，也不代表你的全部。',
+    '過程中如果覺得難受，隨時可以停下來。若心裡的大石頭一直放不下，請找信任的人聊聊，或撥打 1925 安心專線（24 小時、免付費）。',
+    '你留下的回饋與「如果」都是匿名的，只會使用在此次的畢業製作展覽中。'
+  ],
+  noticeSign:  '——花森什麼鳥事',
+  noticeClose: '我知道了',
 
   prep: [
     '歡迎來到心靈花園～',
@@ -1114,7 +1141,10 @@ async function preload(){
   (async () => { for (let i = 0; i < later.length; i += 4) await Promise.all(later.slice(i, i + 4).map(s => loadImg(s, 20000))); })();
 
   const lt = $('#loadText'); lt.textContent = TEXT.ready; lt.classList.add('ready');
-  $('#s-load').addEventListener('click', start, {once:true});
+  $('#s-load').addEventListener('click', function go(e){
+    if (e.target.closest('#notice')) return;              // 點「了解更多」不算開始
+    $('#s-load').removeEventListener('click', go); start();
+  });
 }
 
 /* ---------- 音樂與選單 ---------- */
@@ -1660,6 +1690,14 @@ $('#fbSend').onclick = async () => {
 };
 
 /* 贊助 */
+/* 開始之前（開場畫面的一行小字＋了解更多） */
+$('#noticeLine').textContent = TEXT.noticeLine; $('#noticeMore').textContent = TEXT.noticeMore;
+$('#noticeTitle').textContent = TEXT.noticeTitle; $('#noticeClose').textContent = TEXT.noticeClose;
+$('#noticeBody').innerHTML = TEXT.noticeText.map(t => `<p>${t}</p>`).join('') + `<p class="sign">${TEXT.noticeSign}</p>`;
+$('#noticeMore').addEventListener('click', e => { e.stopPropagation(); $('#noticeModal').classList.add('show'); $('#noticeClose').focus(); });
+$('#noticeClose').addEventListener('click', e => { e.stopPropagation(); $('#noticeModal').classList.remove('show'); });
+$('#noticeModal').addEventListener('click', e => { e.stopPropagation(); if (e.target.id === 'noticeModal') e.currentTarget.classList.remove('show'); });
+
 function setupSponsor(){
   $('#spTitle').textContent = TEXT.spTitle; $('#spText').textContent = TEXT.spText;
   $('#spBtn').textContent = FILES.sponsor ? TEXT.spBtn : TEXT.soon; $('#spBtn').disabled = !FILES.sponsor;

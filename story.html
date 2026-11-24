@@ -17,8 +17,8 @@
   信箱      mailbox2（有信）、mailbox（取出信後的空信箱）
   信封      letter-close、letter-open（1000×1000；小知從信封開口探出頭）
   小知      keeper1
-  花園背景  garden-night（電腦，2400×1350）、garden-night-m（手機，1080×1920）
-  花苞      bud1-down 洋甘菊、bud2-down 桔梗花、bud3-down 繡球花、bud4-down 櫻花、bud-seed 種子（高 520）
+  花園背景  用全站的雲朵天空（site-bg.css）＋下方綠色草地（CSS 畫的 .meadow），不用圖
+  花朵      flower1 洋甘菊、flower2 桔梗花、flower3 繡球花、flower4 櫻花（正方形）、bud-seed 種子；五個一樣大，手機直放 3＋2 兩排、橫放一排
             「看過」「微亮」不用另外畫，用程式調整亮度與光暈
   介紹卡圖  flower1～flower4（正方形，網頁版 1000×1000）
   羽毛      feather（300×600）
@@ -57,9 +57,16 @@ function imgMiss(i){                 // 圖片讀不到：顯示佔位框
     -webkit-tap-highlight-color:transparent;user-select:none;
     background:var(--bg) center/cover no-repeat;background-color:#cfdbe1;
   }
-  body.garden{--bg:url("images/garden-night.webp")}
-  body.garden .site-bg{opacity:0}
-  @media (max-aspect-ratio:1/1){ body.garden{--bg:url("images/garden-night-m.webp")} }
+  /* 花園畫面：沿用全站的雲朵天空，下方加一片綠色草地（.meadow），像走進花園裡 */
+  .meadow{position:fixed;left:0;right:0;bottom:0;height:68vh;z-index:-1;pointer-events:none;opacity:0;transition:opacity .9s ease;
+    background:
+      radial-gradient(ellipse 70% 40% at 12% 84%,rgba(122,166,118,.95) 0 62%,rgba(122,166,118,0) 70%),
+      radial-gradient(ellipse 64% 36% at 88% 88%,rgba(132,174,124,.95) 0 60%,rgba(132,174,124,0) 69%),
+      radial-gradient(ellipse 95% 58% at 50% 96%,rgba(150,188,138,.92) 0 62%,rgba(150,188,138,0) 72%),
+      radial-gradient(ellipse 120% 70% at 30% 92%,rgba(178,205,160,.85) 0 60%,rgba(178,205,160,0) 74%),
+      radial-gradient(ellipse 120% 72% at 78% 90%,rgba(196,216,178,.8) 0 58%,rgba(196,216,178,0) 74%);
+    -webkit-mask-image:linear-gradient(to top,#000 72%,transparent);mask-image:linear-gradient(to top,#000 72%,transparent)}
+  body.garden .meadow{opacity:1}
   .hid{display:none!important}
   button{font:inherit;color:inherit;cursor:pointer}
 
@@ -106,8 +113,8 @@ function imgMiss(i){                 // 圖片讀不到：顯示佔位框
   /* ───── 第二、三段：夜晚花園 ───── */
   /* 花園：上面小知，下面五個一樣大的格子（--slot），花苞在格子裡等比例放大、底部對齊。
      手機/平板直式：3＋2 兩排；電腦/橫放：一排 5 個 */
-  .wall{--slot:min(30vw,calc(var(--sh) * .34));display:grid;justify-content:center;align-content:center;
-    grid-template-columns:repeat(6,calc(var(--slot) / 2));column-gap:2vw;row-gap:calc(var(--slot) * .06);
+  .wall{--slot:min(28vw,calc(var(--sh) * .34));display:grid;justify-content:center;align-content:center;
+    grid-template-columns:repeat(6,calc(var(--slot) / 2));column-gap:1.6vw;row-gap:calc(var(--slot) * .06);
     grid-template-areas:"k k k k k k" "a a b b c c" ". d d e e ." "t t t t t t"}
   @media (min-aspect-ratio:1/1){
     .wall{--slot:min(17vw,calc(var(--sh) * .5));grid-template-columns:repeat(5,var(--slot));
@@ -118,23 +125,22 @@ function imgMiss(i){                 // 圖片讀不到：顯示佔位框
   .it img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;pointer-events:none}
   #gkeeper{grid-area:k;height:calc(var(--slot) * .95);width:calc(var(--slot) * 1.1)}
   #b1{grid-area:a} #b2{grid-area:b} #b3{grid-area:c} #b4{grid-area:d} #b5{grid-area:e}
-  #b4 img{max-width:96%}           /* 櫻花是橫的小枝，放寬一點 */
-  #b5{height:calc(var(--slot) * .8);align-self:end}   /* 種子小一點 */
+  .bud{align-items:center}                       /* 五朵花一樣大（正方形格子），整齊排列 */
   #gkeeper img{filter:drop-shadow(0 4px 8px rgba(31,43,49,.3))}
   /* 花苞：還沒看過＝垂頭、暗；看過＝抬頭、亮一點；選到＝原色；羽毛落下後＝發光 */
   .bud{transform-origin:50% 100%;rotate:-6deg;transition:rotate .6s,filter .6s,opacity .6s}
-  .bud img{filter:grayscale(.75) brightness(.62) saturate(.8);transition:filter .6s}
+  .bud img{filter:grayscale(.65) brightness(.88) contrast(.9);opacity:.85;transition:filter .6s,opacity .6s}
   .bud.seen{rotate:0deg}
-  .bud.seen img{filter:grayscale(.2) brightness(.92)}
+  .bud.seen img{filter:grayscale(.2) brightness(.97);opacity:1}
   .bud.chosen{rotate:0deg}
-  .bud.chosen img{filter:none}
+  .bud.chosen img{filter:none;opacity:1}
   .bud.dim{opacity:.45}
   .bud.lit img{filter:drop-shadow(0 0 10px rgba(255,244,200,.95)) drop-shadow(0 0 26px rgba(255,236,170,.75));animation:lit 2.4s ease-in-out infinite}
   @keyframes lit{50%{filter:drop-shadow(0 0 16px rgba(255,248,215,1)) drop-shadow(0 0 40px rgba(255,236,170,.9))}}
   .pick .bud{cursor:pointer}
   .pick .bud:hover{translate:0 -4px}
-  #pickTip{grid-area:t;justify-self:center;margin:calc(var(--slot) * .08) 0 0;white-space:nowrap;text-align:center;font-size:max(17px,calc(var(--em) * .8));color:var(--cream);
-    text-shadow:0 0 3px var(--ink),0 1px 8px rgba(31,43,49,.7);pointer-events:none}
+  #pickTip{grid-area:t;justify-self:center;margin:calc(var(--slot) * .08) 0 0;white-space:nowrap;text-align:center;font-size:max(17px,calc(var(--em) * .8));color:#34505d;
+    letter-spacing:.08em;text-shadow:0 0 4px #fff,0 0 10px rgba(255,255,255,.95),0 0 18px rgba(255,255,255,.8);pointer-events:none}
   /* 羽毛飄落：像鐘擺一樣左右擺盪、往擺動方向傾斜，越接近花越慢；落下後化成光點融進花裡 */
   #feather{position:fixed;left:0;top:0;z-index:29;width:calc(var(--slot,90px) * .2);pointer-events:none;opacity:0;will-change:transform,opacity}
   #feather img{width:100%;display:block;   /* 羽毛圖和花園背景同色系：飄落時調亮並加柔光，才看得清楚 */
@@ -227,6 +233,24 @@ function imgMiss(i){                 // 圖片讀不到：顯示佔位框
     font-size:max(15px,calc(var(--em) * .66))!important;color:var(--deep)}
   #in-text{font-family:var(--serif);font-size:max(16px,calc(var(--em) * .72))!important;line-height:1.85!important}
 
+  /* 羽毛書寫卡：一張羽毛紙，可以直接打字 */
+  #note .nbox{width:min(92vw,calc(var(--em) * 22),620px);max-height:92svh;overflow:auto;padding:26px 22px 18px;border-radius:24px;text-align:center;outline:none;
+    background:linear-gradient(180deg,rgba(252,249,240,.97),rgba(246,240,226,.97));box-shadow:0 18px 50px rgba(20,30,36,.35)}
+  #note-q{margin:0 0 14px;font-family:var(--serif);font-size:max(18px,calc(var(--em) * .82));line-height:1.75;color:var(--deep);text-wrap:pretty}
+  #note .paper{position:relative;display:block;text-align:left;padding:14px 16px 10px 16px;border-radius:16px;cursor:text;
+    background:#fffdf7;border:1px solid rgba(78,116,134,.22);box-shadow:inset 0 1px 6px rgba(78,116,134,.08);overflow:hidden}
+  #note .nf{position:absolute;right:-6px;top:-10px;height:115%;width:auto;opacity:.18;pointer-events:none;rotate:14deg}
+  #note-pre{position:relative;display:block;font-family:var(--serif);font-size:max(19px,calc(var(--em) * .86));color:var(--accent,#a85a54);letter-spacing:.08em}
+  #note-txt{position:relative;display:block;width:100%;margin-top:4px;border:0;outline:none;resize:none;background:transparent;
+    font-family:var(--serif);font-size:max(18px,calc(var(--em) * .8));line-height:2;color:var(--ink);user-select:text;
+    background-image:repeating-linear-gradient(transparent 0 calc(2em - 1px),rgba(78,116,134,.25) calc(2em - 1px) 2em);background-attachment:local}
+  #note-txt::placeholder{color:rgba(61,83,93,.45)}
+  #note .paper:focus-within{border-color:rgba(78,116,134,.5)}
+  #note-tip{margin:10px 0 6px;font-size:max(14px,calc(var(--em) * .6));line-height:1.6;color:#5d7480;text-wrap:pretty}
+  #note .big{background:var(--deep);color:#fff;text-shadow:none;box-shadow:0 3px 0 rgba(61,83,93,.2)}
+  #note .big.light{background:transparent;color:var(--deep);border:1px solid rgba(78,116,134,.45);box-shadow:none}
+  #note.arming .big{opacity:.45} #note .big{transition:opacity .3s}
+
   /* 現場排卡、結尾 */
   #onsite{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
   #onsite .cbox{max-height:100%}
@@ -301,6 +325,7 @@ function imgMiss(i){                 // 圖片讀不到：顯示佔位框
 
 <body>
 <div class="site-bg" aria-hidden="true"></div>
+<div class="meadow" aria-hidden="true"></div>
 <main>
   <!-- 第一段：寄給你的信 -->
   <section class="stage" id="s1">
@@ -319,10 +344,10 @@ function imgMiss(i){                 // 圖片讀不到：顯示佔位框
   <section class="stage hid" id="s2">
     <div class="wall" id="garden">
       <div class="it" id="gkeeper"><img src="images/keeper1.webp" alt="" onerror="imgMiss(this)"></div>
-      <button class="it bud" id="b1" type="button" data-n="1" aria-label="洋甘菊"><img src="images/bud1-down.webp" alt="" onerror="imgMiss(this)"></button>
-      <button class="it bud" id="b2" type="button" data-n="2" aria-label="桔梗花"><img src="images/bud2-down.webp" alt="" onerror="imgMiss(this)"></button>
-      <button class="it bud" id="b3" type="button" data-n="3" aria-label="繡球花"><img src="images/bud3-down.webp" alt="" onerror="imgMiss(this)"></button>
-      <button class="it bud" id="b4" type="button" data-n="4" aria-label="櫻花"><img src="images/bud4-down.webp" alt="" onerror="imgMiss(this)"></button>
+      <button class="it bud" id="b1" type="button" data-n="1" aria-label="洋甘菊"><img src="images/flower1.webp" alt="" onerror="imgMiss(this)"></button>
+      <button class="it bud" id="b2" type="button" data-n="2" aria-label="桔梗花"><img src="images/flower2.webp" alt="" onerror="imgMiss(this)"></button>
+      <button class="it bud" id="b3" type="button" data-n="3" aria-label="繡球花"><img src="images/flower3.webp" alt="" onerror="imgMiss(this)"></button>
+      <button class="it bud" id="b4" type="button" data-n="4" aria-label="櫻花"><img src="images/flower4.webp" alt="" onerror="imgMiss(this)"></button>
       <button class="it bud" id="b5" type="button" data-n="5" aria-label="種子"><img src="images/bud-seed.webp" alt="" onerror="imgMiss(this)"></button>
       <p id="pickTip" class="hid">點一朵花，看看它連著哪一種課題</p>
     </div>
@@ -373,6 +398,18 @@ function imgMiss(i){                 // 圖片讀不到：顯示佔位框
     <p id="in-text"></p>
     <button type="button" id="in-yes" class="big">就是這朵</button>
     <button type="button" id="in-no" class="big light">再看看</button>
+  </div>
+</div>
+
+<!-- 羽毛書寫卡 -->
+<div id="note" class="ov hid" role="dialog" aria-modal="true" aria-labelledby="note-q">
+  <div class="nbox" tabindex="-1">
+    <p id="note-q"></p>
+    <label class="paper"><img class="nf" src="images/feather.webp" alt="" onerror="this.remove()">
+      <span id="note-pre"></span><textarea id="note-txt" maxlength="80" rows="4"></textarea></label>
+    <p id="note-tip"></p>
+    <button type="button" id="note-ok" class="big"></button>
+    <button type="button" id="note-skip" class="big light"></button>
   </div>
 </div>
 
@@ -436,9 +473,13 @@ const LINES2 = [                                   // 第二段｜不開的那�
 const LINE_OPEN  = '打開信封吧！信封裡有一片我的羽毛';
 const LINE_WRITE = '在羽毛上的「如果那時」寫下遺憾的事情，像是說你做了什麼決定，又或是想做卻沒做什麼？';
 const BTN_WROTE = '我寫好了', BTN_SKIPWRITE = '我想先跳過';
+// 羽毛書寫卡：可以直接在畫面上的羽毛紙打字（不打也可以，現場的人可以寫在實體羽毛紙上）
+const NOTE_PRE   = '如果那時，';
+const NOTE_PH    = '寫下那件讓你放不下的事……';
+const NOTE_TIP   = '在攤位現場的話，也可以寫在你手上的羽毛紙；這裡留白也沒關係。寫下的字只會留在這支手機上。';
 const LINE_THANKS = '謝謝你願意把它寫下來。';
 const LINES_END = [
-  '要不要帶著這片羽毛，用卡牌一起看看那時候的事？',
+  '要不要帶著羽毛，和我一起使用卡牌看看那時候的事情？',
   '讓我們一起慢慢放下對當初那些未發生的想像與糾結，踏實眼前的旅途，重新找回花園裡的繁榮。'
 ];
 const LINES_SKIP = [                               // 選「我想先跳過」時說的話（說完直接到結尾）
@@ -446,6 +487,7 @@ const LINES_SKIP = [                               // 選「我想先跳過」�
   '羽毛先好好收著，你想多了解我們的卡牌嗎？可以到攤位前面參觀~'
 ];
 const BTN_ONSITE = '實體體驗卡牌', BTN_ONLINE = '線上體驗卡牌';
+const BTN_PICK = '就是這朵', BTN_PICK_SEED = '就是這顆了';          // 花朵介紹卡的確定按鈕
 /* 結尾第三段：寫了羽毛的人／選「我想先跳過」的人看到的不一樣 */
 const END_GIFT      = '我們在現場準備了一份神秘小禮物，出示這個畫面就能向攤主領取。也歡迎把寫好的羽毛紙掛到我們的花園牆上，一起打卡拍照～';
 const END_GIFT_SKIP = '我們在現場準備了一份神秘小禮物，出示這個畫面就能向攤主領取。羽毛紙可以先帶回家，等你準備好的時候再寫下來；也歡迎到我們的花園牆前，一起打卡拍照～';
@@ -630,7 +672,7 @@ function submitName() {
 function openLetter() {            // 信打開、小知探出頭，開始第 1–3 句
   envImg.src = 'images/letter-open.webp';
   setTimeout(() => letter.classList.add('peek'), 250);
-  preload(['garden-night.webp', 'garden-night-m.webp', 'bud1-down.webp', 'bud2-down.webp', 'bud3-down.webp', 'bud4-down.webp', 'bud-seed.webp', 'feather.webp']);
+  preload(['flower1.webp', 'flower2.webp', 'flower3.webp', 'flower4.webp', 'bud-seed.webp', 'feather.webp']);
   setTimeout(() => say(LINES1, toGarden), reduce ? 0 : 1100);
 }
 $('#ok').addEventListener('click', submitName);
@@ -645,7 +687,6 @@ let chosen = 0;
 function setGarden() {
   show($('#s1'), false); show($('#s2')); document.body.classList.add('garden');
   store.set('story_stage', 'garden');
-  preload(['flower1.webp', 'flower2.webp', 'flower3.webp', 'flower4.webp']);
 }
 function toGarden() { fade(() => { setGarden(); setTimeout(() => say(LINES2, startPick), 400); }); }
 function startPick() { garden.classList.add('pick'); show($('#pickTip')); }
@@ -662,6 +703,7 @@ function openIntro(n) {
   $('#in-title').textContent = d.title; $('#in-one').textContent = d.one;
   $('#in-lang').textContent = d.lang ? '花語：' + d.lang : ''; show($('#in-lang'), !!d.lang);
   $('#in-text').textContent = d.text;
+  $('#in-yes').textContent = n === 5 ? BTN_PICK_SEED : BTN_PICK;      // 種子用「顆」
   show(intro); intro.querySelector('.cbox').scrollTop = 0; $('#in-yes').focus({ preventScroll: true });
 }
 $('#in-no').addEventListener('click', () => {               // 再看看：關掉介紹卡，花苞微微抬頭（看過了）
@@ -679,12 +721,26 @@ function choose(n) {
 }
 
 /* ═════ 第三段：寫在羽毛上 ═════ */
-function askWrite() {
-  say([LINE_OPEN, { t: LINE_WRITE, center: true, choices: [
-    { label: BTN_WROTE, go: () => { skipped = false; featherFall(() => say([LINE_THANKS, ...LINES_END], askCards)); } },
-    { label: BTN_SKIPWRITE, go: () => { skipped = true; say(LINES_SKIP, openEnd); } }
-  ] }]);
+function askWrite() { say([LINE_OPEN], openNote); }
+/* 羽毛書寫卡：一張畫面就好（提示＋可以打字的羽毛紙＋寫好了／先跳過），不再另外跳對話框 */
+const note = $('#note'), noteTxt = $('#note-txt');
+function openNote() {
+  $('#note-q').textContent = fill(LINE_WRITE); $('#note-pre').textContent = NOTE_PRE;
+  noteTxt.placeholder = NOTE_PH; $('#note-tip').textContent = NOTE_TIP;
+  $('#note-ok').textContent = BTN_WROTE; $('#note-skip').textContent = BTN_SKIPWRITE;
+  try { noteTxt.value = localStorage.getItem('feather_text') || ''; } catch (e) { noteTxt.value = ''; }
+  show(note); note.querySelector('.nbox').scrollTop = 0; note.querySelector('.nbox').focus({ preventScroll: true });
+  const btns = [$('#note-ok'), $('#note-skip')];            // 防止點太快：出現後 0.8 秒才能按
+  btns.forEach(b => b.disabled = true); note.classList.add('arming');
+  setTimeout(() => { btns.forEach(b => b.disabled = false); note.classList.remove('arming'); }, 800);
 }
+$('#note-ok').addEventListener('click', () => {
+  const t = noteTxt.value.trim();
+  try { t ? localStorage.setItem('feather_text', t) : localStorage.removeItem('feather_text'); } catch (e) {}
+  noteTxt.blur(); show(note, false); skipped = false;
+  featherFall(() => say([LINE_THANKS, ...LINES_END], askCards));
+});
+$('#note-skip').addEventListener('click', () => { noteTxt.blur(); show(note, false); skipped = true; say(LINES_SKIP, openEnd); });
 /* 高峰：羽毛從小知身上飄下來，像鐘擺一樣左右擺盪落到選的花上，再化成光點融進花裡，花亮起來 */
 function featherFall(after) {
   const bud = $('#b' + chosen), f = $('#feather');

@@ -124,7 +124,7 @@ const TEXT = {
   boardFail: '網路好像不太穩，請再試一次。',
   boardMax: 40,                                         // 最多幾個字
   // 回應別人的「如果」：點跑馬燈上的一句，跳出小卡，選一句溫柔的回應送給他（可以改字、增減句子）
-  mqHint: '點跑馬燈上的任何一句，送一句溫柔的話給寫下它的人',
+  mqHint: '輕點上面飄過的任何一句「如果」，<br>把一句溫柔的話，送給寫下它的人',   // 跑馬燈下方的引導（<br> 是換行）
   replies: ['我也有過', '抱抱那時候的你', '你已經走很遠了'],
   replyHint: '點一句你想說的，把祝福送給他',
   replyDone: '送出了，謝謝你的溫柔',
@@ -292,8 +292,8 @@ const TEXT = {
   .hero.play .hero-text .lead{animation-delay:6.05s}
   .hero.play .hero-text .hero-btns{animation-delay:6.2s}
   .hero.play .hero-text .dedi{animation-delay:6s}
-  .hero.play .swap .from{animation:swapOut .5s ease 5.15s both}
-  .hero.play .swap .to{animation:swapIn .5s ease 5.15s both}
+  .hero.play .swap .from{animation:swapOut .5s ease 6.15s both}   /* 「如果」多停一秒再變成「此刻」 */
+  .hero.play .swap .to{animation:swapIn .5s ease 6.15s both}
   @keyframes swapOut{from{opacity:1}to{opacity:0}}
   @keyframes swapIn{from{opacity:0}to{opacity:1}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -350,7 +350,15 @@ const TEXT = {
   .marquee .mq-i:hover{color:var(--accent)}
   .marquee .mq-i:focus-visible{outline:2px solid var(--main);outline-offset:4px}
   .marquee.paused .row{animation-play-state:paused}
-  .mq-hint{margin-top:clamp(18px,2.4vw,26px)!important}
+  /* 跑馬燈下方的引導：箭頭往上輕輕跳，提醒去點上面的句子 */
+  .mq-hint{margin:clamp(18px,2.4vw,26px) auto 0!important;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;
+    font-family:var(--serif);font-size:clamp(17px,.5vw + 15px,21px)!important;line-height:1.7;letter-spacing:.08em;color:var(--accent)!important;text-shadow:var(--glow)}
+  .mq-hand{font-family:var(--sans);font-size:1.3em;line-height:1;animation:mqHand 1.6s ease-in-out infinite}
+  @keyframes mqHand{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(-7px);opacity:1}}
+  /* 跑馬燈裡每隔幾秒，有一句會亮一下，吸引大家去點 */
+  .marquee .mq-i.ping{animation:mqPing 1.8s ease}
+  @keyframes mqPing{0%,100%{color:inherit;text-shadow:var(--glow)}35%,65%{color:var(--accent);text-shadow:0 0 12px rgba(255,255,255,1),0 0 22px rgba(255,236,220,.9)}}
+  @media (prefers-reduced-motion:reduce){ .mq-hand,.marquee .mq-i.ping{animation:none} }
   /* 回應小卡：霧面淺色卡，上下細線，不用框 */
   .reply-ov{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;
     background:rgba(214,226,232,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:rIn .35s ease}
@@ -423,7 +431,7 @@ const TEXT = {
     text-wrap:pretty;line-break:strict;min-height:0;flex:1}
   .face.back .tx::-webkit-scrollbar{width:3px} .face.back .tx::-webkit-scrollbar-thumb{background:rgba(63,101,119,.35);border-radius:3px}
   @media (max-width:599px){ .flip{aspect-ratio:3/5.2} .face.back{padding:12px 9px} }
-  @media (orientation:portrait) and (min-width:600px){ .face.back .th{font-size:25px} .face.back .one{font-size:19.5px} .face.back .tx{font-size:21px} }
+  @media (orientation:portrait) and (min-width:600px){ .flip{aspect-ratio:3/4.9} .face.back .th{font-size:25px} .face.back .one{font-size:19.5px} .face.back .tx{font-size:21px} }
 
   .keeper-say{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:760px;margin:clamp(36px,5vw,60px) auto 0}
   .keeper-say img{width:clamp(130px,22vw,220px);height:auto}
@@ -552,7 +560,7 @@ const TEXT = {
         <p class="msg" id="boardMsg" role="status"></p>
       </form>
       <div class="marquee" id="marquee" aria-label="大家寫下的如果"><div class="row" id="mq1"></div><div class="row r2" id="mq2"></div><div class="row r3" id="mq3"></div></div>
-      <p class="hint mq-hint" data-t="mqHint"></p>
+      <p class="mq-hint"><span class="mq-hand" aria-hidden="true">↑</span><span data-t="mqHint"></span></p>
     </section>
 
     <!-- 回應小卡：點跑馬燈上的一句時出現 -->
@@ -647,7 +655,7 @@ $('#stepList').innerHTML = TEXT.steps.map(s => `<li class="reveal"><h3>${s.t}</h
 
 /* 四朵花：點一下翻面，再點一次翻回來（鍵盤也可以用） */
 $('#flipList').innerHTML = TEXT.flowers.map(f => `
-  <button class="flip reveal" type="button" aria-pressed="false" aria-label="${f.name}｜${f.theme}，點一下看主題介紹">
+  <div class="flip reveal" role="button" tabindex="0" aria-pressed="false" aria-label="${f.name}｜${f.theme}，點一下看主題介紹">
     <span class="in">
       <span class="face front">
         <img src="${f.img}" alt="" width="1000" height="1000" loading="lazy">
@@ -659,7 +667,7 @@ $('#flipList').innerHTML = TEXT.flowers.map(f => `
         <span class="tx">${f.text}</span>
       </span>
     </span>
-  </button>`).join('');
+  </div>`).join('');   /* 用 div 而不是 button：平板（iPad）在 button 裡的文字沒辦法上下滑動 */
 document.querySelectorAll('.flip').forEach(b => {
   const inner = b.querySelector('.in');
   b.addEventListener('click', () => {
@@ -670,6 +678,7 @@ document.querySelectorAll('.flip').forEach(b => {
     b.setAttribute('aria-pressed', on);
     if (on && matchMedia('(prefers-reduced-motion: reduce)').matches) b.classList.add('flat');
   });
+  b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); b.click(); } });
   inner.addEventListener('transitionend', e => {
     if (e.target === inner && e.propertyName === 'transform' && b.getAttribute('aria-pressed') === 'true') b.classList.add('flat');
   });
@@ -720,6 +729,19 @@ function drawMarquee(){
   $('#mq1').innerHTML = row(a); $('#mq2').innerHTML = row(b); $('#mq3').innerHTML = row(c);
 }
 drawMarquee();
+// 每隔幾秒讓畫面上的一句亮一下（只在留言板出現在畫面時）
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  const mq = $('#marquee'); let seen = false;
+  new IntersectionObserver(es => { seen = es[0].isIntersecting; }).observe(mq);
+  setInterval(() => {
+    if (!seen || mq.classList.contains('paused')) return;
+    const box = mq.getBoundingClientRect();
+    const vis = [...mq.querySelectorAll('.mq-i')].filter(s => { const r = s.getBoundingClientRect(); return r.left > box.left + 20 && r.right < box.right - 20; });
+    const s = vis[Math.random() * vis.length | 0]; if (!s) return;
+    s.classList.remove('ping'); void s.offsetWidth; s.classList.add('ping');
+  }, 3200);
+})();
 
 // 讀最新的留言（最多等 1.2 秒，開場不會因此變慢）
 let boardCounts = {};                 // 每一句收到的回應次數：{ 留言: { 回應: 次數 } }

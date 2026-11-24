@@ -164,6 +164,7 @@ const FRAMES = [                       // 濾鏡框：檔名放在 images/frames
   { file: 'frame4.webp', name: '櫻花' }
 ];
 const TAG_TEXT = '我在 #遺落成華 #花森什麼鳥事 @below.regret';   // 打卡文字
+const DATE_STAMP = true;          // 拍完的照片右下角寫上日期（像拍立得的手寫紀錄）；不要的話改成 false
 const W = 1080, H = 1920;                                           // 輸出照片大小（9:16）
 
 /* =========================================================
@@ -265,6 +266,26 @@ $('#file').onchange = e => {
   img.src = URL.createObjectURL(f); e.target.value = '';
 };
 
+/* 日期標籤：寫在相框下方的邊框上，靠右，微微傾斜像手寫；依邊框顏色自動用深色或白色字 */
+async function stampDate(g){
+  const d = new Date(), t = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  const y = 1866, x = W - 74, font = '46px "FYSong", "Noto Serif TC", serif';
+  try { await document.fonts.load(font, t); } catch(e) {}
+  let dark = true;
+  try {                                     // 看邊框亮不亮：亮的用深色字，暗的用白字
+    const px = g.getImageData(W - 420, 1828, 360, 76).data; let s = 0;
+    for (let i = 0; i < px.length; i += 16) s += .299 * px[i] + .587 * px[i + 1] + .114 * px[i + 2];
+    dark = s / (px.length / 16) > 165;
+  } catch(e) {}
+  g.save(); g.translate(x, y); g.rotate(-.035);
+  g.font = font; g.textAlign = 'right'; g.textBaseline = 'middle';
+  if ('letterSpacing' in g) g.letterSpacing = '4px';
+  g.shadowColor = dark ? 'rgba(255,255,255,.6)' : 'rgba(40,30,50,.45)'; g.shadowBlur = 6;
+  g.fillStyle = dark ? '#4a4038' : '#fffaf2';
+  g.fillText(t, 0, 0);
+  g.restore();
+}
+
 /* 合成：照片置中裁切成 9:16，再疊上濾鏡框 */
 async function compose(src){
   const sw = src.videoWidth || src.naturalWidth || src.width, sh = src.videoHeight || src.naturalHeight || src.height;
@@ -274,6 +295,7 @@ async function compose(src){
   g.drawImage(src, (W - dw) / 2, (H - dh) / 2, dw, dh);
   const fr = await ensureFrame(frameIdx);
   if (fr) g.drawImage(fr, 0, 0, W, H);
+  if (DATE_STAMP) await stampDate(g);
   try { lastBlob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .92)); }
   catch(e){ setView('cam'); msg.textContent = '直接開檔案時無法合成照片，放上網站（https）後就可以了'; return; }
   if (lastUrl) URL.revokeObjectURL(lastUrl);
