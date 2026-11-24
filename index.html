@@ -405,16 +405,19 @@ const TEXT = {
   @media (min-width:900px){ .steps{grid-template-columns:repeat(3,1fr)} }
 
   /* ═══════════════ 6. 心靈花園（四朵花可以翻面） ═══════════════ */
-  .flips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2.4vw,26px);max-width:1080px;margin:clamp(22px,3.4vw,40px) auto 0}
+  .flips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:clamp(12px,2.4vw,26px);max-width:1080px;margin:clamp(22px,3.4vw,40px) auto 0}
   @media (min-width:900px){ .flips{grid-template-columns:repeat(4,minmax(0,1fr))} }
   .sec .hint{margin-top:14px;font-size:clamp(15px,.3vw + 14px,17px);color:var(--main);letter-spacing:.12em;opacity:.85}
   .flip{position:relative;display:block;width:100%;aspect-ratio:3/4.4;padding:0;border:0;background:none;cursor:pointer;perspective:1000px;font:inherit;color:inherit;text-align:center}
   .flip .in{position:absolute;inset:0;transition:transform .7s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
   .flip[aria-pressed="true"] .in{transform:rotateY(180deg)}
   /* 翻完之後改成平面顯示，平板上背面的字才不會糊（3D 翻轉中的畫面會被瀏覽器降解析度） */
-  .flip.flat .in{transition:none;transform:none}
-  .flip.flat .face.front{visibility:hidden}
-  .flip.flat .face.back{transform:none}
+  /* 翻完之後：卡片往下長高，把整段內文都展開，用整個頁面滑動來看，不用在小框框裡滑（手機、平板都好滑） */
+  .flip.flat{aspect-ratio:auto}
+  .flip.flat .in{position:relative;inset:auto;transition:none;transform:none}
+  .flip.flat .face.front{display:none}
+  .flip.flat .face.back{position:relative;inset:auto;transform:none;min-height:var(--h0,0px)}
+  .flip.flat .face.back .tx{overflow:visible;flex:none;-webkit-mask-image:none;mask-image:none;padding-bottom:4px}
   .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 12px;
     -webkit-backface-visibility:hidden;backface-visibility:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
     background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.16))}
@@ -670,17 +673,18 @@ $('#flipList').innerHTML = TEXT.flowers.map(f => `
   </div>`).join('');   /* 用 div 而不是 button：平板（iPad）在 button 裡的文字沒辦法上下滑動 */
 document.querySelectorAll('.flip').forEach(b => {
   const inner = b.querySelector('.in');
+  const open = () => { b.style.setProperty('--h0', b.offsetHeight + 'px'); b.classList.add('flat'); };   // 展開內文，至少和原本一樣高
   b.addEventListener('click', () => {
     const on = b.getAttribute('aria-pressed') !== 'true';
     if (!on && b.classList.contains('flat')){       // 先無動畫地回到 3D 背面，再翻回正面
       inner.style.transition = 'none'; b.classList.remove('flat'); void inner.offsetWidth; inner.style.transition = '';
     }
     b.setAttribute('aria-pressed', on);
-    if (on && matchMedia('(prefers-reduced-motion: reduce)').matches) b.classList.add('flat');
+    if (on && matchMedia('(prefers-reduced-motion: reduce)').matches) open();
   });
   b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); b.click(); } });
   inner.addEventListener('transitionend', e => {
-    if (e.target === inner && e.propertyName === 'transform' && b.getAttribute('aria-pressed') === 'true') b.classList.add('flat');
+    if (e.target === inner && e.propertyName === 'transform' && b.getAttribute('aria-pressed') === 'true') open();
   });
 });
 
